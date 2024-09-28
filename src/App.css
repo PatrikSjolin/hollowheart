@@ -1,0 +1,107 @@
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.container {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  text-align: center;
+}
+
+h1 {
+  color: #333;
+}
+
+/* Health Progress Bar */
+.health-bar-container {
+  margin-bottom: 20px;
+}
+
+.health-bar {
+  width: 100%;
+  background-color: #ccc;
+  border-radius: 25px;
+  height: 30px;
+  overflow: hidden;
+}
+
+#healthBarFill {
+  height: 100%;
+  background-color: #4CAF50;
+  width: 100%; /* Initial width */
+  border-radius: 25px;
+}
+
+/* Character Button */
+.character-btn {
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  background-color: #008CBA;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.character-btn:hover {
+  background-color: #007B9E;
+}
+
+/* Overlay Styles */
+.overlay {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.8); /* Dark background for overlay */
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 9999; /* Ensure it appears above other content */
+}
+
+.overlay-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  position: relative; /* Add this */
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 24px;
+  cursor: pointer;
+  color: black; /* Ensure the color is visible against the background */
+}
+
+/* Log */
+#log {
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  min-height: 100px;
+  overflow-y: auto;
+  max-height: 200px;
+}
+
+/* Input for Player Name */
+input[type="text"] {
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  width: 80%;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
