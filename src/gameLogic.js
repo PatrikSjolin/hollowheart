@@ -5,7 +5,7 @@ export class Character {
       this.dexterity = initialState.dexterity || 10;
       this.vitality = initialState.vitality || 10;
       this.intelligence = initialState.intelligence || 10;
-      this.health = initialState.health || 100;
+      this.health = this.calculateMaxHealth();
       this.currentHealth = initialState.currentHealth || 100;
       this.iron = initialState.iron || 0;
       this.gold = initialState.gold || 0;
@@ -22,6 +22,11 @@ export class Character {
       saveToLocalStorage(this);
       this.logMessage = logMessage;
     }
+
+      // Calculate max health based on vitality (10 HP per point of vitality)
+  calculateMaxHealth() {
+    return this.vitality * 10;
+  }
 
       // Regenerate health based on lifeRegen stat
   regenerateHealth() {
@@ -85,6 +90,17 @@ export class Character {
                 }
             }, explorationRate);
         }
+    }
+
+    useHealingPotion() {
+      if (this.coins >= 10) {
+        this.currentHealth = Math.min(this.health, this.currentHealth + 100);
+        this.coins -= 10;
+        this.saveToLocalStorage(this);
+      }
+      else{
+
+      }
     }
 
     // Method to simulate encountering a hazard
@@ -154,6 +170,9 @@ export class Character {
         if (this.unallocatedPoints > 0) {
           this[stat] += 1; // Increment the stat
           this.unallocatedPoints -= 1; // Reduce the available points
+          if (stat === 'vitality') {
+            this.health = this.calculateMaxHealth();
+          }
           this.logMessage(`Upgraded ${stat}. Remaining points: ${this.unallocatedPoints}`);
           this.saveToLocalStorage(this);
         } else {

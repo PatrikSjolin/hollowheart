@@ -25,21 +25,21 @@ const App = () => {
 
   const [playerName, setPlayerName] = useState(""); // Add player name state
 
-    // Load character state from localStorage when the app first loads
-    useEffect(() => {
-      const savedCharacter = localStorage.getItem('characterState');
-      console.log("Loading character:", character);
-      if (savedCharacter) {
-        const parsedCharacter = JSON.parse(savedCharacter);
-        setFirstTimeOverlayVisible(false); // Hide intro if character exists
-        setCharacter(new Character(saveToLocalStorage, logMessage, parsedCharacter)); // Load character from storage
-      } else {
-        const newCharacter = new Character(saveToLocalStorage, logMessage); // Create new character if none exists
-        setCharacter(newCharacter);
-      }
-    }, []);
-    
-      // Life regeneration - 1 HP every 20 seconds
+  // Load character state from localStorage when the app first loads
+  useEffect(() => {
+    const savedCharacter = localStorage.getItem('characterState');
+    console.log("Loading character:", character);
+    if (savedCharacter) {
+      const parsedCharacter = JSON.parse(savedCharacter);
+      setFirstTimeOverlayVisible(false); // Hide intro if character exists
+      setCharacter(new Character(saveToLocalStorage, logMessage, parsedCharacter, )); // Load character from storage
+    } else {
+      const newCharacter = new Character(saveToLocalStorage, logMessage); // Create new character if none exists
+      setCharacter(newCharacter);
+    }
+  }, []);
+
+  // Life regeneration - 1 HP every 20 seconds
   useEffect(() => {
     if (character) {
       const regenInterval = setInterval(() => {
@@ -50,9 +50,9 @@ const App = () => {
       return () => clearInterval(regenInterval); // Clean up on unmount
     }
   }, [character]);
-  
-    // Guard clause to prevent rendering before character is initialized
-    if (!character) return <div>Loading...</div>;
+
+  // Guard clause to prevent rendering before character is initialized
+  if (!character) return <div>Loading...</div>;
 
 
 
@@ -80,12 +80,12 @@ const App = () => {
       <p>Coins: {character.coins}</p>
 
       <button className="character-btn" onClick={() => toggleOverlay(setCharacterOverlayVisible)}>
-  Character Stats
-</button>
+        Character Stats
+      </button>
 
-<button className="explore-btn" onClick={() => toggleOverlay(setShopOverlayVisible)}>
-  Open Shop
-</button>
+      <button className="explore-btn" onClick={() => toggleOverlay(setShopOverlayVisible)}>
+        Open Shop
+      </button>
 
       <button className="explore-btn" onClick={() => character.startExploring()}>Descend into the Hole</button>
       <button className="explore-btn" onClick={() => character.ascend()}>Ascend</button>
@@ -97,40 +97,39 @@ const App = () => {
       </div>
 
       {characterOverlayVisible && (
-  <CharacterOverlay 
-    character={character} 
-    setCharacter={setCharacter} 
-    setCharacterOverlayVisible={setCharacterOverlayVisible} 
-  />
-)}
+        <CharacterOverlay
+          character={character}
+          setCharacter={setCharacter}
+          setCharacterOverlayVisible={setCharacterOverlayVisible}
+        />
+      )}
 
-{shopOverlayVisible && (
-  <ShopOverlay 
-    character={character} 
-    setCharacter={setCharacter} 
-    setShopOverlayVisible={setShopOverlayVisible} 
-  />
-)}
+      {shopOverlayVisible && (
+        <ShopOverlay
+          character={character}
+          setCharacter={setCharacter}
+          setShopOverlayVisible={setShopOverlayVisible}
+        />
+      )}
 
 
-
-{firstTimeOverlayVisible && (
-  <div className="overlay">
-    <div className="overlay-content">
-      <h2>Welcome to Hollowheart</h2>
-      <p>A mysterious hole has appeared beside your village, plaguing and poisoning the land. Brave souls have ventured into its depths, never to return.</p>
-      <p>Now it's your turn. Will you survive the descent?</p>
-      <p>This is a dangerous and unforgiving journey. Only the strongest and most resilient will make it out alive.</p>
-      <input 
-        type="text" 
-        placeholder="Your name" 
-        value={playerName} 
-        onChange={(e) => setPlayerName(e.target.value)} 
-      />
-      <button onClick={() => startGame(playerName)}>Start Game</button> {/* Add Start Button */}
-    </div>
-  </div>
-)}
+      {firstTimeOverlayVisible && (
+        <div className="overlay">
+          <div className="overlay-content">
+            <h2>Welcome to Hollowheart</h2>
+            <p>A mysterious hole has appeared beside your village, plaguing and poisoning the land. Brave souls have ventured into its depths, never to return.</p>
+            <p>Now it's your turn. Will you survive the descent?</p>
+            <p>This is a dangerous and unforgiving journey. Only the strongest and most resilient will make it out alive.</p>
+            <input
+              type="text"
+              placeholder="Your name"
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+            />
+            <button onClick={() => startGame(playerName)}>Start Game</button> {/* Add Start Button */}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
