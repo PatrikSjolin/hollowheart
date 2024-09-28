@@ -31,21 +31,25 @@ const App = () => {
       console.log("Loading character:", character);
       if (savedCharacter) {
         const parsedCharacter = JSON.parse(savedCharacter);
+        setFirstTimeOverlayVisible(false); // Hide intro if character exists
         setCharacter(new Character(saveToLocalStorage, logMessage, parsedCharacter)); // Load character from storage
       } else {
         const newCharacter = new Character(saveToLocalStorage, logMessage); // Create new character if none exists
         setCharacter(newCharacter);
       }
     }, []);
-  
-    // Save character state to localStorage whenever it changes
-    useEffect(() => {
-      if (character) {
-        console.log("Character state before saving to localStorage:", character);
-        saveToLocalStorage(character);
-      }
-    }, [character]);
     
+      // Life regeneration - 1 HP every 20 seconds
+  useEffect(() => {
+    if (character) {
+      const regenInterval = setInterval(() => {
+        character.regenerateHealth();
+        setCharacter(character); // Update the character state after regeneration
+      }, 20000); // 20 seconds
+
+      return () => clearInterval(regenInterval); // Clean up on unmount
+    }
+  }, [character]);
   
     // Guard clause to prevent rendering before character is initialized
     if (!character) return <div>Loading...</div>;

@@ -14,19 +14,19 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible 
       <div>
         <button onClick={() => {
           character.upgradeStat('strength');
-          setCharacter({ ...character });
+          setCharacter(character);
         }}>Upgrade Strength</button>
         <button onClick={() => {
           character.upgradeStat('dexterity');
-          setCharacter({ ...character });
+          setCharacter(character);
         }}>Upgrade Dexterity</button>
         <button onClick={() => {
           character.upgradeStat('vitality');
-          setCharacter({ ...character });
+          setCharacter(character);
         }}>Upgrade Vitality</button>
         <button onClick={() => {
           character.upgradeStat('intelligence');
-          setCharacter({ ...character });
+          setCharacter(character);
         }}>Upgrade Intelligence</button>
       </div>
     </div>

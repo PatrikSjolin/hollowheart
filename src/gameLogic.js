@@ -16,11 +16,21 @@ export class Character {
       this.depth = initialState.depth || 0;
       this.isExploring = initialState.isExploring || false;
       this.buildings = initialState.buildings || { wood: 0, stone: 0 };
+      this.lifeRegen = initialState.lifeRegen || 1; // Add life regeneration stat (1 HP every 20 seconds)
   
       this.saveToLocalStorage = saveToLocalStorage;
       saveToLocalStorage(this);
       this.logMessage = logMessage;
     }
+
+      // Regenerate health based on lifeRegen stat
+  regenerateHealth() {
+    if (this.currentHealth < this.health) {
+      this.currentHealth = Math.min(this.currentHealth + this.lifeRegen, this.health);
+      this.logMessage(`Regenerated ${this.lifeRegen} health. Current health: ${this.currentHealth}`);
+      this.saveToLocalStorage(this); // Save state after regeneration
+    }
+  }
 
     // Method to start exploring (descend)
     startExploring() {
@@ -139,8 +149,6 @@ export class Character {
         }
         this.saveToLocalStorage(this); // Update React state
     }
-
-    
 
     upgradeStat(stat) {
         if (this.unallocatedPoints > 0) {
