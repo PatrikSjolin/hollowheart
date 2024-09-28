@@ -1,5 +1,5 @@
 export class Character {
-    constructor(updateState, logMessage, initialState = {}) {
+    constructor(saveToLocalStorage, logMessage, initialState = {}) {
       this.level = initialState.level || 1;
       this.strength = initialState.strength || 10;
       this.dexterity = initialState.dexterity || 10;
@@ -17,7 +17,8 @@ export class Character {
       this.isExploring = initialState.isExploring || false;
       this.buildings = initialState.buildings || { wood: 0, stone: 0 };
   
-      this.updateState = updateState;
+      this.saveToLocalStorage = saveToLocalStorage;
+      saveToLocalStorage(this);
       this.logMessage = logMessage;
     }
 
@@ -37,7 +38,7 @@ export class Character {
             this.isExploring = false;
             this.logMessage(`You ascend back to the surface.`);
             this.depth = 0;
-            this.updateState(this); // Trigger React state update
+            this.saveToLocalStorage(this); // Trigger React state update
         }
     }
 
@@ -69,7 +70,7 @@ export class Character {
                         this.levelUp();
                     }
 
-                    this.updateState(this); // Update React state
+                    this.saveToLocalStorage(this); // Update React state
                     this.explore(); // Continue exploring
                 }
             }, explorationRate);
@@ -91,7 +92,7 @@ export class Character {
                 this.die();
             }
 
-            this.updateState(this); // Update React state
+            this.saveToLocalStorage(this); // Update React state
         }
     }
 
@@ -110,7 +111,7 @@ export class Character {
         this.level += 1;
         this.unallocatedPoints += 5; // Allocate stat points
         this.logMessage(`Level up! You are now level ${this.level} and gained 5 unallocated stat points.`);
-        this.updateState(this); // Update React state
+        this.saveToLocalStorage(this); // Update React state
     }
 
     // Method to convert resources to coins
@@ -136,15 +137,17 @@ export class Character {
                 this.diamonds = 0;
                 break;
         }
-        this.updateState(this); // Update React state
+        this.saveToLocalStorage(this); // Update React state
     }
+
+    
 
     upgradeStat(stat) {
         if (this.unallocatedPoints > 0) {
           this[stat] += 1; // Increment the stat
           this.unallocatedPoints -= 1; // Reduce the available points
           this.logMessage(`Upgraded ${stat}. Remaining points: ${this.unallocatedPoints}`);
-          this.updateState(this); // Update React state
+          this.saveToLocalStorage(this);
         } else {
           this.logMessage(`No unallocated points available.`);
         }
@@ -166,7 +169,7 @@ export class Character {
       this.logMessage(`Not enough coins to buy ${type} generator.`);
     }
 
-    this.updateState(this); // Update the state so React knows to re-render
+    this.saveToLocalStorage(this);
   }
 
   // Method to generate resources over time
@@ -189,7 +192,7 @@ export class Character {
           this.gold += resourceAmount[type]; // Gold for stone generators
         }
         this.logMessage(`Generated ${resourceAmount[type]} ${type}.`);
-        this.updateState(this); // Update state to reflect generated resources
+        this.saveToLocalStorage(this);
       }
     }, resourceGenerationRates[type] * 1000); // Convert seconds to milliseconds
   }

@@ -5,6 +5,12 @@ import { Character } from './gameLogic'; // Import character logic
 
 import './App.css'; // Use existing styles from your CSS
 
+// Define saveToLocalStorage function to be used across the app
+const saveToLocalStorage = (character) => {
+  console.log("Saving character to localStorage:", character);
+  localStorage.setItem('characterState', JSON.stringify(character));
+};
+
 const App = () => {
   const [character, setCharacter] = useState(null); // Initialize as null to avoid premature access
   const [log, setLog] = useState([]);
@@ -22,24 +28,29 @@ const App = () => {
     // Load character state from localStorage when the app first loads
     useEffect(() => {
       const savedCharacter = localStorage.getItem('characterState');
+      console.log("Loading character:", character);
       if (savedCharacter) {
         const parsedCharacter = JSON.parse(savedCharacter);
-        setCharacter(new Character(setCharacter, logMessage, parsedCharacter)); // Load character from storage
+        setCharacter(new Character(saveToLocalStorage, logMessage, parsedCharacter)); // Load character from storage
       } else {
-        const newCharacter = new Character(setCharacter, logMessage); // Create new character if none exists
+        const newCharacter = new Character(saveToLocalStorage, logMessage); // Create new character if none exists
         setCharacter(newCharacter);
       }
-    }, []); // Empty dependency array ensures this runs only once, on mount
+    }, []);
   
     // Save character state to localStorage whenever it changes
     useEffect(() => {
       if (character) {
-        localStorage.setItem('characterState', JSON.stringify(character));
+        console.log("Character state before saving to localStorage:", character);
+        saveToLocalStorage(character);
       }
-    }, [character]); // This runs whenever the character state updates
+    }, [character]);
+    
   
     // Guard clause to prevent rendering before character is initialized
     if (!character) return <div>Loading...</div>;
+
+
 
   const startGame = (name) => {
     character.playerName = name;
