@@ -168,7 +168,7 @@ const App = () => {
           <p>Diamonds: {character.diamonds}</p>
           <p>Coins: {character.coins}</p>
           <p>Wood: {character.wood} / {character.maxWood}</p>
-          <p>Stone: {character.stone}</p>
+          <p>Stone: {character.stone} / {character.maxStone}</p>
         </section>
       )}
       

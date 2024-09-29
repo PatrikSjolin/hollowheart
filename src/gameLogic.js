@@ -24,7 +24,8 @@ export class Character {
     this.treasureTimer = 0;
     this.hazardTimer = 0;
     this.woodTimer = 0;
-    this.maxWood = 100;  // Initial maximum amount of wood
+    this.maxWood = initialState.maxWood || 100;  // Initial maximum amount of wood
+    this.maxStone = initialState.maxStone || 100;  // Initial maximum amount of stone
     this.stoneTimer = 0;
     this.saveToLocalStorage = saveToLocalStorage;
     saveToLocalStorage(this);
@@ -199,12 +200,13 @@ export class Character {
 
       // Add the building and apply its effect
       this.buildings.push(building);
-      //building.applyEffect(this);
+      building.applyEffect(this);
 
       console.log(`Bought a ${building.name}`);
     } else {
       console.log('Not enough resources.');
     }
+    this.saveToLocalStorage(this);
   }
 
   unlockFeature(feature) {
@@ -288,7 +290,7 @@ export class Building {
       character.maxStone += this.effect.stone || 0;
     } else if (this.type === 'feature') {
       // Unlock features, e.g., research center
-      character.unlockFeature(this.name);
+      // character.unlockFeature(this.name);
     }
   }
 }
