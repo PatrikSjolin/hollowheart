@@ -332,3 +332,47 @@ h1 {
   cursor: not-allowed;
   opacity: 0.6;
 }
+
+/* Flexbox layout for the building block */
+.building-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+/* Building name styling */
+.building-name {
+  flex: 1;
+  font-size: 1.2rem;
+  color: #fff;
+  margin-right: 10px;
+}
+
+/* Building cost styling */
+.building-cost {
+  flex: 2;
+  font-size: 1rem;
+  color: #ccc;
+  margin-right: 10px;
+}
+
+/* Purchase button styling */
+.shop-button {
+  padding: 8px 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.shop-button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
+}

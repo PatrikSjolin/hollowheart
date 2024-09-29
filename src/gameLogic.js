@@ -293,7 +293,6 @@ export class Building {
   }
 }
 
-
 // Define the array of buildings
 export const buildings = [
   new Building(
@@ -309,14 +308,14 @@ export const buildings = [
     { productionRate: 3 }
   ),
   new Building(
-    'Storage Warehouse',
-    { wood: 200, stone: 50, coins: 100 },
+    'Wood Warehouse',
+    { wood: 100, stone: 50, coins: 300 },
     'storage',
-    { wood: 1000, stone: 500 }  // Increases max wood/stone storage
+    { wood: 200 }  // Increases max wood/stone storage
   ),
   new Building(
-    'Research Center',
-    { wood: 500, coins: 300, iron: 50 },
+    'Library',
+    { wood: 300, coins: 300, iron: 50 },
     'feature',
     { unlocks: 'research' }  // Unlocks research for upgrades
   ),

@@ -184,14 +184,10 @@ const App = () => {
       {/* Action Buttons */}
       {character && (
         <section className="actions-section">
-          <button className="character-btn" onClick={() => setCharacterOverlayVisible(!characterOverlayVisible)}>
-            Character Stats
-          </button>
-
+          <button className="character-btn" onClick={() => setCharacterOverlayVisible(!characterOverlayVisible)}>Character Stats</button>
           <button className="explore-btn" onClick={() => character.startExploring()}>
             {character.isExploring ? 'Descend Deeper ↓' : 'Descend into the Hole ↓'}
           </button>
-
           <button
             className={`explore-btn ${!character.isExploring ? 'disabled' : ''}`}
             onClick={() => {
@@ -202,14 +198,10 @@ const App = () => {
             Ascend ↑
           </button>
 
-          <button className="shop-btn" onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>
-            Open Shop
-          </button>
+          <button className="shop-btn" onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>Shop</button>
 
           {/* Give Up Button */}
-          <button className="give-up-btn" onClick={resetGame}>
-            Give Up
-          </button>
+          <button className="give-up-btn" onClick={resetGame}>Give Up</button>
         </section>
       )}
       {/* Log Section */}
