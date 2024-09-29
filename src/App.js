@@ -87,6 +87,13 @@ const App = () => {
   return (
     <div className="container">
       <h1>Hollowheart</h1>
+
+    {/* Character Name and Level Section */}
+    <section className="character-info">
+      <p>{character.playerName}</p>
+      <p>Level: {character.level}</p>
+    </section>
+
       <p>Current Depth: {character.depth}</p>
 
     {/* Sun Element */}

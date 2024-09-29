@@ -54,11 +54,11 @@ export class Character {
 
   // Method to start exploring (descend)
   startExploring() {
-    if (!this.isExploring) {
+    // if (!this.isExploring) {
       this.isExploring = true;
       this.depth += 1; // Start at depth 1 or go deeper
       this.logMessage(`You descend to depth ${this.depth}`);
-    }
+    // }
   }
 
   // Method to ascend (stop exploring)
@@ -110,10 +110,10 @@ export class Character {
   // Method to simulate encountering a hazard
   encounterHazard() {
     const hazardChance = Math.random(); // Random chance to encounter a hazard
-    const dangerLevel = this.depth * 3; // Increased danger scaling
+    const dangerLevel = this.depth * 6; // Increased danger scaling
 
-    if (hazardChance < 0.6) { // Increased chance of a hazard occurring (60%)
-      const damage = Math.floor(Math.random() * dangerLevel) + 10; // Hazard deals more damage (min 10)
+    if (hazardChance < 0.7) { // Increased chance of a hazard occurring (60%)
+      const damage = Math.floor(Math.random() * dangerLevel) + 20; // Hazard deals more damage (min 10)
       this.currentHealth -= damage;
       this.logMessage(`You encountered a hazard and took ${damage} damage! Current health: ${this.currentHealth}.`);
 
