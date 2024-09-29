@@ -177,6 +177,7 @@ useEffect(() => {
       <button className="explore-btn" onClick={() => character.startExploring()}>
         {character.isExploring ? 'Descend Deeper ↓' : 'Descend into the Hole ↓'}
       </button>
+      
       <button
         className={`explore-btn ${!character.isExploring ? 'disabled' : ''}`}
         onClick={() => {
@@ -232,6 +233,8 @@ useEffect(() => {
               placeholder="Your name"
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
+              autoFocus
+              className="name-input"
             />
             <button onClick={() => startGame(playerName)}>Start Game</button> {/* Add Start Button */}
           </div>

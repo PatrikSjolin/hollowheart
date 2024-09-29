@@ -298,3 +298,16 @@ h1 {
   background-color: #555;
   opacity: 0.6;
 }
+
+/* Name Input Field */
+.name-input {
+  width: 80%;
+  padding: 12px;
+  margin-top: 15px;
+  margin-bottom: 20px; /* Adds space between the input field and the button */
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1.2rem;
+  background-color: #f8f8f8;
+  color: #333;
+}
