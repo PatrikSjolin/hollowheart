@@ -95,12 +95,11 @@ export class Character {
         this.encounterHazard();
 
         // Check if it's time to level up
-        if (this.experience >= this.level * 200) {
+        if (this.experience >= Math.floor(200 * Math.pow(1.5, this.level - 1))) {
           this.levelUp();
         }
         this.hazardTimer = this.hazardTimer - hazardInterval;
       }
-      //this.saveToLocalStorage(this); // Update React state
     }
   }
 
