@@ -18,6 +18,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => (
       <h3>Buy Buildings</h3>
       <button onClick={() => {character.buyBuilding('wood'); setCharacter(character); }}>Buy Wood Generator (100 Coins)</button>
       <button onClick={() => { character.buyBuilding('stone'); setCharacter(character); }}>Buy Stone Generator (150 Coins)</button>
+      <button onClick={() => { character.buyBuilding('iron'); setCharacter(character); }}>Buy Iron Generator (150 Coins, 30 wood, 20 stone)</button>
       <h3>Buy items</h3>
       <button onClick={() => { character.useHealingPotion(); setCharacter(character);}}>Buy Health Potion (+100 hp) (10 Coins)</button>
     </div>

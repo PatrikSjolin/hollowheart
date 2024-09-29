@@ -20,7 +20,13 @@ const App = () => {
 
   // Logging function
   const logMessage = (message) => {
-    setLog((prevLog) => [...prevLog, message]);
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    const timestamp = `[${hours}:${minutes}:${seconds}] `;
+
+    setLog((prevLog) => [...prevLog, `${timestamp}${message}`]);
   };
 
   const [playerName, setPlayerName] = useState(""); // Add player name state
@@ -32,29 +38,43 @@ const App = () => {
     if (savedCharacter) {
       const parsedCharacter = JSON.parse(savedCharacter);
       setFirstTimeOverlayVisible(false); // Hide intro if character exists
-      setCharacter(new Character(saveToLocalStorage, logMessage, parsedCharacter, )); // Load character from storage
+      setCharacter(new Character(saveToLocalStorage, logMessage, parsedCharacter,)); // Load character from storage
     } else {
       const newCharacter = new Character(saveToLocalStorage, logMessage); // Create new character if none exists
       setCharacter(newCharacter);
     }
   }, []);
 
-  // Life regeneration - 1 HP every 20 seconds
+  // Game loop to handle resource gathering, life regen, exploration, hazards
   useEffect(() => {
     if (character) {
-      const regenInterval = setInterval(() => {
-        character.regenerateHealth();
-        setCharacter(character); // Update the character state after regeneration
-      }, 20000); // 20 seconds
+      let lastTimestamp = Date.now(); // Keep track of the last loop tick
+      const gameLoop = setInterval(() => {
 
-      return () => clearInterval(regenInterval); // Clean up on unmount
+        const currentTimestamp = Date.now();
+        const elapsedTime = (currentTimestamp - lastTimestamp) / 1000; // Convert to seconds
+        lastTimestamp = currentTimestamp;
+
+        // Life regeneration
+        character.regenerateHealth(elapsedTime);
+
+        // Resource gathering (e.g., from buildings)
+        character.generateResources(elapsedTime);
+
+        // Exploration and hazard checks
+        character.checkExplorationProgress(elapsedTime);  // Explore and handle hazards
+
+        // Update character and save to localStorage
+        setCharacter(character);
+        saveToLocalStorage(character);
+      }, 1000); // Game loop runs every 1 second
+
+      return () => clearInterval(gameLoop); // Cleanup on component unmount
     }
   }, [character]);
 
   // Guard clause to prevent rendering before character is initialized
   if (!character) return <div>Loading...</div>;
-
-
 
   const startGame = (name) => {
     character.playerName = name;
@@ -78,6 +98,8 @@ const App = () => {
       <p>Gold: {character.gold}</p>
       <p>Diamonds: {character.diamonds}</p>
       <p>Coins: {character.coins}</p>
+      <p>Stone: {character.stone}</p>
+      <p>Wood: {character.wood}</p>
 
       <button className="character-btn" onClick={() => toggleOverlay(setCharacterOverlayVisible)}>
         Character Stats
@@ -91,9 +113,11 @@ const App = () => {
       <button className="explore-btn" onClick={() => character.ascend()}>Ascend</button>
 
       <div id="log">
-        {log.map((message, index) => (
-          <p key={index}>{message}</p>
-        ))}
+        <section className="log-section">
+          {log.slice(0).reverse().map((message, index) => (
+            <p key={index}>{message}</p>
+          ))}
+        </section>
       </div>
 
       {characterOverlayVisible && (
@@ -111,7 +135,6 @@ const App = () => {
           setShopOverlayVisible={setShopOverlayVisible}
         />
       )}
-
 
       {firstTimeOverlayVisible && (
         <div className="overlay">

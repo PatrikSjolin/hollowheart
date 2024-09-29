@@ -17,7 +17,11 @@ export class Character {
       this.isExploring = initialState.isExploring || false;
       this.buildings = initialState.buildings || { wood: 0, stone: 0 };
       this.lifeRegen = initialState.lifeRegen || 1; // Add life regeneration stat (1 HP every 20 seconds)
-  
+      this.wood = initialState.wood || 0;
+      this.stone = initialState.stone || 0;
+      this.regenTimer = 0; // Initialize regen timer for health regeneration
+    this.woodTimer = 0;
+    this.stoneTimer = 0;
       this.saveToLocalStorage = saveToLocalStorage;
       saveToLocalStorage(this);
       this.logMessage = logMessage;
@@ -29,12 +33,19 @@ export class Character {
   }
 
       // Regenerate health based on lifeRegen stat
-  regenerateHealth() {
-    if (this.currentHealth < this.health) {
-      this.currentHealth = Math.min(this.currentHealth + this.lifeRegen, this.health);
-      this.logMessage(`Regenerated ${this.lifeRegen} health. Current health: ${this.currentHealth}`);
-      this.saveToLocalStorage(this); // Save state after regeneration
-    }
+  regenerateHealth(elapsedTime) {
+    this.regenTimer += elapsedTime;
+
+    if(this.regenTimer >= 20){
+      if (this.currentHealth < this.health) {
+        this.currentHealth = Math.min(this.currentHealth + this.lifeRegen, this.health);
+        this.logMessage(`Regenerated ${this.lifeRegen} health. Current health: ${this.currentHealth}`);
+        this.saveToLocalStorage(this); // Save state after regeneration
+      }
+      this.regenTimer = this.regenTimer - 20;
+  }
+  
+  this.saveToLocalStorage(this);
   }
 
     // Method to start exploring (descend)
@@ -57,38 +68,37 @@ export class Character {
         }
     }
 
+    checkExplorationProgress(elapsedTime){
+      this.explore(elapsedTime);
+    }
+
     // Exploration mechanism - gathering resources, finding items, gaining experience, and encountering hazards
-    explore() {
+    explore(elapsedTime) {
         if (this.isExploring) {
             const explorationRate = 1000; // Set how often (milliseconds) exploration events happen
-            setTimeout(() => {
-                if (this.isExploring) {
-                    // Simulate finding resources and gaining experience
-                    const resourceFound = {
-                        iron: Math.floor(Math.random() * 5),
-                        gold: Math.floor(Math.random() * 3),
-                        diamonds: Math.floor(Math.random() * 1),
-                    };
-                    this.iron += resourceFound.iron;
-                    this.gold += resourceFound.gold;
-                    this.diamonds += resourceFound.diamonds;
+              // Simulate finding resources and gaining experience
+              const resourceFound = {
+                  iron: Math.floor(Math.random() * 5),
+                  gold: Math.floor(Math.random() * 3),
+                  diamonds: Math.floor(Math.random() * 1),
+              };
+              this.iron += resourceFound.iron;
+              this.gold += resourceFound.gold;
+              this.diamonds += resourceFound.diamonds;
 
-                    const expGained = Math.floor(Math.random() * 20) + 5; // Random exp gained
-                    this.experience += expGained;
-                    this.logMessage(`You found ${resourceFound.iron} iron, ${resourceFound.gold} gold, and ${resourceFound.diamonds} diamonds, and gained ${expGained} experience.`);
+              const expGained = Math.floor(Math.random() * 20) + 5; // Random exp gained
+              this.experience += expGained;
+              this.logMessage(`You found ${resourceFound.iron} iron, ${resourceFound.gold} gold, and ${resourceFound.diamonds} diamonds, and gained ${expGained} experience.`);
 
-                    // Check for hazards (enemies or environments)
-                    this.encounterHazard();
+              // Check for hazards (enemies or environments)
+              this.encounterHazard();
 
-                    // Check if it's time to level up
-                    if (this.experience >= this.level * 100) {
-                        this.levelUp();
-                    }
+              // Check if it's time to level up
+              if (this.experience >= this.level * 100) {
+                  this.levelUp();
+              }
 
-                    this.saveToLocalStorage(this); // Update React state
-                    this.explore(); // Continue exploring
-                }
-            }, explorationRate);
+              this.saveToLocalStorage(this); // Update React state
         }
     }
 
@@ -191,11 +201,24 @@ export class Character {
       this.coins -= buildingCosts[type];
       this.buildings[type] += 1;
       this.logMessage(`Purchased a ${type} generator.`);
-      this.generateResource(type); // Start generating resources for that building
+      //this.generateResource(type); // Start generating resources for that building
     } else {
       this.logMessage(`Not enough coins to buy ${type} generator.`);
     }
 
+    this.saveToLocalStorage(this);
+  }
+
+  generateResources(elapsedTime) {
+    this.woodTimer += elapsedTime;
+    if(this.woodTimer > 10) {
+      this.wood += this.buildings['wood'];
+    }
+
+    this.stoneTimer += elapsedTime;
+    if(this.stoneTimer > 15) {
+      this.stone += this.buildings['stone'];
+    }
     this.saveToLocalStorage(this);
   }
 
@@ -214,9 +237,9 @@ export class Character {
     setInterval(() => {
       if (this.buildings[type] > 0) {
         if (type === 'wood') {
-          this.iron += resourceAmount[type]; // Iron is being used for wood generators
+          this.wood += resourceAmount[type]; // Iron is being used for wood generators
         } else if (type === 'stone') {
-          this.gold += resourceAmount[type]; // Gold for stone generators
+          this.stone += resourceAmount[type]; // Gold for stone generators
         }
         this.logMessage(`Generated ${resourceAmount[type]} ${type}.`);
         this.saveToLocalStorage(this);
