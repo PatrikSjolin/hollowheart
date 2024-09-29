@@ -223,15 +223,8 @@ export class Character {
   }
 
   generateResources(elapsedTime) {
+    
     this.woodTimer += elapsedTime;
-    // if (this.woodTimer > 10000) {
-    //   if (this.buildings['wood'] > 0) {
-    //     this.wood += this.buildings['wood'];
-    //     this.logMessage(`Generated ${this.buildings['wood']} wood.`);
-    //   }
-    //   this.woodTimer -= 10000;
-    // }
-
     if (this.woodTimer > 10000) {
       // Find all wood-generating buildings
       const woodGenerators = this.buildings.filter(building => building.name === 'Lumber Mill');
@@ -245,14 +238,18 @@ export class Character {
       this.woodTimer -= 10000;
     }
 
-    // this.stoneTimer += elapsedTime;
-    // if (this.stoneTimer > 15000) {
-    //   if (this.buildings['stone'] > 0) {
-    //     this.stone += this.buildings['stone'];
-    //     this.logMessage(`Generated ${this.buildings['stone']} stone.`);
-    //   }
-    //   this.stoneTimer -= 15000;
-    // }
+    this.stoneTimer += elapsedTime;
+    if (this.stoneTimer > 15000) {
+      const stoneGenerators = this.buildings.filter(building => building.name === 'Stone Quarry');
+      let generatedStone = 0;
+      stoneGenerators.forEach(building => {
+        generatedStone++;
+    });
+    
+    this.logMessage(`Generated ${generatedStone} stone.`);
+    this.stone += generatedStone;
+      this.stoneTimer -= 15000;
+    }
     this.saveToLocalStorage(this);
   }
 }
@@ -296,13 +293,13 @@ export class Building {
 export const buildings = [
   new Building(
     'Lumber Mill',
-    { coins: 100 },  // Multi-resource cost
+    { coins: 150 },  // Multi-resource cost
     'generator',
     { productionRate: 5 }  // Generates wood per second
   ),
   new Building(
     'Stone Quarry',
-    { stone: 150, coins: 75 },
+    { wood: 100, coins: 300 },
     'generator',
     { productionRate: 3 }
   ),
