@@ -16,7 +16,7 @@ export class Character {
     this.experience = initialState.experience || 0;
     this.depth = initialState.depth || 0;
     this.isExploring = initialState.isExploring || false;
-    this.buildings = initialState.buildings || { wood: 0, stone: 0 };
+    this.buildings = initialState.buildings || [];
     this.lifeRegen = initialState.lifeRegen || 1; // Add life regeneration stat (1 HP every 20 seconds)
     this.wood = initialState.wood || 0;
     this.stone = initialState.stone || 0;
@@ -189,22 +189,26 @@ export class Character {
   }
 
   // Method to buy buildings that generate resources
-  buyBuilding(type) {
-    const buildingCosts = {
-      wood: 100,
-      stone: 150,
-    };
+  buyBuilding(building) {
+    if (building.canAfford(this)) {
+      // Deduct the resources
+      for (const [resource, amount] of Object.entries(building.cost)) {
+        this[resource] -= amount;
+      }
 
-    if (this.coins >= buildingCosts[type]) {
-      this.coins -= buildingCosts[type];
-      this.buildings[type] += 1;
-      this.logMessage(`Purchased a ${type} generator.`);
-      //this.generateResource(type); // Start generating resources for that building
+      // Add the building and apply its effect
+      this.buildings.push(building);
+      //building.applyEffect(this);
+
+      console.log(`Bought a ${building.name}`);
     } else {
-      this.logMessage(`Not enough coins to buy ${type} generator.`);
+      console.log('Not enough resources.');
     }
+  }
 
-    this.saveToLocalStorage(this);
+  unlockFeature(feature) {
+    this.unlockedFeatures.push(feature);
+    console.log(`Unlocked feature: ${feature}`);
   }
 
   useHealingPotion() {
@@ -220,22 +224,98 @@ export class Character {
 
   generateResources(elapsedTime) {
     this.woodTimer += elapsedTime;
+    // if (this.woodTimer > 10000) {
+    //   if (this.buildings['wood'] > 0) {
+    //     this.wood += this.buildings['wood'];
+    //     this.logMessage(`Generated ${this.buildings['wood']} wood.`);
+    //   }
+    //   this.woodTimer -= 10000;
+    // }
+
     if (this.woodTimer > 10000) {
-      if (this.buildings['wood'] > 0) {
-        this.wood += this.buildings['wood'];
-        this.logMessage(`Generated ${this.buildings['wood']} wood.`);
-      }
+      // Find all wood-generating buildings
+      const woodGenerators = this.buildings.filter(building => building.name === 'Lumber Mill');
+      let generatedWood = 0;
+      woodGenerators.forEach(building => {
+        generatedWood++;
+      });
+      
+      this.logMessage(`Generated ${generatedWood} wood.`);
+      this.wood += generatedWood;
       this.woodTimer -= 10000;
     }
 
-    this.stoneTimer += elapsedTime;
-    if (this.stoneTimer > 15000) {
-      if (this.buildings['stone'] > 0) {
-        this.stone += this.buildings['stone'];
-        this.logMessage(`Generated ${this.buildings['stone']} stone.`);
-      }
-      this.stoneTimer -= 15000;
-    }
+    // this.stoneTimer += elapsedTime;
+    // if (this.stoneTimer > 15000) {
+    //   if (this.buildings['stone'] > 0) {
+    //     this.stone += this.buildings['stone'];
+    //     this.logMessage(`Generated ${this.buildings['stone']} stone.`);
+    //   }
+    //   this.stoneTimer -= 15000;
+    // }
     this.saveToLocalStorage(this);
   }
 }
+
+export class Building {
+  constructor(name, cost, type, effect) {
+    this.name = name;
+    this.cost = cost;  // Object with various resource costs
+    this.type = type;  // 'generator', 'storage', 'feature' (to define the purpose)
+    this.effect = effect;  // Effect applied after purchase (e.g., resource max increase)
+  }
+
+  // Check if the player can afford the building
+  canAfford(resources) {
+    for (const [resource, amount] of Object.entries(this.cost)) {
+      if (resources[resource] < amount) {
+        return false;
+      }
+    }
+    console.log('can afford');
+    return true;
+  }
+
+  // Apply the building effect (based on type)
+  applyEffect(character) {
+    if (this.type === 'generator') {
+      // Generate resources over time (handled elsewhere)
+    } else if (this.type === 'storage') {
+      // Increase max storage
+      character.maxWood += this.effect.wood || 0;
+      character.maxStone += this.effect.stone || 0;
+    } else if (this.type === 'feature') {
+      // Unlock features, e.g., research center
+      character.unlockFeature(this.name);
+    }
+  }
+}
+
+
+// Define the array of buildings
+export const buildings = [
+  new Building(
+    'Lumber Mill',
+    { coins: 100 },  // Multi-resource cost
+    'generator',
+    { productionRate: 5 }  // Generates wood per second
+  ),
+  new Building(
+    'Stone Quarry',
+    { stone: 150, coins: 75 },
+    'generator',
+    { productionRate: 3 }
+  ),
+  new Building(
+    'Storage Warehouse',
+    { wood: 200, stone: 50, coins: 100 },
+    'storage',
+    { wood: 1000, stone: 500 }  // Increases max wood/stone storage
+  ),
+  new Building(
+    'Research Center',
+    { wood: 500, coins: 300, iron: 50 },
+    'feature',
+    { unlocks: 'research' }  // Unlocks research for upgrades
+  ),
+];

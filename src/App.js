@@ -46,32 +46,32 @@ const App = () => {
   }, []);
 
   // Game loop to handle resource gathering, life regen, exploration, hazards
-// Game loop to handle resource gathering, life regen, exploration, hazards
-useEffect(() => {
-  if (character && !firstTimeOverlayVisible) {  // Ensure the loop only starts after the player has clicked Start
-    let lastTimestamp = Date.now(); // Keep track of the last loop tick
-    const gameLoop = setInterval(() => {
-      const currentTimestamp = Date.now();
-      const elapsedTime = currentTimestamp - lastTimestamp;
-      lastTimestamp = currentTimestamp;
+  // Game loop to handle resource gathering, life regen, exploration, hazards
+  useEffect(() => {
+    if (character && !firstTimeOverlayVisible) {  // Ensure the loop only starts after the player has clicked Start
+      let lastTimestamp = Date.now(); // Keep track of the last loop tick
+      const gameLoop = setInterval(() => {
+        const currentTimestamp = Date.now();
+        const elapsedTime = currentTimestamp - lastTimestamp;
+        lastTimestamp = currentTimestamp;
 
-      // Life regeneration
-      character.regenerateHealth(elapsedTime);
+        // Life regeneration
+        character.regenerateHealth(elapsedTime);
 
-      // Resource gathering (e.g., from buildings)
-      character.generateResources(elapsedTime);
+        // Resource gathering (e.g., from buildings)
+        character.generateResources(elapsedTime);
 
-      // Exploration and hazard checks
-      character.explore(elapsedTime);
+        // Exploration and hazard checks
+        character.explore(elapsedTime);
 
-      // Update character and save to localStorage
-      setCharacter(character);
-      saveToLocalStorage(character);
-    }, 500); // Game loop runs every 1 second
+        // Update character and save to localStorage
+        setCharacter(character);
+        saveToLocalStorage(character);
+      }, 500); // Game loop runs every 1 second
 
-    return () => clearInterval(gameLoop); // Cleanup on component unmount
-  }
-}, [character, firstTimeOverlayVisible]);  // Now the loop only starts after the overlay is hidden
+      return () => clearInterval(gameLoop); // Cleanup on component unmount
+    }
+  }, [character, firstTimeOverlayVisible]);  // Now the loop only starts after the overlay is hidden
 
 
   // Guard clause to prevent rendering before character is initialized
@@ -90,11 +90,11 @@ useEffect(() => {
       character.playerName = name;
       setCharacter(character);
     }
-  
+
     setFirstTimeOverlayVisible(false);  // Hide the overlay
     logMessage(`Welcome, ${name}. Prepare for a dangerous descent into Hollowheart.`);
   };
-  
+
 
   // Function to reset the game and show the first overlay again
   const resetGame = () => {
@@ -116,94 +116,95 @@ useEffect(() => {
     <div className="container">
       <h1>Hollowheart</h1>
 
-    {/* Character Name and Level Section */}
-    {character && (
-    <section className="character-info">
-      <p>{character.playerName}</p>
-      <p>Level: {character.level}</p>
-    </section>
-    )}
+      {/* Character Name and Level Section */}
+      {character && (
+        <section className="character-info">
+          <p>{character.playerName}</p>
+          <p>Level: {character.level}</p>
+        </section>
+      )}
 
-{character && (
-      <p>Current Depth: {character.depth}</p>
-)}
-    {/* Sun Element */}
-    {character && (
-    <div
-      id="sun"
-      style={{
-        backgroundColor: `rgba(255, 223, 0, ${1 - character.depth * 0.6})`,
-        boxShadow: `0 0 30px rgba(255, 223, 0, ${0.8 - character.depth * 0.6})`
-      }}
-    ></div>
-  )}
+      {character && (
+        <p>Current Depth: {character.depth}</p>
+      )}
+      {/* Sun Element */}
+      {character && (
+        <div
+          id="sun"
+          style={{
+            backgroundColor: `rgba(255, 223, 0, ${1 - character.depth * 0.6})`,
+            boxShadow: `0 0 30px rgba(255, 223, 0, ${0.8 - character.depth * 0.6})`
+          }}
+        ></div>
+      )}
 
-{character && (
-      <section className="health-section">
-      <div className="health-bar-container">
-        <p>Health: {character.currentHealth} / {character.calculateMaxHealth()}</p>
-        <div className="health-bar">
-          <div id="healthBarFill" style={{ width: `${(character.currentHealth / character.calculateMaxHealth()) * 100}%` }}></div>
-        </div>
-      </div>
-    </section>
-  )}
-    {/* Resources Section */}
-    {character && (
-    <section className="resources-section">
-      <p>Iron: {character.iron}</p>
-      <p>Gold: {character.gold}</p>
-      <p>Diamonds: {character.diamonds}</p>
-      <p>Coins: {character.coins}</p>
-      <p>Stone: {character.stone}</p>
-      <p>Wood: {character.wood}</p>
-    </section>
-  )}
-    {/* Buildings Section */}
-    {character && (
-    <section className="buildings-section">
-      <p>Wood Generator: {character.buildings.wood}</p>
-      <p>Stone Generator: {character.buildings.stone}</p>
-      {/* Add other buildings as needed */}
-    </section>
-  )}
-  {/* Action Buttons */}
-  {character && (
-    <section className="actions-section">
-      <button className="character-btn" onClick={() => setCharacterOverlayVisible(!characterOverlayVisible)}>
-        Character Stats
-      </button>
+      {character && (
+        <section className="health-section">
+          <div className="health-bar-container">
+            <p>Health: {character.currentHealth} / {character.calculateMaxHealth()}</p>
+            <div className="health-bar">
+              <div id="healthBarFill" style={{ width: `${(character.currentHealth / character.calculateMaxHealth()) * 100}%` }}></div>
+            </div>
+          </div>
+        </section>
+      )}
+      {/* Resources Section */}
+      {character && (
+        <section className="resources-section">
+          <p>Iron: {character.iron}</p>
+          <p>Gold: {character.gold}</p>
+          <p>Diamonds: {character.diamonds}</p>
+          <p>Coins: {character.coins}</p>
+          <p>Stone: {character.stone}</p>
+          <p>Wood: {character.wood}</p>
+        </section>
+      )}
+      {/* Buildings Section */}
+      {character && character.buildings.length > 0 && (
+        <section className="buildings-section">
+          <h3>Owned Buildings:</h3>
+          {character.buildings.map((building, index) => (
+            <p key={index}>{building.name}</p>
+          ))}
+        </section>
+      )}
+      {/* Action Buttons */}
+      {character && (
+        <section className="actions-section">
+          <button className="character-btn" onClick={() => setCharacterOverlayVisible(!characterOverlayVisible)}>
+            Character Stats
+          </button>
 
-      <button className="explore-btn" onClick={() => character.startExploring()}>
-        {character.isExploring ? 'Descend Deeper ↓' : 'Descend into the Hole ↓'}
-      </button>
-      
-      <button
-        className={`explore-btn ${!character.isExploring ? 'disabled' : ''}`}
-        onClick={() => {
-          if (character.isExploring) character.ascend();
-        }}
-        disabled={!character.isExploring}
-      >
-        Ascend ↑
-      </button>
+          <button className="explore-btn" onClick={() => character.startExploring()}>
+            {character.isExploring ? 'Descend Deeper ↓' : 'Descend into the Hole ↓'}
+          </button>
 
-      <button className="shop-btn" onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>
-        Open Shop
-      </button>
+          <button
+            className={`explore-btn ${!character.isExploring ? 'disabled' : ''}`}
+            onClick={() => {
+              if (character.isExploring) character.ascend();
+            }}
+            disabled={!character.isExploring}
+          >
+            Ascend ↑
+          </button>
+
+          <button className="shop-btn" onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>
+            Open Shop
+          </button>
 
           {/* Give Up Button */}
           <button className="give-up-btn" onClick={resetGame}>
-        Give Up
-      </button>
-    </section>
-  )}
-    {/* Log Section */}
-    <section className="log-section">
-      {log.slice(0).reverse().map((message, index) => (
-        <p key={index}>{message}</p>
-      ))}
-    </section>
+            Give Up
+          </button>
+        </section>
+      )}
+      {/* Log Section */}
+      <section className="log-section">
+        {log.slice(0).reverse().map((message, index) => (
+          <p key={index}>{message}</p>
+        ))}
+      </section>
 
       {characterOverlayVisible && (
         <CharacterOverlay
