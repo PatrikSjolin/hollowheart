@@ -175,7 +175,7 @@ useEffect(() => {
       </button>
 
       <button className="explore-btn" onClick={() => character.startExploring()}>
-        Descend into the Hole
+        {character.isExploring ? 'Descend Deeper ↓' : 'Descend into the Hole ↓'}
       </button>
       <button
         className={`explore-btn ${!character.isExploring ? 'disabled' : ''}`}
@@ -184,7 +184,7 @@ useEffect(() => {
         }}
         disabled={!character.isExploring}
       >
-        Ascend
+        Ascend ↑
       </button>
 
       <button className="shop-btn" onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>

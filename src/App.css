@@ -263,7 +263,6 @@ h1 {
 
 .plus-button:disabled {
   background-color: #555;
-  cursor: not-allowed;
   opacity: 0.6;
 }
 
@@ -280,6 +279,22 @@ h1 {
 
 .shop-button:disabled {
   background-color: #555;
-  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.explore-btn {
+  padding: 12px 20px;
+  margin: 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.explore-btn.disabled {
+  background-color: #555;
   opacity: 0.6;
 }
