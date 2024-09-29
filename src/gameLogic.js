@@ -24,6 +24,7 @@ export class Character {
     this.treasureTimer = 0;
     this.hazardTimer = 0;
     this.woodTimer = 0;
+    this.maxWood = 100;  // Initial maximum amount of wood
     this.stoneTimer = 0;
     this.saveToLocalStorage = saveToLocalStorage;
     saveToLocalStorage(this);
@@ -223,7 +224,7 @@ export class Character {
   }
 
   generateResources(elapsedTime) {
-    
+
     this.woodTimer += elapsedTime;
     if (this.woodTimer > 10000) {
       // Find all wood-generating buildings
@@ -232,9 +233,12 @@ export class Character {
       woodGenerators.forEach(building => {
         generatedWood++;
       });
-      
-      this.logMessage(`Generated ${generatedWood} wood.`);
-      this.wood += generatedWood;
+
+      if (generatedWood > 0) {
+        this.logMessage(`Generated ${generatedWood} wood.`);
+        // console.log(this.wood + generatedWood);
+        this.wood = Math.min(this.maxWood, this.wood + generatedWood);
+      }
       this.woodTimer -= 10000;
     }
 
@@ -244,10 +248,11 @@ export class Character {
       let generatedStone = 0;
       stoneGenerators.forEach(building => {
         generatedStone++;
-    });
-    
-    this.logMessage(`Generated ${generatedStone} stone.`);
-    this.stone += generatedStone;
+      });
+      if (generatedStone > 0) {
+        this.logMessage(`Generated ${generatedStone} stone.`);
+        this.stone += generatedStone;
+      }
       this.stoneTimer -= 15000;
     }
     this.saveToLocalStorage(this);

@@ -112,6 +112,18 @@ const App = () => {
 
   const toggleOverlay = (setter) => setter((prev) => !prev); // Toggles the given overlay's visibility state
 
+  const getBuildingCounts = (buildings) => {
+    const buildingCounts = {};
+    buildings.forEach((building) => {
+      if (!buildingCounts[building.name]) {
+        buildingCounts[building.name] = 1;
+      } else {
+        buildingCounts[building.name]++;
+      }
+    });
+    return buildingCounts;
+  };
+
   return (
     <div className="container">
       <h1>Hollowheart</h1>
@@ -155,19 +167,20 @@ const App = () => {
           <p>Gold: {character.gold}</p>
           <p>Diamonds: {character.diamonds}</p>
           <p>Coins: {character.coins}</p>
+          <p>Wood: {character.wood} / {character.maxWood}</p>
           <p>Stone: {character.stone}</p>
-          <p>Wood: {character.wood}</p>
         </section>
       )}
+      
       {/* Buildings Section */}
       {character && character.buildings.length > 0 && (
-        <section className="buildings-section">
-          <h3>Owned Buildings:</h3>
-          {character.buildings.map((building, index) => (
-            <p key={index}>{building.name}</p>
-          ))}
-        </section>
-      )}
+      <section className="buildings-section">
+        <h3>Owned Buildings:</h3>
+        {Object.entries(getBuildingCounts(character.buildings)).map(([name, count], index) => (
+          <p key={index}>{name} x{count}</p>
+        ))}
+      </section>
+    )}
       {/* Action Buttons */}
       {character && (
         <section className="actions-section">
