@@ -52,7 +52,7 @@ const App = () => {
       const gameLoop = setInterval(() => {
 
         const currentTimestamp = Date.now();
-        const elapsedTime = (currentTimestamp - lastTimestamp) / 1000; // Convert to seconds
+        const elapsedTime = currentTimestamp - lastTimestamp;
         lastTimestamp = currentTimestamp;
 
         // Life regeneration
@@ -62,12 +62,12 @@ const App = () => {
         character.generateResources(elapsedTime);
 
         // Exploration and hazard checks
-        character.checkExplorationProgress(elapsedTime);  // Explore and handle hazards
+        character.explore(elapsedTime);  // Explore and handle hazards
 
         // Update character and save to localStorage
         setCharacter(character);
         saveToLocalStorage(character);
-      }, 1000); // Game loop runs every 1 second
+      }, 500); // Game loop runs every 1 second
 
       return () => clearInterval(gameLoop); // Cleanup on component unmount
     }
@@ -88,37 +88,72 @@ const App = () => {
     <div className="container">
       <h1>Hollowheart</h1>
       <p>Current Depth: {character.depth}</p>
+
+    {/* Sun Element */}
+    <div
+      id="sun"
+      style={{
+        backgroundColor: `rgba(255, 223, 0, ${1 - character.depth * 0.6})`,
+        boxShadow: `0 0 30px rgba(255, 223, 0, ${0.8 - character.depth * 0.6})`
+      }}
+    ></div>
+
+      <section className="health-section">
       <div className="health-bar-container">
-        <p>Health: {character.currentHealth} / {character.health}</p>
+        <p>Health: {character.currentHealth} / {character.calculateMaxHealth()}</p>
         <div className="health-bar">
-          <div id="healthBarFill" style={{ width: `${(character.currentHealth / character.health) * 100}%` }}></div>
+          <div id="healthBarFill" style={{ width: `${(character.currentHealth / character.calculateMaxHealth()) * 100}%` }}></div>
         </div>
       </div>
+    </section>
+
+    {/* Resources Section */}
+    <section className="resources-section">
       <p>Iron: {character.iron}</p>
       <p>Gold: {character.gold}</p>
       <p>Diamonds: {character.diamonds}</p>
       <p>Coins: {character.coins}</p>
       <p>Stone: {character.stone}</p>
       <p>Wood: {character.wood}</p>
+    </section>
 
-      <button className="character-btn" onClick={() => toggleOverlay(setCharacterOverlayVisible)}>
+    {/* Buildings Section */}
+    <section className="buildings-section">
+      <p>Wood Generator: {character.buildings.wood}</p>
+      <p>Stone Generator: {character.buildings.stone}</p>
+      {/* Add other buildings as needed */}
+    </section>
+
+  {/* Action Buttons */}
+    <section className="actions-section">
+      <button className="character-btn" onClick={() => setCharacterOverlayVisible(!characterOverlayVisible)}>
         Character Stats
       </button>
 
-      <button className="explore-btn" onClick={() => toggleOverlay(setShopOverlayVisible)}>
-        Open Shop
+      <button className="explore-btn" onClick={() => character.startExploring()}>
+        Descend into the Hole
+      </button>
+      <button
+        className={`explore-btn ${!character.isExploring ? 'disabled' : ''}`}
+        onClick={() => {
+          if (character.isExploring) character.ascend();
+        }}
+        disabled={!character.isExploring}
+      >
+        Ascend
       </button>
 
-      <button className="explore-btn" onClick={() => character.startExploring()}>Descend into the Hole</button>
-      <button className="explore-btn" onClick={() => character.ascend()}>Ascend</button>
+      <button className="shop-btn" onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>
+        Open Shop
+      </button>
+    </section>
 
-      <div id="log">
-        <section className="log-section">
-          {log.slice(0).reverse().map((message, index) => (
-            <p key={index}>{message}</p>
-          ))}
-        </section>
-      </div>
+    {/* Log Section */}
+    <section className="log-section">
+      {log.slice(0).reverse().map((message, index) => (
+        <p key={index}>{message}</p>
+      ))}
+    </section>
 
       {characterOverlayVisible && (
         <CharacterOverlay
