@@ -111,8 +111,14 @@ export class Character {
 
     if (hazardChance < 0.7) { // Increased chance of a hazard occurring (60%)
       const damage = Math.floor(Math.random() * dangerLevel) + 20; // Hazard deals more damage (min 10)
-      this.currentHealth -= damage;
-      this.logMessage(`You encountered a hazard and took ${damage} damage! Current health: ${this.currentHealth}.`);
+
+      const armor = this.strength * 4;
+      const damageReduction = (armor / (armor + 100));
+      const damageTaken = Math.floor(damage * (1 - damageReduction));
+
+      this.currentHealth -= damageTaken;
+      this.logMessage(`You encountered a hazard and took ${damageTaken} damage! Current health: ${this.currentHealth}.`);
+      console.log(`actual damage: ${damage}, reduction: ${damageReduction}`);
 
       const expGained = this.depth * Math.floor(Math.random() * 20) + 5; // Random exp gained
       this.experience += expGained;
