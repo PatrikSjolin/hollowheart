@@ -54,11 +54,9 @@ export class Character {
 
   // Method to start exploring (descend)
   startExploring() {
-    // if (!this.isExploring) {
-      this.isExploring = true;
-      this.depth += 1; // Start at depth 1 or go deeper
-      this.logMessage(`You descend to depth ${this.depth}`);
-    // }
+    this.isExploring = true;
+    this.depth += 1; // Start at depth 1 or go deeper
+    this.logMessage(`You descend to depth ${this.depth}`);
   }
 
   // Method to ascend (stop exploring)
@@ -75,14 +73,13 @@ export class Character {
   explore(elapsedTime) {
     if (this.isExploring) {
       const treasureInterval = 5000;
-       this.treasureTimer += elapsedTime;
-      //this.logMessage(elapsedTime);
+      this.treasureTimer += elapsedTime;
       if (this.treasureTimer > treasureInterval) {
         // Simulate finding resources and gaining experience
         const resourceFound = {
-          iron: Math.floor(Math.random() * 5),
-          gold: Math.floor(Math.random() * 3),
-          diamonds: Math.floor(Math.random() * 1),
+          iron: Math.floor(Math.random() * 5) * this.depth,
+          gold: Math.floor(Math.random() * 3) * this.depth,
+          diamonds: Math.floor(Math.random() * 1) * this.depth,
         };
         this.iron += resourceFound.iron;
         this.gold += resourceFound.gold;
@@ -117,7 +114,7 @@ export class Character {
       this.currentHealth -= damage;
       this.logMessage(`You encountered a hazard and took ${damage} damage! Current health: ${this.currentHealth}.`);
 
-      const expGained = Math.floor(Math.random() * 20) + 5; // Random exp gained
+      const expGained = this.depth * Math.floor(Math.random() * 20) + 5; // Random exp gained
       this.experience += expGained;
       this.logMessage(`You survived and gained ${expGained} experience.`);
 
@@ -125,8 +122,6 @@ export class Character {
       if (this.currentHealth <= 0) {
         this.die();
       }
-
-      //this.saveToLocalStorage(this); // Update React state
     }
   }
 
@@ -136,7 +131,7 @@ export class Character {
     this.iron = 0;
     this.gold = 0;
     this.diamonds = 0;
-    //this.currentHealth = this.health; // Respawn at full health
+    this.currentHealth = 0;
     this.ascend(); // Ascend back to the surface upon death
   }
 
@@ -221,7 +216,7 @@ export class Character {
   generateResources(elapsedTime) {
     this.woodTimer += elapsedTime;
     if (this.woodTimer > 10000) {
-      if(this.buildings['wood'] > 0) {
+      if (this.buildings['wood'] > 0) {
         this.wood += this.buildings['wood'];
         this.logMessage(`Generated ${this.buildings['wood']} wood.`);
       }
@@ -230,18 +225,12 @@ export class Character {
 
     this.stoneTimer += elapsedTime;
     if (this.stoneTimer > 15000 && this.buildings['stone'] > 0) {
-      if(this.buildings['stone'] > 0) {
+      if (this.buildings['stone'] > 0) {
         this.stone += this.buildings['stone'];
         this.logMessage(`Generated ${this.buildings['stone']} stone.`);
       }
       this.stoneTimer -= 15000;
     }
     this.saveToLocalStorage(this);
-  }
-
-
-  // Log helper method to log game messages
-  logMessage(message) {
-    console.log(message); // Can be improved to display in the game UI
   }
 }
