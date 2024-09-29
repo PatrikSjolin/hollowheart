@@ -106,13 +106,13 @@ export class Character {
   // Method to simulate encountering a hazard
   encounterHazard() {
     const hazardChance = Math.random(); // Random chance to encounter a hazard
-    const dangerLevel = this.depth * 10; // Increased danger scaling
+    const dangerLevel = this.depth * 15; // Increased danger scaling
 
     if (hazardChance < 0.7) { // Increased chance of a hazard occurring (60%)
-      const damage = Math.floor(Math.random() * dangerLevel) + 10; // Hazard deals more damage (min 10)
+      const damage = Math.floor(Math.random() * dangerLevel) + 6; // Hazard deals more damage (min 10)
 
       const armor = this.strength * 4;
-      const damageReduction = (armor / (armor + 100));
+      const damageReduction = (armor / (armor + 120));
       const damageTaken = Math.floor(damage * (1 - damageReduction));
 
       this.currentHealth -= damageTaken;
