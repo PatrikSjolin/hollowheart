@@ -217,3 +217,20 @@ h1 {
     box-shadow: 0 0 30px rgba(255, 223, 0, 0.8);
   }
 }
+
+/* Give Up Button */
+.give-up-btn {
+  padding: 12px 20px;
+  margin: 5px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.give-up-btn:hover {
+  background-color: #ff3333;
+}

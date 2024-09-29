@@ -1,6 +1,6 @@
 export class Character {
   constructor(saveToLocalStorage, logMessage, initialState = {}) {
-    this.playerName = initialState.name || 'Solider';
+    this.playerName = initialState.playerName || 'Soldier';  // Fix here
     this.level = initialState.level || 1;
     this.strength = initialState.strength || 10;
     this.dexterity = initialState.dexterity || 10;
@@ -221,15 +221,19 @@ export class Character {
   generateResources(elapsedTime) {
     this.woodTimer += elapsedTime;
     if (this.woodTimer > 10000) {
-      this.wood += this.buildings['wood'];
-      this.logMessage(`Generated ${this.buildings['wood']} wood.`);
+      if(this.buildings['wood'] > 0) {
+        this.wood += this.buildings['wood'];
+        this.logMessage(`Generated ${this.buildings['wood']} wood.`);
+      }
       this.woodTimer -= 10000;
     }
 
     this.stoneTimer += elapsedTime;
     if (this.stoneTimer > 15000 && this.buildings['stone'] > 0) {
-      this.stone += this.buildings['stone'];
-      this.logMessage(`Generated ${this.buildings['stone']} stone.`);
+      if(this.buildings['stone'] > 0) {
+        this.stone += this.buildings['stone'];
+        this.logMessage(`Generated ${this.buildings['stone']} stone.`);
+      }
       this.stoneTimer -= 15000;
     }
     this.saveToLocalStorage(this);

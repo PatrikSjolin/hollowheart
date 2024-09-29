@@ -46,40 +46,68 @@ const App = () => {
   }, []);
 
   // Game loop to handle resource gathering, life regen, exploration, hazards
-  useEffect(() => {
-    if (character) {
-      let lastTimestamp = Date.now(); // Keep track of the last loop tick
-      const gameLoop = setInterval(() => {
+// Game loop to handle resource gathering, life regen, exploration, hazards
+useEffect(() => {
+  if (character && !firstTimeOverlayVisible) {  // Ensure the loop only starts after the player has clicked Start
+    let lastTimestamp = Date.now(); // Keep track of the last loop tick
+    const gameLoop = setInterval(() => {
+      const currentTimestamp = Date.now();
+      const elapsedTime = currentTimestamp - lastTimestamp;
+      lastTimestamp = currentTimestamp;
 
-        const currentTimestamp = Date.now();
-        const elapsedTime = currentTimestamp - lastTimestamp;
-        lastTimestamp = currentTimestamp;
+      // Life regeneration
+      character.regenerateHealth(elapsedTime);
 
-        // Life regeneration
-        character.regenerateHealth(elapsedTime);
+      // Resource gathering (e.g., from buildings)
+      character.generateResources(elapsedTime);
 
-        // Resource gathering (e.g., from buildings)
-        character.generateResources(elapsedTime);
+      // Exploration and hazard checks
+      character.explore(elapsedTime);
 
-        // Exploration and hazard checks
-        character.explore(elapsedTime);  // Explore and handle hazards
+      // Update character and save to localStorage
+      setCharacter(character);
+      saveToLocalStorage(character);
+    }, 500); // Game loop runs every 1 second
 
-        // Update character and save to localStorage
-        setCharacter(character);
-        saveToLocalStorage(character);
-      }, 500); // Game loop runs every 1 second
+    return () => clearInterval(gameLoop); // Cleanup on component unmount
+  }
+}, [character, firstTimeOverlayVisible]);  // Now the loop only starts after the overlay is hidden
 
-      return () => clearInterval(gameLoop); // Cleanup on component unmount
-    }
-  }, [character]);
 
   // Guard clause to prevent rendering before character is initialized
-  if (!character) return <div>Loading...</div>;
+  if (character === null && !firstTimeOverlayVisible) {
+    return <div>Loading...</div>;
+  }
 
   const startGame = (name) => {
-    character.playerName = name;
-    setFirstTimeOverlayVisible(false);
+    console.log("starting game");
+    if (character === null) {
+      // Create a new character and set playerName to the entered name
+      const newCharacter = new Character(saveToLocalStorage, logMessage, { playerName: name });
+      setCharacter(newCharacter);
+    } else {
+      // Update the name if the character already exists
+      character.playerName = name;
+      setCharacter(character);
+    }
+  
+    setFirstTimeOverlayVisible(false);  // Hide the overlay
     logMessage(`Welcome, ${name}. Prepare for a dangerous descent into Hollowheart.`);
+  };
+  
+
+  // Function to reset the game and show the first overlay again
+  const resetGame = () => {
+    // Show a confirmation prompt to the user before proceeding
+    const confirmReset = window.confirm("Are you sure you want to give up? All progress will be lost.");
+    if (confirmReset) {
+      // Clear character data and reset the state
+      setCharacter(null);
+      setFirstTimeOverlayVisible(true);
+      localStorage.removeItem('characterState');  // Clear saved character in localStorage
+      setLog([]);  // Clear the log
+      console.clear();
+    }
   };
 
   const toggleOverlay = (setter) => setter((prev) => !prev); // Toggles the given overlay's visibility state
@@ -89,14 +117,18 @@ const App = () => {
       <h1>Hollowheart</h1>
 
     {/* Character Name and Level Section */}
+    {character && (
     <section className="character-info">
       <p>{character.playerName}</p>
       <p>Level: {character.level}</p>
     </section>
+    )}
 
+{character && (
       <p>Current Depth: {character.depth}</p>
-
+)}
     {/* Sun Element */}
+    {character && (
     <div
       id="sun"
       style={{
@@ -104,7 +136,9 @@ const App = () => {
         boxShadow: `0 0 30px rgba(255, 223, 0, ${0.8 - character.depth * 0.6})`
       }}
     ></div>
+  )}
 
+{character && (
       <section className="health-section">
       <div className="health-bar-container">
         <p>Health: {character.currentHealth} / {character.calculateMaxHealth()}</p>
@@ -113,8 +147,9 @@ const App = () => {
         </div>
       </div>
     </section>
-
+  )}
     {/* Resources Section */}
+    {character && (
     <section className="resources-section">
       <p>Iron: {character.iron}</p>
       <p>Gold: {character.gold}</p>
@@ -123,15 +158,17 @@ const App = () => {
       <p>Stone: {character.stone}</p>
       <p>Wood: {character.wood}</p>
     </section>
-
+  )}
     {/* Buildings Section */}
+    {character && (
     <section className="buildings-section">
       <p>Wood Generator: {character.buildings.wood}</p>
       <p>Stone Generator: {character.buildings.stone}</p>
       {/* Add other buildings as needed */}
     </section>
-
+  )}
   {/* Action Buttons */}
+  {character && (
     <section className="actions-section">
       <button className="character-btn" onClick={() => setCharacterOverlayVisible(!characterOverlayVisible)}>
         Character Stats
@@ -153,8 +190,13 @@ const App = () => {
       <button className="shop-btn" onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>
         Open Shop
       </button>
-    </section>
 
+          {/* Give Up Button */}
+          <button className="give-up-btn" onClick={resetGame}>
+        Give Up
+      </button>
+    </section>
+  )}
     {/* Log Section */}
     <section className="log-section">
       {log.slice(0).reverse().map((message, index) => (
