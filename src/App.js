@@ -6,8 +6,8 @@ import { Character } from './gameLogic'; // Import character logic
 
 import './App.css'; // Use existing styles from your CSS
 
-const gameVersion = '0.0.1';
-export const debug = true;
+const gameVersion = '0.0.2';
+export const debug = false;
 
 // Define saveToLocalStorage function to be used across the app
 const saveToLocalStorage = (character) => {
@@ -326,6 +326,9 @@ const App = () => {
           </div>
         </div>
       )}
+          <div className="game-version">
+      Version: {gameVersion}
+    </div>
     </div>
   );
 };

@@ -10,6 +10,7 @@ export class Character {
     this.currentHealth = initialState.currentHealth || 100;
     this.iron = initialState.iron || 0;
     this.gold = initialState.gold || 0;
+    this.recordDepth = initialState.recordDepth || 0;
     this.diamonds = initialState.diamonds || 0;
     this.coins = initialState.coins || 0;
     this.unallocatedPoints = initialState.unallocatedPoints || 0;
@@ -90,6 +91,9 @@ export class Character {
       this.depth = this.lastDepthVisited; // Go back to the last visited depth
     } else {
       this.depth += 1; // Otherwise, go down by 1 depth
+    }
+    if(this.depth > this.recordDepth) {
+      this.recordDepth = this.depth;
     }
     this.logMessage(`You descend to depth ${this.depth}`);
   }
@@ -175,6 +179,9 @@ export class Character {
     this.iron = 0;
     this.gold = 0;
     this.diamonds = 0;
+    this.coins = 0;
+    this.wood = Math.floor(this.wood * 0.1);
+    this.stone = Math.floor(this.wood * 0.1);
     this.currentHealth = 0;
     this.ascend(); // Ascend back to the surface upon death
   }

@@ -585,3 +585,13 @@ button:disabled {
   margin: 5px 0;
   font-size: 0.9rem;
 }
+
+.game-version {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  color: #888;  /* Light color for the version text */
+  font-size: 0.9rem;
+  font-family: Arial, sans-serif;
+  z-index: 100;  /* Ensure it appears on top of other elements */
+}
