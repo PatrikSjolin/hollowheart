@@ -158,30 +158,31 @@ export class Character {
   }
 
   // Method to convert resources to coins
-  convertToCoins(resourceType) {
+  convertToCoins(resourceType, amount) {
     let conversionRate = 1; // Define conversion rates
     switch (resourceType) {
       case 'iron':
         conversionRate = 1;
-        this.coins += this.iron * conversionRate;
-        this.logMessage(`Converted ${this.iron} Iron to ${this.iron * conversionRate} Coins.`);
-        this.iron = 0;
+        this.coins += amount * conversionRate;
+        this.logMessage(`Converted ${amount} Iron to ${amount * conversionRate} Coins.`);
+        this.iron -= amount; // Subtract the converted amount
         break;
       case 'gold':
         conversionRate = 5;
-        this.coins += this.gold * conversionRate;
-        this.logMessage(`Converted ${this.gold} Gold to ${this.gold * conversionRate} Coins.`);
-        this.gold = 0;
+        this.coins += amount * conversionRate;
+        this.logMessage(`Converted ${amount} Gold to ${amount * conversionRate} Coins.`);
+        this.gold -= amount; // Subtract the converted amount
         break;
       case 'diamonds':
         conversionRate = 10;
-        this.coins += this.diamonds * conversionRate;
-        this.logMessage(`Converted ${this.diamonds} Diamonds to ${this.diamonds * conversionRate} Coins.`);
-        this.diamonds = 0;
+        this.coins += amount * conversionRate;
+        this.logMessage(`Converted ${amount} Diamonds to ${amount * conversionRate} Coins.`);
+        this.diamonds -= amount; // Subtract the converted amount
         break;
     }
-    this.saveToLocalStorage(this); // Update React state
+    this.saveToLocalStorage(this); // Save the updated state
   }
+  
 
   upgradeStat(stat) {
     if (this.unallocatedPoints > 0) {

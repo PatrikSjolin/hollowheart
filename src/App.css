@@ -338,9 +338,9 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
+  padding: 5px 0;
   border-bottom: 1px solid #ccc;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .building-info {
@@ -414,4 +414,95 @@ h1 {
 
 .character-stats-button.glow {
   box-shadow: 0 0 20px rgba(255, 255, 0, 1);  /* Intense yellow glow on button */
+}
+
+/* Conversion section styling */
+.conversion-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.conversion-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.conversion-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0; /* Ensure padding is large enough for slider */
+}
+
+.conversion-row p {
+  margin: 0;
+  font-size: 1rem;
+  flex: 2;
+}
+
+.conversion-row input[type="range"] {
+  flex: 2;
+  margin: 0 10px;
+}
+
+.conversion-row span {
+  flex: 0.5;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.conversion-row .shop-button {
+  flex: 1;
+  padding: 8px 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.conversion-row .shop-button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Ensure the slider is properly styled */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%; /* Make sure it takes up available space */
+  height: 10px;
+  background: #ddd;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity 0.15s ease-in-out;
+}
+
+input[type="range"]:hover {
+  opacity: 1;
+}
+
+/* Style the slider thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #4caf50;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #4caf50;
+  cursor: pointer;
 }
