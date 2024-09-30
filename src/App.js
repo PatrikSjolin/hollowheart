@@ -35,7 +35,7 @@ const App = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (character.ongoingResearch && character.getResearchProgress() > 0) {
+      if (character && character.ongoingResearch && character.getResearchProgress() > 0) {
         setCharacter(character); // Trigger state update to reflect progress
       }
     }, 1000);
@@ -56,6 +56,24 @@ const App = () => {
       setCharacter(newCharacter);
     }
   }, []);
+
+  const [researchTimers, setResearchTimers] = useState(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (character && character.ongoingResearch && character.getResearchProgress() > 0) {
+        setResearchTimers(character.getResearchProgress()); // Update the research timers
+        setCharacter(character); // Update character state
+      } else if (character && character.ongoingResearch && character.getResearchProgress() === 0) {
+        character.completeResearch(); // Complete the research
+        setCharacter(character);
+        setResearchTimers(null); // Clear the timers after completion
+      }
+    }, 1000); // Check every second
+  
+    return () => clearInterval(interval); // Clean up on component unmount
+  }, [character, setCharacter]);
+  
 
   // Game loop to handle resource gathering, life regen, exploration, hazards
   // Game loop to handle resource gathering, life regen, exploration, hazards
@@ -248,18 +266,19 @@ const App = () => {
               character={character}
               setCharacter={setCharacter}
               setResearchOverlayVisible={setResearchOverlayVisible}
+              researchTimers={researchTimers}
             />
           )}
 
           {/* Give Up Button */}
           <button className="give-up-btn" onClick={resetGame}>Give Up</button>
             {/* Debug button */}
-  {/* <button className="debug-btn" onClick={() => {
+  <button className="debug-btn" onClick={() => {
     character.addDebugResources();
     setCharacter(character);
   }}>
     Debug: Add Resources
-  </button> */}
+  </button>
         </section>
       )}
       {/* Log Section */}

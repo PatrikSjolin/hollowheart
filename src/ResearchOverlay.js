@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+// import React, { useState, useEffect } from 'react';
 
-const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible }) => {
+const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible, researchTimers }) => {
 
-
-    const [researchTimers, setResearchTimers] = useState(character.getResearchProgress());
+    // const [researchTimers, setResearchTimers] = useState(character.getResearchProgress());
 
     // Research options
     const researches = [
         {
             name: 'Increased Life Regen',
             description: 'Increase life regeneration rate from 1 every 20 seconds to 1 every 10 seconds.',
-            timeRequired: 30 * 60 * 1000, // 30 minutes in milliseconds
+            timeRequired: 30 * 1000, // 30 minutes in milliseconds
             unlockCondition: character.intelligence >= 15, // Example condition based on intelligence
             effect: () => {
                 character.lifeRegenRate = 10; // Apply effect to character
@@ -26,6 +25,9 @@ const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible })
             },
         },
     ];
+    const availableResearches = researches.filter(research =>
+        !character.isResearchCompleted(research.name) // Filter out completed research
+    );
 
     // Function to handle starting research
     const startResearch = (research) => {
@@ -35,29 +37,21 @@ const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible })
     };
 
     // Handle countdown for research timers
-    useEffect(() => {
-        const timer = setInterval(() => {
-            const timeRemaining = character.getResearchProgress();
-            if (timeRemaining === 0) {
-                character.completeResearch();
-                setCharacter(character);
-            }
-            setResearchTimers(timeRemaining);
-        }, 1000);
+    // useEffect(() => {
+    //     const timer = setInterval(() => {
+    //         const timeRemaining = character.getResearchProgress();
+    //         if (timeRemaining === 0) {
+    //             character.completeResearch();
+    //             setResearchTimers(null);
+    //             setCharacter(character);
+    //         }
+    //         else {
+    //             setResearchTimers(timeRemaining);
+    //         }
+    //     }, 1000);
 
-        return () => clearInterval(timer);
-    }, [character, setCharacter]);
-
-    // Handle applying the research effects when the timer reaches 0
-    //   useEffect(() => {
-    //     Object.keys(researchTimers).forEach((researchName) => {
-    //       const research = researches.find((r) => r.name === researchName);
-    //       if (researchTimers[researchName] === 0 && research) {
-    //         research.effect();
-    //         setCharacter({ ...character });
-    //       }
-    //     });
-    //   }, [researchTimers, character, researches, setCharacter]);
+    //     return () => clearInterval(timer);
+    // }, [character, setCharacter]);
 
     return (
         <div className="overlay">
@@ -67,7 +61,7 @@ const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible })
                 <p>Choose a research to enhance your character's abilities.</p>
 
                 {/* List available researches */}
-                {researches.map((research, index) => (
+                {availableResearches.map((research, index) => (
                     <div key={index} className="research-item">
                         <p><strong>{research.name}</strong></p>
                         <p>{research.description}</p>

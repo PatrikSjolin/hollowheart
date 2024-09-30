@@ -338,9 +338,9 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 0;
+  padding: 2px 0;
   border-bottom: 1px solid #ccc;
-  margin-bottom: 5px;
+  margin-bottom: 2px;
 }
 
 .building-info {
@@ -359,7 +359,7 @@ h1 {
 .building-description {
   font-size: 1rem;
   color: #ccc;
-  margin-top: 5px;
+  margin-top: 2px;
 }
 
 
@@ -420,22 +420,22 @@ h1 {
 .conversion-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 10px 0;
+  gap: 2px;
+  padding: 2px 0;
 }
 
 .conversion-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 0;
+  padding: 2px 0;
 }
 
 .conversion-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0; /* Ensure padding is large enough for slider */
+  padding: 2px 0; /* Ensure padding is large enough for slider */
 }
 
 .conversion-row p {
@@ -559,4 +559,29 @@ button:disabled {
   background-color: #4caf50; /* Same color as the health bar */
   height: 100%;
   transition: width 0.3s ease-in-out;
+}
+
+.item-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+  padding: 2px;
+  /* border: 1px solid #ccc;
+  border-radius: 8px; */
+  /*background-color: #f9f9f9;*/
+}
+
+.item-info {
+  flex-grow: 1;
+}
+
+.item-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.item-description {
+  margin: 5px 0;
+  font-size: 0.9rem;
 }

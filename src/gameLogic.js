@@ -23,6 +23,7 @@ export class Character {
     this.lifeRegenRate = initialState.lifeRegenRate || 20;
     this.expBoost = initialState.expBoost || 1;
     this.wood = initialState.wood || 0;
+    this.completedResearch = initialState.completedResearch || []; // Store completed research
     this.stone = initialState.stone || 0;
     this.regenTimer = 0; // Initialize regen timer for health regeneration
     this.treasureTimer = 0;
@@ -220,9 +221,12 @@ export class Character {
   
   addDebugResources() {
     this.coins += 1000;
-    this.wood += 100;
-    this.stone += 100;
-    this.iron += 100;
+    this.wood += 1000;
+    this.stone += 1000;
+    this.iron += 1000;
+    this.intelligence += 100;
+
+
     this.logMessage('Added 1000 coins, 100 wood, 100 stone, and 100 iron for debugging.');
     this.saveToLocalStorage(this); // Save to local storage to persist the resources
   }
@@ -271,14 +275,11 @@ export class Character {
       this.coins -= 10;
       this.saveToLocalStorage(this);
     }
-    else {
-
-    }
   }
 
   startResearch(research, duration) {
     const now = new Date().getTime();
-    this.ongoingResearch = research;
+    this.ongoingResearch = { ...research };
     this.researchEndTime = now + duration; // Store the end time of the research
     this.saveToLocalStorage(this);
     this.logMessage(`Research "${research.name}" started.`);
@@ -298,10 +299,15 @@ export class Character {
       this.logMessage(`Research "${this.ongoingResearch.name}" completed!`);
       // Apply the effects of the completed research (increase life regen, exp boost, etc.)
       this.ongoingResearch.effect();
+      this.completedResearch.push(this.ongoingResearch.name);
       this.ongoingResearch = null;
       this.researchEndTime = null;
       this.saveToLocalStorage(this);
     }
+  }
+
+  isResearchCompleted(researchName) {
+    return this.completedResearch.includes(researchName);
   }
 
   generateResources(elapsedTime) {
@@ -341,12 +347,13 @@ export class Character {
 }
 
 export class Building {
-  constructor(name, cost, type, effect, description) {
+  constructor(name, cost, type, effect, description, unlockCondition) {
     this.name = name;
     this.cost = cost;  // Object with various resource costs
     this.type = type;  // 'generator', 'storage', 'feature' (to define the purpose)
     this.effect = effect;  // Effect applied after purchase (e.g., resource max increase)
     this.description = description;  // New description field
+    this.unlockCondition = unlockCondition;
   }
 
   // Check if the player can afford the building
@@ -358,6 +365,10 @@ export class Building {
     }
     console.log('can afford');
     return true;
+  }
+
+  isUnlocked(character){
+    return this.unlockCondition(character);
   }
 
   // Apply the building effect (based on type)
@@ -381,27 +392,50 @@ export const buildings = [
     { coins: 150 },  // Multi-resource cost
     'generator',
     { productionRate: 5 },  // Generates wood per second
-    'Generates 1 wood every 10 seconds.'
+    'Generates 1 wood every 10 seconds.',
+    function (character) { return true; }
   ),
   new Building(
     'Stone Quarry',
     { wood: 100, coins: 300 },
     'generator',
     { productionRate: 3 },
-    'Generates 1 stone every 15 seconds.'
+    'Generates 1 stone every 15 seconds.',
+    function (character) { return character.buildings.some(building => building.name === 'Lumber Mill'); }
   ),
   new Building(
     'Wood Warehouse',
     { wood: 100, stone: 50, coins: 300 },
     'storage',
     { wood: 200 },  // Increases max wood/stone storage
-    'Increases the maximum storage of wood with 200.'
+    'Increases the maximum storage of wood with 200.',
+    function (character) { return character.buildings.some(building => building.name === 'Lumber Mill'); }
   ),
   new Building(
     'Library',
     { wood: 300, coins: 300, iron: 50 },
     'feature',
     { unlocks: 'research' },  // Unlocks research for upgrades
-    'Unlocks the ability to research.'
+    'Unlocks the ability to research.',
+    function (character) { return character.buildings.some(building => building.name === 'Stone Quarry') && character.intelligence >= 20; }
   ),
+];
+
+export const items = [
+  {
+    name: 'Health Potion',
+    description: 'Restores 100 health points.',
+    cost: { coins: 10 },
+    effect: (character) => {
+      character.useHealingPotion(); // Apply the healing effect
+    }
+  },
+  {
+    name: 'Rope',
+    description: 'Used to climb up one depth.',
+    cost: { coins: 10 },
+    effect: (character) => {
+      character.buyRope(); // Add one rope to the inventory
+    }
+  }
 ];

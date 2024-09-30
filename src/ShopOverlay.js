@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 
 import { buildings } from './gameLogic';
 
+import { items } from './gameLogic';  // Import the items array from gameLogic
+
 const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
 
   const [convertAmount, setConvertAmount] = useState({
@@ -67,7 +69,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
         </div>
 
       <h2>Buy Buildings</h2>
-      {buildings.map((building, index) => (
+      {buildings.filter((building) => building.isUnlocked(character)).map((building, index) => (
         <div key={index} className="building-block">
           <div className="building-info">
             <p className="building-name">{building.name}</p>
@@ -104,9 +106,33 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
         </div>
       ))}
 
+      {/* Buy Items Section */}
       <h2>Buy Items</h2>
-      <button onClick={() => { character.useHealingPotion(); setCharacter(character); }} disabled={character.isExploring} className="shop-button">Buy Health Potion (+100 hp) (10 Coins)</button>
-      <button onClick={() => { character.buyRope(); setCharacter(character); }} disabled={character.isExploring} className="shop-button">Buy Rope (10 Coin)</button>
+      {items.map((item, index) => (
+        <div key={index} className="item-block">
+          <div className="item-info">
+            <p className="item-name">{item.name}</p>
+            <p className="item-description">{item.description}</p>
+            <p className="item-cost">
+              {Object.entries(item.cost).map(([resource, amount]) => (
+                <span key={resource}> {resource}: {amount} </span>
+              ))}
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              if (character.coins >= item.cost.coins) {
+                item.effect(character);
+                setCharacter(character);
+              }
+            }}
+            disabled={character.isExploring || character.coins < item.cost.coins}
+            className="shop-button"
+          >
+            Buy
+          </button>
+        </div>
+      ))}
     </div>
   </div>
   );
