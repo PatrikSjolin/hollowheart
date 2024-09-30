@@ -2,7 +2,6 @@ import React from 'react';
 import { buildings } from './gameLogic';
 
 const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => (
-
   <div className="overlay">
     <div className="overlay-content">
       <span className="close-btn" onClick={() => setShopOverlayVisible(false)}>&times;</span> {/* Close button */}
@@ -20,12 +19,15 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => (
       <h3>Buy Buildings</h3>
       {buildings.map((building, index) => (
         <div key={index} className="building-block">
-          <p className="building-name">{building.name}</p>
-          <p className="building-cost">
-            {Object.entries(building.cost).map(([resource, amount]) => (
-              <span key={resource}> {resource}: {amount} </span>
-            ))}
-          </p>
+          <div className="building-info">
+            <p className="building-name">{building.name}</p>
+            <p className="building-description">{building.description}</p>  {/* Displaying the description */}
+            <p className="building-cost">
+              {Object.entries(building.cost).map(([resource, amount]) => (
+                <span key={resource}> {resource}: {amount} </span>
+              ))}
+            </p>
+          </div>
           <button
             onClick={() => {
               const resources = {

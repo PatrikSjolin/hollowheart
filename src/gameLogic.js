@@ -269,11 +269,12 @@ export class Character {
 }
 
 export class Building {
-  constructor(name, cost, type, effect) {
+  constructor(name, cost, type, effect, description) {
     this.name = name;
     this.cost = cost;  // Object with various resource costs
     this.type = type;  // 'generator', 'storage', 'feature' (to define the purpose)
     this.effect = effect;  // Effect applied after purchase (e.g., resource max increase)
+    this.description = description;  // New description field
   }
 
   // Check if the player can afford the building
@@ -308,24 +309,28 @@ export const buildings = [
     'Lumber Mill',
     { coins: 150 },  // Multi-resource cost
     'generator',
-    { productionRate: 5 }  // Generates wood per second
+    { productionRate: 5 },  // Generates wood per second
+    'Generates 1 wood every 10 seconds.'
   ),
   new Building(
     'Stone Quarry',
     { wood: 100, coins: 300 },
     'generator',
-    { productionRate: 3 }
+    { productionRate: 3 },
+    'Generates 1 stone every 15 seconds.'
   ),
   new Building(
     'Wood Warehouse',
     { wood: 100, stone: 50, coins: 300 },
     'storage',
-    { wood: 200 }  // Increases max wood/stone storage
+    { wood: 200 },  // Increases max wood/stone storage
+    'Increases the maximum storage of wood with 200.'
   ),
   new Building(
     'Library',
     { wood: 300, coins: 300, iron: 50 },
     'feature',
-    { unlocks: 'research' }  // Unlocks research for upgrades
+    { unlocks: 'research' },  // Unlocks research for upgrades
+    'Unlocks the ability to research.'
   ),
 ];

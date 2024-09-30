@@ -343,23 +343,34 @@ h1 {
   margin-bottom: 10px;
 }
 
+.building-info {
+  flex-grow: 1;
+}
+
+
 /* Building name styling */
 .building-name {
-  flex: 1;
   font-size: 1.2rem;
+  font-weight: bold;
   color: #fff;
-  margin-right: 10px;
 }
+
+
+.building-description {
+  font-size: 1rem;
+  color: #ccc;
+  margin-top: 5px;
+}
+
 
 /* Building cost styling */
 .building-cost {
-  flex: 2;
   font-size: 1rem;
   color: #ccc;
-  margin-right: 10px;
+  margin-top: 10px;
 }
 
-/* Purchase button styling */
+/* Shop button styling */
 .shop-button {
   padding: 8px 12px;
   background-color: #4caf50;
