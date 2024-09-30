@@ -29,7 +29,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
   const handleConvert = (resource) => {
     character.convertToCoins(resource, convertAmount[resource]);
     setCharacter(character);
-    
+
     // Reset slider to the new max value after conversion (remaining resource)
     setConvertAmount(prevState => ({
       ...prevState,
@@ -106,6 +106,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
 
       <h2>Buy Items</h2>
       <button onClick={() => { character.useHealingPotion(); setCharacter(character); }} disabled={character.isExploring} className="shop-button">Buy Health Potion (+100 hp) (10 Coins)</button>
+      <button onClick={() => { character.buyRope(); setCharacter(character); }} disabled={character.isExploring} className="shop-button">Buy Rope (10 Coin)</button>
     </div>
   </div>
   );

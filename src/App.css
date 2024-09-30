@@ -506,3 +506,33 @@ input[type="range"]::-moz-range-thumb {
   background: #4caf50;
   cursor: pointer;
 }
+
+.research-item {
+  margin-bottom: 15px;
+}
+
+.research-item p {
+  margin: 0 0 5px;
+}
+
+button:disabled {
+  background-color: #888;
+  cursor: not-allowed;
+}
+
+.climb-btn {
+  padding: 5px 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.climb-btn:disabled {
+  background-color: #888;
+  cursor: not-allowed;
+}

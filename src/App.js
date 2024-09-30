@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ShopOverlay from './ShopOverlay';
 import CharacterOverlay from './CharacterOverlay';
+import ResearchOverlay from './ResearchOverlay';  // Add this line
 import { Character } from './gameLogic'; // Import character logic
 
 import './App.css'; // Use existing styles from your CSS
@@ -17,6 +18,7 @@ const App = () => {
   const [firstTimeOverlayVisible, setFirstTimeOverlayVisible] = useState(true);
   const [shopOverlayVisible, setShopOverlayVisible] = useState(false); // Shop visibility state
   const [characterOverlayVisible, setCharacterOverlayVisible] = useState(false); // Character overlay visibility state
+  const [researchOverlayVisible, setResearchOverlayVisible] = useState(false); // Character overlay visibility state
 
   // Logging function
   const logMessage = (message) => {
@@ -124,6 +126,11 @@ const App = () => {
     return buildingCounts;
   };
 
+  const handleClimbUp = () => {
+    character.climbUp();
+    setCharacter(character);
+  };
+
   return (
     <div className="container">
       <h1>Hollowheart</h1>
@@ -192,6 +199,7 @@ const App = () => {
           <button className="explore-btn" onClick={() => character.startExploring()}>
             {character.isExploring ? 'Descend Deeper ↓' : 'Descend into the Hole ↓'}
           </button>
+          <button onClick={handleClimbUp} disabled={character.rope === 0 || character.depth === 0}>⬆️</button> {/* Climb Up button */}
           <button
             className={`explore-btn ${!character.isExploring ? 'disabled' : ''}`}
             onClick={() => {
@@ -203,6 +211,15 @@ const App = () => {
           </button>
 
           <button className="shop-btn" onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>Shop</button>
+
+          {character.libraryBuilt && (
+  <button className="character-btn" onClick={() => setResearchOverlayVisible(true)}>Research</button>
+)}
+          {/* <ResearchOverlay
+            character={character}
+            setCharacter={setCharacter}
+            setResearchOverlayVisible={setResearchOverlayVisible}
+          /> */}
 
           {/* Give Up Button */}
           <button className="give-up-btn" onClick={resetGame}>Give Up</button>

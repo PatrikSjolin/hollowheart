@@ -18,16 +18,21 @@ export class Character {
     this.isExploring = initialState.isExploring || false;
     this.buildings = initialState.buildings || [];
     this.lifeRegen = initialState.lifeRegen || 1; // Add life regeneration stat (1 HP every 20 seconds)
+    this.lifeRegenRate = initialState.lifeRegenRate || 20;
+    this.expBoost = initialState.expBoost || 1;
     this.wood = initialState.wood || 0;
     this.stone = initialState.stone || 0;
     this.regenTimer = 0; // Initialize regen timer for health regeneration
     this.treasureTimer = 0;
+    this.rope = initialState.rope || 0; // Add rope item to the character
     this.hazardTimer = 0;
     this.woodTimer = 0;
+    this.lastDepthVisited = initialState.lastDepthVisited || 0; // Store the last visited depth
     this.maxWood = initialState.maxWood || 100;  // Initial maximum amount of wood
     this.maxStone = initialState.maxStone || 100;  // Initial maximum amount of stone
     this.stoneTimer = 0;
     this.isLevelingUp = false; // New property to track level-up state
+    this.libraryBuilt = initialState.libraryBuilt || false;
     this.saveToLocalStorage = saveToLocalStorage;
     saveToLocalStorage(this);
     this.logMessage = logMessage;
@@ -36,6 +41,26 @@ export class Character {
   // Calculate max health based on vitality (10 HP per point of vitality)
   calculateMaxHealth() {
     return this.vitality * 10;
+  }
+
+  climbUp() {
+    if (this.rope > 0 && this.depth > 0) {
+      this.depth -= 1; // Climb up one depth
+      this.rope -= 1; // Consume one rope
+      this.logMessage(`You climbed up to depth ${this.depth} using one rope.`);
+    } else if (this.rope === 0) {
+      this.logMessage('You do not have any ropes to climb up.');
+    }
+    this.saveToLocalStorage(this);
+  }
+
+  buyRope() {
+    if (this.coins >= 10) {
+      this.rope += 1; // Buying one rope at a time
+      this.coins -= 10;
+      this.logMessage('You bought one rope.');
+      this.saveToLocalStorage(this);
+    }
   }
 
   // Regenerate health based on lifeRegen stat
@@ -58,7 +83,11 @@ export class Character {
   // Method to start exploring (descend)
   startExploring() {
     this.isExploring = true;
-    this.depth += 1; // Start at depth 1 or go deeper
+    if (this.depth === 0 && this.lastDepthVisited > 0) {
+      this.depth = this.lastDepthVisited; // Go back to the last visited depth
+    } else {
+      this.depth += 1; // Otherwise, go down by 1 depth
+    }
     this.logMessage(`You descend to depth ${this.depth}`);
   }
 
@@ -66,6 +95,7 @@ export class Character {
   ascend() {
     if (this.isExploring) {
       this.isExploring = false;
+      this.lastDepthVisited = this.depth; // Store the current depth before ascending
       this.logMessage(`You ascend back to the surface.`);
       this.depth = 0;
       this.saveToLocalStorage(this); // Trigger React state update
@@ -301,8 +331,7 @@ export class Building {
       character.maxWood += this.effect.wood || 0;
       character.maxStone += this.effect.stone || 0;
     } else if (this.type === 'feature') {
-      // Unlock features, e.g., research center
-      // character.unlockFeature(this.name);
+      character.libraryBuilt = true; // Set flag when the library is built
     }
   }
 }
