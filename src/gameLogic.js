@@ -27,6 +27,7 @@ export class Character {
     this.maxWood = initialState.maxWood || 100;  // Initial maximum amount of wood
     this.maxStone = initialState.maxStone || 100;  // Initial maximum amount of stone
     this.stoneTimer = 0;
+    this.isLevelingUp = false; // New property to track level-up state
     this.saveToLocalStorage = saveToLocalStorage;
     saveToLocalStorage(this);
     this.logMessage = logMessage;
@@ -146,7 +147,13 @@ export class Character {
   levelUp() {
     this.level += 1;
     this.unallocatedPoints += 5; // Allocate stat points
+    this.isLevelingUp = true; // Set the level-up flag
     this.logMessage(`Level up! You are now level ${this.level} and gained 5 unallocated stat points.`);
+      // Remove the level-up glow after a few seconds
+      setTimeout(() => {
+        this.isLevelingUp = false;
+        this.saveToLocalStorage(this); // Save the updated state
+      }, 3000);
     this.saveToLocalStorage(this); // Update React state
   }
 

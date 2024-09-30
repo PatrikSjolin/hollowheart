@@ -132,7 +132,9 @@ const App = () => {
       {character && (
         <section className="character-info">
           <p>{character.playerName}</p>
-          <p>Level: {character.level}</p>
+          <p className={`level-text ${character.isLevelingUp ? 'level-up-glow' : ''}`}>
+            Level: {character.level}
+          </p>
         </section>
       )}
 
@@ -171,20 +173,22 @@ const App = () => {
           <p>Stone: {character.stone} / {character.maxStone}</p>
         </section>
       )}
-      
+
       {/* Buildings Section */}
       {character && character.buildings.length > 0 && (
-      <section className="buildings-section">
-        <h3>Owned Buildings:</h3>
-        {Object.entries(getBuildingCounts(character.buildings)).map(([name, count], index) => (
-          <p key={index}>{name} x{count}</p>
-        ))}
-      </section>
-    )}
+        <section className="buildings-section">
+          <h3>Owned Buildings:</h3>
+          {Object.entries(getBuildingCounts(character.buildings)).map(([name, count], index) => (
+            <p key={index}>{name} x{count}</p>
+          ))}
+        </section>
+      )}
       {/* Action Buttons */}
       {character && (
         <section className="actions-section">
-          <button className="character-btn" onClick={() => setCharacterOverlayVisible(!characterOverlayVisible)}>Character Stats</button>
+          <button className={`character-stats-button ${character.isLevelingUp ? 'glow' : ''}`} onClick={() => setCharacterOverlayVisible(true)}>
+            Character Stats
+          </button>
           <button className="explore-btn" onClick={() => character.startExploring()}>
             {character.isExploring ? 'Descend Deeper ↓' : 'Descend into the Hole ↓'}
           </button>
