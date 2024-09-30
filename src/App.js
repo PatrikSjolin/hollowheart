@@ -33,6 +33,16 @@ const App = () => {
 
   const [playerName, setPlayerName] = useState(""); // Add player name state
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (character.ongoingResearch && character.getResearchProgress() > 0) {
+        setCharacter(character); // Trigger state update to reflect progress
+      }
+    }, 1000);
+  
+    return () => clearInterval(interval);
+  }, [character, setCharacter]);
+
   // Load character state from localStorage when the app first loads
   useEffect(() => {
     const savedCharacter = localStorage.getItem('characterState');
@@ -190,6 +200,23 @@ const App = () => {
           ))}
         </section>
       )}
+      {/* Display ongoing research under buildings */}
+      {character && character.ongoingResearch && (
+  <div className="research-progress">
+    <p>Ongoing Research: {character.ongoingResearch.name}</p>
+    
+    {/* <p>research end time: {character.researchEndTime}, researchProgress: {character.getResearchProgress()}, {new Date().getTime()}, progress = {character.getResearchProgress() / (character.researchEndTime - new Date().getTime())} </p> */}
+    <div className="progress-bar">
+    <div
+        className="progress"
+        style={{
+          width: `${((character.ongoingResearch.timeRequired - character.getResearchProgress()) / character.ongoingResearch.timeRequired) * 100}%`
+        }}
+      ></div>
+    </div>
+  </div>
+  
+)}
       {/* Action Buttons */}
       {character && (
         <section className="actions-section">
@@ -213,16 +240,26 @@ const App = () => {
           <button className="shop-btn" onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>Shop</button>
 
           {character.libraryBuilt && (
-  <button className="character-btn" onClick={() => setResearchOverlayVisible(true)}>Research</button>
-)}
-          {/* <ResearchOverlay
-            character={character}
-            setCharacter={setCharacter}
-            setResearchOverlayVisible={setResearchOverlayVisible}
-          /> */}
+            <button className="character-btn" onClick={() => setResearchOverlayVisible(true)}>Research</button>
+          )}
+
+          {researchOverlayVisible && (
+            <ResearchOverlay
+              character={character}
+              setCharacter={setCharacter}
+              setResearchOverlayVisible={setResearchOverlayVisible}
+            />
+          )}
 
           {/* Give Up Button */}
           <button className="give-up-btn" onClick={resetGame}>Give Up</button>
+            {/* Debug button */}
+  {/* <button className="debug-btn" onClick={() => {
+    character.addDebugResources();
+    setCharacter(character);
+  }}>
+    Debug: Add Resources
+  </button> */}
         </section>
       )}
       {/* Log Section */}

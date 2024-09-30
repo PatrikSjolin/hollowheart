@@ -15,6 +15,8 @@ export class Character {
     this.unallocatedPoints = initialState.unallocatedPoints || 0;
     this.experience = initialState.experience || 0;
     this.depth = initialState.depth || 0;
+    this.ongoingResearch = initialState.ongoingResearch || null; // Track ongoing research
+    this.researchEndTime = initialState.researchEndTime || null; // Track the time research will end
     this.isExploring = initialState.isExploring || false;
     this.buildings = initialState.buildings || [];
     this.lifeRegen = initialState.lifeRegen || 1; // Add life regeneration stat (1 HP every 20 seconds)
@@ -66,7 +68,7 @@ export class Character {
   // Regenerate health based on lifeRegen stat
   regenerateHealth(elapsedTime) {
     this.regenTimer += elapsedTime;
-    const regenInterval = 20000;
+    const regenInterval = this.lifeRegenRate * 1000;
 
     if (this.regenTimer >= regenInterval) {
       if (this.currentHealth < this.health) {
@@ -216,6 +218,14 @@ export class Character {
     this.saveToLocalStorage(this); // Save the updated state
   }
   
+  addDebugResources() {
+    this.coins += 1000;
+    this.wood += 100;
+    this.stone += 100;
+    this.iron += 100;
+    this.logMessage('Added 1000 coins, 100 wood, 100 stone, and 100 iron for debugging.');
+    this.saveToLocalStorage(this); // Save to local storage to persist the resources
+  }
 
   upgradeStat(stat) {
     if (this.unallocatedPoints > 0) {
@@ -263,6 +273,34 @@ export class Character {
     }
     else {
 
+    }
+  }
+
+  startResearch(research, duration) {
+    const now = new Date().getTime();
+    this.ongoingResearch = research;
+    this.researchEndTime = now + duration; // Store the end time of the research
+    this.saveToLocalStorage(this);
+    this.logMessage(`Research "${research.name}" started.`);
+  }
+
+  getResearchProgress() {
+    if (this.ongoingResearch && this.researchEndTime) {
+      const now = new Date().getTime();
+      const timeRemaining = this.researchEndTime - now;
+      return Math.max(timeRemaining, 0); // Return the remaining time or 0 if completed
+    }
+    return null;
+  }
+
+  completeResearch() {
+    if (this.ongoingResearch) {
+      this.logMessage(`Research "${this.ongoingResearch.name}" completed!`);
+      // Apply the effects of the completed research (increase life regen, exp boost, etc.)
+      this.ongoingResearch.effect();
+      this.ongoingResearch = null;
+      this.researchEndTime = null;
+      this.saveToLocalStorage(this);
     }
   }
 
