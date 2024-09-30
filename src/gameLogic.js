@@ -77,12 +77,15 @@ export class Character {
     if (this.isExploring) {
       const treasureInterval = 5000;
       this.treasureTimer += elapsedTime;
+
+      const intelligenceFactor = (1 + this.intelligence) / this.intelligence;
+
       if (this.treasureTimer > treasureInterval) {
         // Simulate finding resources and gaining experience
         const resourceFound = {
-          iron: Math.floor(Math.random() * 5) * this.depth,
-          gold: Math.floor(Math.random() * 3) * this.depth,
-          diamonds: Math.floor(Math.random() * 1) * this.depth,
+          iron: Math.floor(Math.floor(Math.random() * 5) * this.depth * intelligenceFactor),
+          gold: Math.floor(Math.floor(Math.random() * 3) * this.depth * intelligenceFactor),
+          diamonds: Math.floor(this.depth >= 10 ? Math.floor(Math.random() * 2) * this.depth * intelligenceFactor : 0),
         };
         this.iron += resourceFound.iron;
         this.gold += resourceFound.gold;
@@ -122,7 +125,7 @@ export class Character {
       this.logMessage(`You encountered a hazard and took ${damageTaken} damage! Current health: ${this.currentHealth}.`);
       console.log(`actual damage: ${damage}, reduction: ${damageReduction}`);
 
-      const expGained = this.depth * Math.floor(Math.random() * 20) + 5; // Random exp gained
+      const expGained = Math.floor(((1+this.intelligence) / this.intelligence) * this.depth * Math.floor(Math.random() * 20) + 5); // Random exp gained
       this.experience += expGained;
       this.logMessage(`You survived and gained ${expGained} experience.`);
 
