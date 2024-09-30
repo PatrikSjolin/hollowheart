@@ -10,6 +10,14 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
     diamonds: 0,
   });
 
+  // Conversion rates for each resource
+  const conversionRates = {
+    iron: 1,
+    gold: 5,
+    diamonds: 10,
+  };
+
+
   // Handle slider change for resource conversion
   const handleSliderChange = (resource, value) => {
     setConvertAmount(prevState => ({
@@ -21,15 +29,13 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
   const handleConvert = (resource) => {
     character.convertToCoins(resource, convertAmount[resource]);
     setCharacter(character);
+    
+    // Reset slider to the new max value after conversion (remaining resource)
+    setConvertAmount(prevState => ({
+      ...prevState,
+      [resource]: 0,  // Reset slider to 0
+    }));
   };
-
-    // Conversion rates for each resource
-    const conversionRates = {
-      iron: 1,
-      gold: 5,
-      diamonds: 10,
-    };
-
   return (
   <div className="overlay">
     <div className="overlay-content">
