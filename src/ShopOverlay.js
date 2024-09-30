@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-
 import { buildings } from './gameLogic';
-
 import { items } from './gameLogic';  // Import the items array from gameLogic
 
 const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {

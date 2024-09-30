@@ -36,6 +36,19 @@ const App = () => {
 
   const [playerName, setPlayerName] = useState(""); // Add player name state
 
+  // function startMusic() {
+  //   // Start playing the music when the component mounts
+  //   const audio = new Audio('/ethereal-ambient-music-55115.mp3'); // The path to the MP3 file
+  //   audio.loop = true; // Loop the music
+  //   audio.play().catch((error) => {
+  //     console.log("Error playing background music:", error);
+  //   });
+
+  //   return () => {
+  //     audio.pause(); // Pause the music when the component unmounts
+  //   };
+  // };
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (character && character.ongoingResearch && character.getResearchProgress() > 0) {
@@ -125,6 +138,7 @@ const App = () => {
     }
 
     setFirstTimeOverlayVisible(false);  // Hide the overlay
+    // startMusic();
     logMessage(`Welcome, ${name}. Prepare for a dangerous descent into Hollowheart.`);
   };
 
@@ -242,7 +256,7 @@ const App = () => {
       {character && (
         <section className="actions-section">
           <button className={`character-stats-button ${character.isLevelingUp ? 'glow' : ''}`} onClick={() => setCharacterOverlayVisible(true)}>
-            Character Stats
+            Character
           </button>
           <button className="explore-btn" onClick={() => character.startExploring()}>
             {character.isExploring ? 'Descend Deeper ↓' : 'Descend into the Hole ↓'}
@@ -329,6 +343,9 @@ const App = () => {
           <div className="game-version">
       Version: {gameVersion}
     </div>
+    <div className="highscore-display">
+  Highscore: {character ? `${character.playerName}: ${character.recordDepth}` : 0}
+</div>
     </div>
   );
 };

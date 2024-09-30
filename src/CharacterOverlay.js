@@ -8,6 +8,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible 
       
       <div className="stat-row">
         <p><strong>Strength:</strong> {character.strength}</p>
+        <p>Improves armor and survivability</p>
         <button
           onClick={() => {
             character.upgradeStat('strength');
@@ -22,6 +23,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible 
 
       <div className="stat-row">
         <p><strong>Dexterity:</strong> {character.dexterity}</p>
+        <p>Improves nothing</p>
         <button
           onClick={() => {
             character.upgradeStat('dexterity');
@@ -36,6 +38,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible 
 
       <div className="stat-row">
         <p><strong>Vitality:</strong> {character.vitality}</p>
+        <p>Increases maximum health</p>
         <button
           onClick={() => {
             character.upgradeStat('vitality');
@@ -50,6 +53,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible 
 
       <div className="stat-row">
         <p><strong>Intelligence:</strong> {character.intelligence}</p>
+        <p>Increases experience and resources gained</p>
         <button
           onClick={() => {
             character.upgradeStat('intelligence');

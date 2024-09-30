@@ -14,6 +14,7 @@ export class Character {
     this.diamonds = initialState.diamonds || 0;
     this.coins = initialState.coins || 0;
     this.unallocatedPoints = initialState.unallocatedPoints || 0;
+    this.researchBoost = initialState.researchBoost || 1;
     this.experience = initialState.experience || 0;
     this.depth = initialState.depth || 0;
     this.ongoingResearch = initialState.ongoingResearch || null; // Track ongoing research
@@ -84,6 +85,10 @@ export class Character {
     this.saveToLocalStorage(this);
   }
 
+  sendHighscoreToServer() {
+    // Send the highscore data to the server (This function will be defined later)
+  }
+
   // Method to start exploring (descend)
   startExploring() {
     this.isExploring = true;
@@ -94,6 +99,7 @@ export class Character {
     }
     if(this.depth > this.recordDepth) {
       this.recordDepth = this.depth;
+      this.sendHighscoreToServer();  // Send highscore to the server
     }
     this.logMessage(`You descend to depth ${this.depth}`);
   }
