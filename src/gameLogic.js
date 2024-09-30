@@ -253,7 +253,7 @@ export class Character {
       });
       if (generatedStone > 0) {
         this.logMessage(`Generated ${generatedStone} stone.`);
-        this.stone += generatedStone;
+        this.stone = Math.min(this.maxStone, this.stone + generatedStone);
       }
       this.stoneTimer -= 15000;
     }
