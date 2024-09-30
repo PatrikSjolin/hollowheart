@@ -6,6 +6,9 @@ import { Character } from './gameLogic'; // Import character logic
 
 import './App.css'; // Use existing styles from your CSS
 
+const gameVersion = '0.0.1';
+export const debug = true;
+
 // Define saveToLocalStorage function to be used across the app
 const saveToLocalStorage = (character) => {
   console.log("Saving character to localStorage:", character);
@@ -273,12 +276,12 @@ const App = () => {
           {/* Give Up Button */}
           <button className="give-up-btn" onClick={resetGame}>Give Up</button>
             {/* Debug button */}
-  <button className="debug-btn" onClick={() => {
+  {debug && (<button className="debug-btn" onClick={() => {
     character.addDebugResources();
     setCharacter(character);
   }}>
     Debug: Add Resources
-  </button>
+  </button>)}
         </section>
       )}
       {/* Log Section */}

@@ -61,10 +61,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible 
           +
         </button>
       </div>
-
       <p><strong>Unallocated Stat Points:</strong> {character.unallocatedPoints}</p>
-
-      {/* <button className="close-btn" onClick={() => setCharacterOverlayVisible(false)}>Close</button> */}
     </div>
   </div>
 );
