@@ -37,21 +37,21 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
     }));
   };
   return (
-  <div className="overlay">
-    <div className="overlay-content">
-      <span className="close-btn" onClick={() => setShopOverlayVisible(false)}>&times;</span> {/* Close button */}
-      {/* <h2>Shop</h2>
-        <p>Convert resources to coins or purchase buildings.</p> */}
-{/* Display resources at the top of the shop */}
-<div className="resources-display">
+    <div className="overlay">
+      <div className="overlay-content">
+        <span className="close-btn" onClick={() => setShopOverlayVisible(false)}>&times;</span> {/* Close button */}
+
+        {/* Display resources at the top of the shop */}
+        <div className="resources-display">
           <p><strong>Coins:</strong> {character.coins}</p>
           <p><strong>Wood:</strong> {character.wood}</p>
           <p><strong>Stone:</strong> {character.stone}</p>
           <p><strong>Iron:</strong> {character.iron}</p>
           <p><strong>Diamonds:</strong> {character.diamonds}</p>
         </div>
-                {/* Conversion Section */}
-                <h2>Convert Resources</h2>
+        
+        {/* Conversion Section */}
+        <h2>Convert Resources</h2>
         <div className="conversion-section">
           {['iron', 'gold', 'diamonds'].map(resource => (
             <div key={resource} className="conversion-row">
@@ -73,73 +73,73 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
           ))}
         </div>
 
-      <h2>Buy Buildings</h2>
-      {buildings.filter((building) => building.isUnlocked(character)).map((building, index) => (
-        <div key={index} className="building-block">
-          <div className="building-info">
-            <p className="building-name">{building.name}</p>
-            <p className="building-description">{building.description}</p>  {/* Displaying the description */}
-            <p className="building-cost">
-              {Object.entries(building.cost).map(([resource, amount]) => (
-                <span key={resource}> {resource}: {amount} </span>
-              ))}
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              const resources = {
+        <h2>Buy Buildings</h2>
+        {buildings.filter((building) => building.isUnlocked(character)).map((building, index) => (
+          <div key={index} className="building-block">
+            <div className="building-info">
+              <p className="building-name">{building.name}</p>
+              <p className="building-description">{building.description}</p>  {/* Displaying the description */}
+              <p className="building-cost">
+                {Object.entries(building.cost).map(([resource, amount]) => (
+                  <span key={resource}> {resource}: {amount} </span>
+                ))}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                const resources = {
+                  wood: character.wood,
+                  stone: character.stone,
+                  iron: character.iron,
+                  coins: character.coins,
+                };
+                if (building.canAfford(resources)) {
+                  character.buyBuilding(building);
+                  setCharacter(character);
+                }
+              }}
+              disabled={!building.canAfford({
                 wood: character.wood,
                 stone: character.stone,
                 iron: character.iron,
                 coins: character.coins,
-              };
-              if (building.canAfford(resources)) {
-                character.buyBuilding(building);
-                setCharacter(character);
-              }
-            }}
-            disabled={!building.canAfford({
-              wood: character.wood,
-              stone: character.stone,
-              iron: character.iron,
-              coins: character.coins,
-            })}
-            className="shop-button"
-          >
-            Buy
-          </button>
-        </div>
-      ))}
-
-      {/* Buy Items Section */}
-      <h2>Buy Items</h2>
-      {items.map((item, index) => (
-        <div key={index} className="item-block">
-          <div className="item-info">
-            <p className="item-name">{item.name}</p>
-            <p className="item-description">{item.description}</p>
-            <p className="item-cost">
-              {Object.entries(item.cost).map(([resource, amount]) => (
-                <span key={resource}> {resource}: {amount} </span>
-              ))}
-            </p>
+              })}
+              className="shop-button"
+            >
+              Buy
+            </button>
           </div>
-          <button
-            onClick={() => {
-              if (character.coins >= item.cost.coins) {
-                item.effect(character);
-                setCharacter(character);
-              }
-            }}
-            disabled={character.isExploring || character.coins < item.cost.coins}
-            className="shop-button"
-          >
-            Buy
-          </button>
-        </div>
-      ))}
+        ))}
+
+        {/* Buy Items Section */}
+        <h2>Buy Items</h2>
+        {items.map((item, index) => (
+          <div key={index} className="item-block">
+            <div className="item-info">
+              <p className="item-name">{item.name}</p>
+              <p className="item-description">{item.description}</p>
+              <p className="item-cost">
+                {Object.entries(item.cost).map(([resource, amount]) => (
+                  <span key={resource}> {resource}: {amount} </span>
+                ))}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                if (character.coins >= item.cost.coins) {
+                  item.effect(character);
+                  setCharacter(character);
+                }
+              }}
+              disabled={character.isExploring || character.coins < item.cost.coins}
+              className="shop-button"
+            >
+              Buy
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
-  </div>
   );
 };
 

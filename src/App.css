@@ -565,8 +565,8 @@ button:disabled {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 3px;
-  padding: 2px;
+  margin-bottom: 0px;
+  padding: 0px;
 }
 
 .item-info {
@@ -614,6 +614,7 @@ button:disabled {
   border-radius: 8px;
   margin-bottom: 20px;
   text-align: center;
+  border-bottom: 1px solid #ccc;
 }
 
 .resources-display p {

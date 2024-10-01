@@ -269,16 +269,16 @@ export class Character {
       this.buildings.push(building);
       building.applyEffect(this);
 
-      console.log(`Bought a ${building.name}`);
+      this.logMessage(`Bought a ${building.name}`);
     } else {
-      console.log('Not enough resources.');
+      this.logMessage('Not enough resources.');
     }
     this.saveToLocalStorage(this);
   }
 
   unlockFeature(feature) {
     this.unlockedFeatures.push(feature);
-    console.log(`Unlocked feature: ${feature}`);
+    this.logMessage(`Unlocked feature: ${feature}`);
   }
 
   buyRope() {
