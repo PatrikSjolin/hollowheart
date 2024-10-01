@@ -159,8 +159,6 @@ const App = () => {
     }
   };
 
-  const toggleOverlay = (setter) => setter((prev) => !prev); // Toggles the given overlay's visibility state
-
   const getBuildingCounts = (buildings) => {
     const buildingCounts = {};
     buildings.forEach((building) => {

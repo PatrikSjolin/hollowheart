@@ -42,7 +42,14 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
       <span className="close-btn" onClick={() => setShopOverlayVisible(false)}>&times;</span> {/* Close button */}
       {/* <h2>Shop</h2>
         <p>Convert resources to coins or purchase buildings.</p> */}
-
+{/* Display resources at the top of the shop */}
+<div className="resources-display">
+          <p><strong>Coins:</strong> {character.coins}</p>
+          <p><strong>Wood:</strong> {character.wood}</p>
+          <p><strong>Stone:</strong> {character.stone}</p>
+          <p><strong>Iron:</strong> {character.iron}</p>
+          <p><strong>Diamonds:</strong> {character.diamonds}</p>
+        </div>
                 {/* Conversion Section */}
                 <h2>Convert Resources</h2>
         <div className="conversion-section">

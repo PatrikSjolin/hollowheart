@@ -61,15 +61,6 @@ export class Character {
     this.saveToLocalStorage(this);
   }
 
-  buyRope() {
-    if (this.coins >= 10) {
-      this.rope += 1; // Buying one rope at a time
-      this.coins -= 10;
-      this.logMessage('You bought one rope.');
-      this.saveToLocalStorage(this);
-    }
-  }
-
   // Regenerate health based on lifeRegen stat
   regenerateHealth(elapsedTime) {
     this.regenTimer += elapsedTime;
@@ -290,10 +281,20 @@ export class Character {
     console.log(`Unlocked feature: ${feature}`);
   }
 
+  buyRope() {
+    if (this.coins >= 10) {
+      this.rope += 1; // Buying one rope at a time
+      this.coins -= 10;
+      this.logMessage('You bought a rope.');
+      this.saveToLocalStorage(this);
+    }
+  }
+
   useHealingPotion() {
     if (this.coins >= 10) {
       this.currentHealth = Math.min(this.health, this.currentHealth + 100);
       this.coins -= 10;
+      this.logMessage('You bought a health potion.');
       this.saveToLocalStorage(this);
     }
   }
