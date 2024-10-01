@@ -233,8 +233,8 @@ const App = () => {
         <div
           id="sun"
           style={{
-            backgroundColor: `rgba(255, 223, 0, ${1 - character.depth * 0.6})`,
-            boxShadow: `0 0 30px rgba(255, 223, 0, ${0.8 - character.depth * 0.6})`
+            backgroundColor: `rgba(255, 223, 0, ${1 - character.depth * 0.2})`,
+            boxShadow: `0 0 30px rgba(255, 223, 0, ${0.8 - character.depth * 0.2})`
           }}
         ></div>
       )}
@@ -369,9 +369,9 @@ const App = () => {
         <div className="overlay">
           <div className="overlay-content">
             <h2>Welcome to Hollowheart</h2>
-            <p>translations[language].welcomeMessage1</p>
-            <p>translations[language].welcomeMessage2</p>
-            <p>translations[language].welcomeMessage3</p>
+            <p>{translations[language].welcomeMessage1}</p>
+            <p>{translations[language].welcomeMessage2}</p>
+            <p>{translations[language].welcomeMessage3}</p>
             <input
               type="text"
               placeholder="Your name"
@@ -388,7 +388,9 @@ const App = () => {
         Version: {gameVersion}
       </div>
       <div className="highscore-display">
-        Highscore: {character ? `${character.playerName}: ${character.recordDepth}` : 0}
+        <p>Highscore (depth)</p>
+         <p>{character ? `${character.playerName}: ${character.recordDepth}` : 0}</p>
+         <p>Ada: 21</p>
       </div>
     </div>
   );
