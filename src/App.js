@@ -3,6 +3,7 @@ import ShopOverlay from './ShopOverlay';
 import CharacterOverlay from './CharacterOverlay';
 import ResearchOverlay from './ResearchOverlay';  // Add this line
 import { Character } from './gameLogic'; // Import character logic
+import MessageOverlay from './MessageOverlay';
 
 import './App.css'; // Use existing styles from your CSS
 
@@ -34,6 +35,7 @@ const App = () => {
     setLog((prevLog) => [...prevLog, `${timestamp}${message}`]);
   };
 
+  const [generalMessage, setGeneralMessage] = useState(null);
   const [playerName, setPlayerName] = useState(""); // Add player name state
 
   // function startMusic() {
@@ -66,9 +68,9 @@ const App = () => {
     if (savedCharacter) {
       const parsedCharacter = JSON.parse(savedCharacter);
       setFirstTimeOverlayVisible(false); // Hide intro if character exists
-      setCharacter(new Character(saveToLocalStorage, logMessage, parsedCharacter,)); // Load character from storage
+      setCharacter(new Character(saveToLocalStorage, logMessage, setGeneralMessage, parsedCharacter)); // Load character from storage
     } else {
-      const newCharacter = new Character(saveToLocalStorage, logMessage); // Create new character if none exists
+      const newCharacter = new Character(saveToLocalStorage, logMessage, setGeneralMessage); // Create new character if none exists
       setCharacter(newCharacter);
     }
   }, []);
@@ -129,7 +131,7 @@ const App = () => {
     console.log("starting game");
     if (character === null) {
       // Create a new character and set playerName to the entered name
-      const newCharacter = new Character(saveToLocalStorage, logMessage, { playerName: name });
+      const newCharacter = new Character(saveToLocalStorage, logMessage, showGeneralMessage, { playerName: name });
       setCharacter(newCharacter);
     } else {
       // Update the name if the character already exists
@@ -169,6 +171,11 @@ const App = () => {
       }
     });
     return buildingCounts;
+
+  };
+
+  const showGeneralMessage = (title, message) => {
+    setGeneralMessage({ title, message });
   };
 
   const handleClimbUp = () => {
@@ -320,6 +327,15 @@ const App = () => {
           setShopOverlayVisible={setShopOverlayVisible}
         />
       )}
+
+      {generalMessage && (
+              <MessageOverlay
+                title={generalMessage.title}
+                message={generalMessage.message}
+                onClose={() => setGeneralMessage(null)}
+              />
+            )}
+
 
       {firstTimeOverlayVisible && (
         <div className="overlay">

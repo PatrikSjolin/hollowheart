@@ -1,5 +1,5 @@
 export class Character {
-  constructor(saveToLocalStorage, logMessage, initialState = {}) {
+  constructor(saveToLocalStorage, logMessage, showGeneralMessage, initialState = {}) {
     this.playerName = initialState.playerName || 'Soldier';  // Fix here
     this.level = initialState.level || 1;
     this.strength = initialState.strength || 10;
@@ -30,6 +30,7 @@ export class Character {
     this.regenTimer = 0; // Initialize regen timer for health regeneration
     this.treasureTimer = 0;
     this.rope = initialState.rope || 0; // Add rope item to the character
+    this.numberOfDeaths = initialState.numberOfDeaths || 0;
     this.hazardTimer = 0;
     this.woodTimer = 0;
     this.lastDepthVisited = initialState.lastDepthVisited || 0; // Store the last visited depth
@@ -41,6 +42,7 @@ export class Character {
     this.saveToLocalStorage = saveToLocalStorage;
     saveToLocalStorage(this);
     this.logMessage = logMessage;
+    this.showGeneralMessage = showGeneralMessage;
   }
 
   // Calculate max health based on vitality (10 HP per point of vitality)
@@ -189,6 +191,12 @@ export class Character {
     this.wood = Math.floor(this.wood * 0.1);
     this.stone = Math.floor(this.wood * 0.1);
     this.currentHealth = 0;
+    this.numberOfDeaths++;
+
+    if(this.numberOfDeaths === 1){
+      this.showGeneralMessage('You died', 'Or not really. You will slowly regen back, but all resources are lost. Giving up might be a good choice.');  // Show the death overlay only on the first death
+    }
+
     this.ascend(); // Ascend back to the surface upon death
   }
 
