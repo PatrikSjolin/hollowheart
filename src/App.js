@@ -4,11 +4,14 @@ import CharacterOverlay from './CharacterOverlay';
 import ResearchOverlay from './ResearchOverlay';  // Add this line
 import { Character } from './gameLogic'; // Import character logic
 import MessageOverlay from './MessageOverlay';
+import translations from './translations'; // Import translations
 
 import './App.css'; // Use existing styles from your CSS
 
 const gameVersion = '0.0.2';
 export const debug = false;
+
+
 
 // Define saveToLocalStorage function to be used across the app
 const saveToLocalStorage = (character) => {
@@ -17,12 +20,31 @@ const saveToLocalStorage = (character) => {
 };
 
 const App = () => {
+  const [language, setLanguage] = useState(() => {
+    // Load language from localStorage, default to 'en'
+    const savedSettings = JSON.parse(localStorage.getItem('siteSettings'));
+    return savedSettings?.language || 'en';
+  });
+
+
+  // Save the selected language in localStorage when it changes
+  useEffect(() => {
+    const siteSettings = { language };
+    localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
+  }, [language]);
+
+
   const [character, setCharacter] = useState(null); // Initialize as null to avoid premature access
   const [log, setLog] = useState([]);
   const [firstTimeOverlayVisible, setFirstTimeOverlayVisible] = useState(true);
   const [shopOverlayVisible, setShopOverlayVisible] = useState(false); // Shop visibility state
   const [characterOverlayVisible, setCharacterOverlayVisible] = useState(false); // Character overlay visibility state
   const [researchOverlayVisible, setResearchOverlayVisible] = useState(false); // Character overlay visibility state
+
+  // Handle language change
+  const handleLanguageChange = (event) => {
+    setLanguage(event.target.value);
+  };
 
   // Logging function
   const logMessage = (message) => {
@@ -57,7 +79,7 @@ const App = () => {
         setCharacter(character); // Trigger state update to reflect progress
       }
     }, 1000);
-  
+
     return () => clearInterval(interval);
   }, [character, setCharacter]);
 
@@ -88,10 +110,10 @@ const App = () => {
         setResearchTimers(null); // Clear the timers after completion
       }
     }, 1000); // Check every second
-  
+
     return () => clearInterval(interval); // Clean up on component unmount
   }, [character, setCharacter]);
-  
+
 
   // Game loop to handle resource gathering, life regen, exploration, hazards
   // Game loop to handle resource gathering, life regen, exploration, hazards
@@ -183,7 +205,15 @@ const App = () => {
 
   return (
     <div className="container">
-      <h1>Hollowheart</h1>
+      {/* Language Dropdown */}
+      <div className="language-dropdown">
+    <label htmlFor="language">Language: </label>
+    <select id="language" value={language} onChange={handleLanguageChange}>
+      <option value="en">English</option>
+      <option value="sv">Swedish</option>
+    </select>
+  </div>
+      <h1>{translations[language].title}</h1>
 
       {/* Character Name and Level Section */}
       {character && (
@@ -242,21 +272,21 @@ const App = () => {
       )}
       {/* Display ongoing research under buildings */}
       {character && character.ongoingResearch && (
-  <div className="research-progress">
-    <p>Ongoing Research: {character.ongoingResearch.name}</p>
-    
-    {/* <p>research end time: {character.researchEndTime}, researchProgress: {character.getResearchProgress()}, {new Date().getTime()}, progress = {character.getResearchProgress() / (character.researchEndTime - new Date().getTime())} </p> */}
-    <div className="progress-bar">
-    <div
-        className="progress"
-        style={{
-          width: `${((character.ongoingResearch.timeRequired - character.getResearchProgress()) / character.ongoingResearch.timeRequired) * 100}%`
-        }}
-      ></div>
-    </div>
-  </div>
-  
-)}
+        <div className="research-progress">
+          <p>Ongoing Research: {character.ongoingResearch.name}</p>
+
+          {/* <p>research end time: {character.researchEndTime}, researchProgress: {character.getResearchProgress()}, {new Date().getTime()}, progress = {character.getResearchProgress() / (character.researchEndTime - new Date().getTime())} </p> */}
+          <div className="progress-bar">
+            <div
+              className="progress"
+              style={{
+                width: `${((character.ongoingResearch.timeRequired - character.getResearchProgress()) / character.ongoingResearch.timeRequired) * 100}%`
+              }}
+            ></div>
+          </div>
+        </div>
+
+      )}
       {/* Action Buttons */}
       {character && (
         <section className="actions-section">
@@ -293,14 +323,14 @@ const App = () => {
           )}
 
           {/* Give Up Button */}
-          <button className="give-up-btn" onClick={resetGame}>Give Up</button>
-            {/* Debug button */}
-  {debug && (<button className="debug-btn" onClick={() => {
-    character.addDebugResources();
-    setCharacter(character);
-  }}>
-    Debug: Add Resources
-  </button>)}
+          <button className="give-up-btn" onClick={resetGame}>{translations[language].giveUp}</button>
+          {/* Debug button */}
+          {debug && (<button className="debug-btn" onClick={() => {
+            character.addDebugResources();
+            setCharacter(character);
+          }}>
+            Debug: Add Resources
+          </button>)}
         </section>
       )}
       {/* Log Section */}
@@ -327,21 +357,21 @@ const App = () => {
       )}
 
       {generalMessage && (
-              <MessageOverlay
-                title={generalMessage.title}
-                message={generalMessage.message}
-                onClose={() => setGeneralMessage(null)}
-              />
-            )}
+        <MessageOverlay
+          title={generalMessage.title}
+          message={generalMessage.message}
+          onClose={() => setGeneralMessage(null)}
+        />
+      )}
 
 
       {firstTimeOverlayVisible && (
         <div className="overlay">
           <div className="overlay-content">
             <h2>Welcome to Hollowheart</h2>
-            <p>A mysterious hole has appeared beside your village, plaguing and poisoning the land. Brave souls have ventured into its depths, never to return.</p>
-            <p>Now it's your turn. Will you survive the descent?</p>
-            <p>This is a dangerous and unforgiving journey. Only the strongest and most resilient will make it out alive.</p>
+            <p>translations[language].welcomeMessage1</p>
+            <p>translations[language].welcomeMessage2</p>
+            <p>translations[language].welcomeMessage3</p>
             <input
               type="text"
               placeholder="Your name"
@@ -354,12 +384,12 @@ const App = () => {
           </div>
         </div>
       )}
-          <div className="game-version">
-      Version: {gameVersion}
-    </div>
-    <div className="highscore-display">
-  Highscore: {character ? `${character.playerName}: ${character.recordDepth}` : 0}
-</div>
+      <div className="game-version">
+        Version: {gameVersion}
+      </div>
+      <div className="highscore-display">
+        Highscore: {character ? `${character.playerName}: ${character.recordDepth}` : 0}
+      </div>
     </div>
   );
 };

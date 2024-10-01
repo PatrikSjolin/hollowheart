@@ -621,3 +621,34 @@ button:disabled {
   margin: 0 15px; /* Add some space between resource items */
   font-size: 1rem;
 }
+
+.language-dropdown {
+  position:absolute;
+  top: 60px;
+  left: 10px;
+  background-color: #5a5a5a;
+  padding: 5px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  z-index: 10;  /* Ensure it stays above other elements */
+  /* width: 100px; */
+}
+
+.language-dropdown label {
+  margin-right: 10px;
+  font-size: 1rem;
+}
+
+.language-dropdown select {
+  padding: 5px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.language-dropdown select:focus {
+  outline: none;
+  border-color: #4caf50;
+}
