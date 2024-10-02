@@ -1,3 +1,5 @@
+import { apiUrl } from './App';
+
 export class Character {
   constructor(saveToLocalStorage, logMessage, showGeneralMessage, initialState = {}) {
     this.playerName = initialState.playerName || 'Soldier';  // Fix here
@@ -81,25 +83,13 @@ export class Character {
     this.saveToLocalStorage(this);
   }
 
-  getHighScores() {
-    fetch('http://192.168.1.146:3003/highscores')
-      .then(response => response.json())
-      .then(highScores => {
-        console.log('High Scores:', highScores);
-        // You can render the high scores to the UI or log them here
-        // displayHighScores(highScores);  // Example: pass it to a function that renders the scores
-      })
-      .catch(error => {
-        console.error('Error retrieving high scores:', error);
-      });
-  };
-
   sendHighscoreToServer(characterName, score) {
     // Send the highscore data to the server (This function will be defined later)
-    fetch('http://192.168.1.146:3003/submit', {
+    fetch(apiUrl + '/submit', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        "ngrok-skip-browser-warning": "69420",
       },
       body: JSON.stringify({ characterName, score }),  // Sending character name and score
     })
@@ -114,6 +104,7 @@ export class Character {
 
   // Method to start exploring (descend)
   startExploring() {
+    if(this.health > 0){
     this.isExploring = true;
     if (this.depth === 0 && this.lastDepthVisited > 0) {
       this.depth = this.lastDepthVisited; // Go back to the last visited depth
@@ -125,6 +116,10 @@ export class Character {
       this.sendHighscoreToServer(this.playerName, this.recordDepth);  // Send highscore to the server
     }
     this.logMessage(`You descend to depth ${this.depth}`);
+  }
+  else{
+    this.logMessage(`You can't decend while being dead.`);
+  }
   }
 
   // Method to ascend (stop exploring)

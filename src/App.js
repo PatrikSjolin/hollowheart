@@ -8,6 +8,8 @@ import translations from './translations'; // Import translations
 
 import './App.css'; // Use existing styles from your CSS
 
+export const apiUrl = 'https://23ab-2001-9b1-4500-ef00-a4e3-da53-a84b-f3be.ngrok-free.app';
+
 const gameVersion = '0.0.2';
 export const debug = false;
 
@@ -75,7 +77,9 @@ const App = () => {
 
   const [highScores, setHighScores] = useState([]);
   useEffect(() => {
-    fetch('http://192.168.1.146:3003/highscores')  // Replace with your server URL
+    fetch(apiUrl + '/highscores', {
+      headers: new Headers({"ngrok-skip-browser-warning": "69420",
+    }),})  // Replace with your server URL
       .then(response => response.json())
       .then(data => setHighScores(data))
       .catch(error => console.error('Error fetching high scores:', error));
@@ -123,7 +127,6 @@ const App = () => {
   }, [character, setCharacter]);
 
 
-  // Game loop to handle resource gathering, life regen, exploration, hazards
   // Game loop to handle resource gathering, life regen, exploration, hazards
   useEffect(() => {
     if (character && !firstTimeOverlayVisible) {  // Ensure the loop only starts after the player has clicked Start
@@ -217,8 +220,8 @@ const App = () => {
       <div className="language-dropdown">
         <label htmlFor="language">Language: </label>
         <select id="language" value={language} onChange={handleLanguageChange}>
-          <option value="en">English</option>
-          <option value="sv">Swedish</option>
+          <option value="en">{translations[language].english}</option>
+          <option value="sv">{translations[language].swedish}</option>
         </select>
       </div>
       <h1>{translations[language].title}</h1>
@@ -396,12 +399,12 @@ const App = () => {
         Version: {gameVersion}
       </div>
       <div className="highscore-display">
-        <h3>High Scores</h3>
+        <h3>{translations[language].highScores}</h3>
         <ul>
           {highScores.map((score, index) => (
-            <li key={index}>
-              {index + 1}. {score.characterName}: {score.score}
-            </li>
+            // <li key={index}>
+              <p>{index + 1}. {score.characterName}: {score.score}</p>
+            // </li>
           ))}
         </ul>
       </div>

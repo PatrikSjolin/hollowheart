@@ -596,7 +596,7 @@ button:disabled {
 .highscore-display {
   position: fixed;
   top: 10px;
-  left: 10px;
+  left: 0px;
   color: #fff;
   background-color: #333;
   padding: 10px;
@@ -624,7 +624,7 @@ button:disabled {
 
 .language-dropdown {
   position:absolute;
-  top: 190px;
+  bottom: 10px;
   left: 10px;
   background-color: #5a5a5a;
   padding: 5px;

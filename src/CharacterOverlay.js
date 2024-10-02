@@ -1,4 +1,5 @@
 import React from 'react';
+import { debug } from './App';
 
 const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible }) => (
   <div className="overlay">
@@ -66,6 +67,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible 
         </button>
       </div>
       <p><strong>Unallocated Stat Points:</strong> {character.unallocatedPoints}</p>
+      {debug && (<p>`${character.experience} / ${character.level}`</p>)}
     </div>
   </div>
 );
