@@ -82,7 +82,7 @@ export class Character {
   }
 
   getHighScores() {
-    fetch('http://localhost:3003/highscores')
+    fetch('http://192.168.1.146:3003/highscores')
       .then(response => response.json())
       .then(highScores => {
         console.log('High Scores:', highScores);
@@ -96,7 +96,7 @@ export class Character {
 
   sendHighscoreToServer(characterName, score) {
     // Send the highscore data to the server (This function will be defined later)
-    fetch('http://localhost:3003/submit', {
+    fetch('http://192.168.1.146:3003/submit', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

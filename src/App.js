@@ -75,7 +75,7 @@ const App = () => {
 
   const [highScores, setHighScores] = useState([]);
   useEffect(() => {
-    fetch('http://192.168.1.242:3003/highscores')  // Replace with your server URL
+    fetch('http://192.168.1.146:3003/highscores')  // Replace with your server URL
       .then(response => response.json())
       .then(data => setHighScores(data))
       .catch(error => console.error('Error fetching high scores:', error));
