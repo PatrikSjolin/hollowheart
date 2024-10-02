@@ -72,8 +72,7 @@ export class Character {
 
       const rounds = Math.floor(this.regenTimer / regenInterval);
       if (this.currentHealth < this.health) {
-
-        this.currentHealth = Math.min(this.currentHealth + (this.lifeRegen)* rounds, this.health);
+        this.currentHealth = Math.min(this.currentHealth + (this.lifeRegen) * rounds, this.health);
         this.logMessage(`Regenerated ${this.lifeRegen * rounds} health. Current health: ${this.currentHealth}`);
         this.saveToLocalStorage(this); // Save state after regeneration
       }
@@ -104,22 +103,22 @@ export class Character {
 
   // Method to start exploring (descend)
   startExploring() {
-    if(this.health > 0){
-    this.isExploring = true;
-    if (this.depth === 0 && this.lastDepthVisited > 0) {
-      this.depth = this.lastDepthVisited; // Go back to the last visited depth
-    } else {
-      this.depth += 1; // Otherwise, go down by 1 depth
+    if (this.currentHealth > 0) {
+      this.isExploring = true;
+      if (this.depth === 0 && this.lastDepthVisited > 0) {
+        this.depth = this.lastDepthVisited; // Go back to the last visited depth
+      } else {
+        this.depth += 1; // Otherwise, go down by 1 depth
+      }
+      if (this.depth > this.recordDepth) {
+        this.recordDepth = this.depth;
+        this.sendHighscoreToServer(this.playerName, this.recordDepth);  // Send highscore to the server
+      }
+      this.logMessage(`You descend to depth ${this.depth}`);
     }
-    if(this.depth > this.recordDepth) {
-      this.recordDepth = this.depth;
-      this.sendHighscoreToServer(this.playerName, this.recordDepth);  // Send highscore to the server
+    else {
+      this.logMessage(`You can't decend while being dead.`);
     }
-    this.logMessage(`You descend to depth ${this.depth}`);
-  }
-  else{
-    this.logMessage(`You can't decend while being dead.`);
-  }
   }
 
   // Method to ascend (stop exploring)
@@ -139,7 +138,7 @@ export class Character {
       const treasureInterval = 5000;
       this.treasureTimer += elapsedTime;
 
-      const intelligenceFactor = (1 + this.intelligence) / this.intelligence;
+      const intelligenceFactor = this.calculateXpBoostFromIntelligence();
 
       if (this.treasureTimer > treasureInterval) {
         // Simulate finding resources and gaining experience
@@ -178,15 +177,14 @@ export class Character {
     if (hazardChance < 0.7) { // Increased chance of a hazard occurring (60%)
       const damage = Math.floor(Math.random() * dangerLevel) + 6; // Hazard deals more damage (min 10)
 
-      const armor = this.strength * 4;
-      const damageReduction = (armor / (armor + 120));
+      const damageReduction = this.calculateDamageReductionFromArmor();
       const damageTaken = Math.floor(damage * (1 - damageReduction));
 
       this.currentHealth -= damageTaken;
       this.logMessage(`You encountered a hazard and took ${damageTaken} damage! Current health: ${this.currentHealth}.`);
       console.log(`actual damage: ${damage}, reduction: ${damageReduction}`);
 
-      const expGained = Math.floor(((1+this.intelligence) / this.intelligence) * this.depth * Math.floor(Math.random() * 20) + 5); // Random exp gained
+      const expGained = Math.floor(this.calculateXpBoostFromIntelligence() * this.depth * Math.floor(Math.random() * 20) + 5); // Random exp gained
       this.experience += expGained;
       this.logMessage(`You survived and gained ${expGained} experience.`);
 
@@ -195,6 +193,23 @@ export class Character {
         this.die();
       }
     }
+  }
+
+  calculateQuantityBoostFromIntelligence() {
+    return (1 + this.intelligence) / this.intelligence;
+  }
+
+  calculateXpBoostFromIntelligence() {
+    return (1 + this.intelligence) / this.intelligence;
+  }
+
+  calculateDamageReductionFromArmor(){
+    const armor = this.calculateArmor();
+    return (armor / (armor + 120));
+  }
+
+  calculateArmor() {
+    return this.strength * 4;
   }
 
   // Method for the character to die and reset
@@ -209,7 +224,7 @@ export class Character {
     this.currentHealth = 0;
     this.numberOfDeaths++;
 
-    if(this.numberOfDeaths === 1){
+    if (this.numberOfDeaths === 1) {
       this.showGeneralMessage('You died', 'Or not really. You will slowly regen back, but all resources are lost. Giving up might be a good choice.');  // Show the death overlay only on the first death
     }
 
@@ -222,14 +237,14 @@ export class Character {
     this.unallocatedPoints += 5; // Allocate stat points
     this.isLevelingUp = true; // Set the level-up flag
     this.logMessage(`Level up! You are now level ${this.level} and gained 5 unallocated stat points.`);
-      // Remove the level-up glow after a few seconds
-      setTimeout(() => {
-        this.isLevelingUp = false;
-        this.saveToLocalStorage(this); // Save the updated state
-      }, 3000);
+    // Remove the level-up glow after a few seconds
+    setTimeout(() => {
+      this.isLevelingUp = false;
+      this.saveToLocalStorage(this); // Save the updated state
+    }, 3000);
     this.saveToLocalStorage(this); // Update React state
   }
-  
+
   addDebugResources() {
     this.coins += 1000;
     this.wood += 1000;
@@ -383,7 +398,7 @@ export class Character {
       stoneGenerators.forEach(building => {
         generatedStone++;
       });
-      
+
       const rounds = Math.floor(this.stoneTimer / 15000);
 
       if (generatedStone > 0) {
@@ -417,7 +432,7 @@ export class Building {
     return true;
   }
 
-  isUnlocked(character){
+  isUnlocked(character) {
     return this.unlockCondition(character);
   }
 

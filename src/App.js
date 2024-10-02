@@ -78,8 +78,10 @@ const App = () => {
   const [highScores, setHighScores] = useState([]);
   useEffect(() => {
     fetch(apiUrl + '/highscores', {
-      headers: new Headers({"ngrok-skip-browser-warning": "69420",
-    }),})  // Replace with your server URL
+      headers: new Headers({
+        "ngrok-skip-browser-warning": "69420",
+      }),
+    })  // Replace with your server URL
       .then(response => response.json())
       .then(data => setHighScores(data))
       .catch(error => console.error('Error fetching high scores:', error));
@@ -285,8 +287,6 @@ const App = () => {
       {character && character.ongoingResearch && (
         <div className="research-progress">
           <p>Ongoing Research: {character.ongoingResearch.name}</p>
-
-          {/* <p>research end time: {character.researchEndTime}, researchProgress: {character.getResearchProgress()}, {new Date().getTime()}, progress = {character.getResearchProgress() / (character.researchEndTime - new Date().getTime())} </p> */}
           <div className="progress-bar">
             <div
               className="progress"
@@ -402,9 +402,7 @@ const App = () => {
         <h3>{translations[language].highScores}</h3>
         <ul>
           {highScores.map((score, index) => (
-            // <li key={index}>
-              <p>{index + 1}. {score.characterName}: {score.score}</p>
-            // </li>
+            <p>{index + 1}. {score.characterName}: {score.score}</p>
           ))}
         </ul>
       </div>

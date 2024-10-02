@@ -67,7 +67,9 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible 
         </button>
       </div>
       <p><strong>Unallocated Stat Points:</strong> {character.unallocatedPoints}</p>
-      {debug && (<p>`${character.experience} / ${character.level}`</p>)}
+      {debug && (<p>Experience: {character.experience} / {Math.floor(200 * Math.pow(1.5, character.level - 1))} </p>)}
+      {debug && (<p>Amor: {character.calculateArmor()} - Reduction: {character.calculateDamageReductionFromArmor()} </p>)}
+      {debug && (<p>Quantity gain: {character.calculateQuantityBoostFromIntelligence()} - Xp gain: {character.calculateXpBoostFromIntelligence()} </p>)}
     </div>
   </div>
 );
