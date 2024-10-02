@@ -246,8 +246,8 @@ const App = () => {
         <div
           id="sun"
           style={{
-            backgroundColor: `rgba(255, 223, 0, ${1 - character.depth * 0.2})`,
-            boxShadow: `0 0 30px rgba(255, 223, 0, ${0.8 - character.depth * 0.2})`
+            backgroundColor: `rgba(255, 223, 0, ${Math.max(1 - character.depth * 0.1, 0.05)})`,
+            boxShadow: `0 0 30px rgba(255, 223, 0, ${0.8 - character.depth * 0.1})`
           }}
         ></div>
       )}
