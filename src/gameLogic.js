@@ -67,12 +67,15 @@ export class Character {
     const regenInterval = this.lifeRegenRate * 1000;
 
     if (this.regenTimer >= regenInterval) {
+
+      const rounds = Math.floor(this.regenTimer / regenInterval);
       if (this.currentHealth < this.health) {
-        this.currentHealth = Math.min(this.currentHealth + this.lifeRegen, this.health);
-        this.logMessage(`Regenerated ${this.lifeRegen} health. Current health: ${this.currentHealth}`);
+
+        this.currentHealth = Math.min(this.currentHealth + (this.lifeRegen)* rounds, this.health);
+        this.logMessage(`Regenerated ${this.lifeRegen * rounds} health. Current health: ${this.currentHealth}`);
         this.saveToLocalStorage(this); // Save state after regeneration
       }
-      this.regenTimer = this.regenTimer - regenInterval;
+      this.regenTimer = this.regenTimer - (regenInterval * rounds);
     }
 
     this.saveToLocalStorage(this);
@@ -204,32 +207,6 @@ export class Character {
       }, 3000);
     this.saveToLocalStorage(this); // Update React state
   }
-
-  // Method to convert resources to coins
-  convertToCoins(resourceType, amount) {
-    let conversionRate = 1; // Define conversion rates
-    switch (resourceType) {
-      case 'iron':
-        conversionRate = 1;
-        this.coins += amount * conversionRate;
-        this.logMessage(`Converted ${amount} Iron to ${amount * conversionRate} Coins.`);
-        this.iron -= amount; // Subtract the converted amount
-        break;
-      case 'gold':
-        conversionRate = 5;
-        this.coins += amount * conversionRate;
-        this.logMessage(`Converted ${amount} Gold to ${amount * conversionRate} Coins.`);
-        this.gold -= amount; // Subtract the converted amount
-        break;
-      case 'diamonds':
-        conversionRate = 10;
-        this.coins += amount * conversionRate;
-        this.logMessage(`Converted ${amount} Diamonds to ${amount * conversionRate} Coins.`);
-        this.diamonds -= amount; // Subtract the converted amount
-        break;
-    }
-    this.saveToLocalStorage(this); // Save the updated state
-  }
   
   addDebugResources() {
     this.coins += 1000;
@@ -255,6 +232,32 @@ export class Character {
     } else {
       this.logMessage(`No unallocated points available.`);
     }
+  }
+
+  // Method to convert resources to coins
+  convertToCoins(resourceType, amount) {
+    let conversionRate = 1; // Define conversion rates
+    switch (resourceType) {
+      case 'iron':
+        conversionRate = 1;
+        this.coins += amount * conversionRate;
+        this.logMessage(`Converted ${amount} Iron to ${amount * conversionRate} Coins.`);
+        this.iron -= amount; // Subtract the converted amount
+        break;
+      case 'gold':
+        conversionRate = 5;
+        this.coins += amount * conversionRate;
+        this.logMessage(`Converted ${amount} Gold to ${amount * conversionRate} Coins.`);
+        this.gold -= amount; // Subtract the converted amount
+        break;
+      case 'diamonds':
+        conversionRate = 10;
+        this.coins += amount * conversionRate;
+        this.logMessage(`Converted ${amount} Diamonds to ${amount * conversionRate} Coins.`);
+        this.diamonds -= amount; // Subtract the converted amount
+        break;
+    }
+    this.saveToLocalStorage(this); // Save the updated state
   }
 
   // Method to buy buildings that generate resources
@@ -334,6 +337,7 @@ export class Character {
 
   generateResources(elapsedTime) {
 
+    // if(woodGenerators)
     this.woodTimer += elapsedTime;
     if (this.woodTimer > 10000) {
       // Find all wood-generating buildings
@@ -342,13 +346,12 @@ export class Character {
       woodGenerators.forEach(building => {
         generatedWood++;
       });
-
+      const rounds = Math.floor(this.woodTimer / 10000);
       if (generatedWood > 0) {
-        this.logMessage(`Generated ${generatedWood} wood.`);
-        // console.log(this.wood + generatedWood);
-        this.wood = Math.min(this.maxWood, this.wood + generatedWood);
+        this.logMessage(`Generated ${generatedWood * rounds} wood.`);
+        this.wood = Math.min(this.maxWood, this.wood + (generatedWood * rounds));
       }
-      this.woodTimer -= 10000;
+      this.woodTimer -= 10000 * rounds;
     }
 
     this.stoneTimer += elapsedTime;
@@ -358,11 +361,14 @@ export class Character {
       stoneGenerators.forEach(building => {
         generatedStone++;
       });
+      
+      const rounds = Math.floor(this.stoneTimer / 15000);
+
       if (generatedStone > 0) {
-        this.logMessage(`Generated ${generatedStone} stone.`);
-        this.stone = Math.min(this.maxStone, this.stone + generatedStone);
+        this.logMessage(`Generated ${generatedStone * rounds} stone.`);
+        this.stone = Math.min(this.maxStone, this.stone + (generatedStone * rounds));
       }
-      this.stoneTimer -= 15000;
+      this.stoneTimer -= 15000 * rounds;
     }
     this.saveToLocalStorage(this);
   }
@@ -385,7 +391,7 @@ export class Building {
         return false;
       }
     }
-    console.log('can afford');
+    // console.log('can afford');
     return true;
   }
 
