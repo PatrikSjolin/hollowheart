@@ -69,7 +69,7 @@ const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible, r
                 <p>Choose a research to enhance your character's abilities. More research options will be available by progressing in various ways.</p>
 
                 {/* List available researches */}
-                {availableResearches.map((research, index) => (
+                {availableResearches.filter(research => research.unlockCondition).map((research, index) => (
                     <div key={index} className="research-item">
                         <p><strong>{research.name}</strong></p>
                         <p>{research.description}</p>
