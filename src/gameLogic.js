@@ -161,12 +161,19 @@ export class Character {
         this.encounterHazard();
 
         // Check if it's time to level up
-        if (this.experience >= Math.floor(200 * Math.pow(1.5, this.level - 1))) {
+        if (this.experience >= this.calculateXpNeededForLevel(this.level)) {
           this.levelUp();
         }
         this.hazardTimer = this.hazardTimer - hazardInterval;
       }
     }
+  }
+
+  calculateXpNeededForLevel(level) {
+    if(level === 0)
+      return 0;
+
+    return Math.floor(200 * Math.pow(1.5, level - 1));
   }
 
   // Method to simulate encountering a hazard
@@ -223,6 +230,8 @@ export class Character {
     this.stone = Math.floor(this.wood * 0.1);
     this.currentHealth = 0;
     this.numberOfDeaths++;
+    this.treasureTimer = 0;
+    this.experience = this.calculateXpNeededForLevel(this.level - 1);
 
     if (this.numberOfDeaths === 1) {
       this.showGeneralMessage('You died', 'Or not really. You will slowly regen back, but all resources are lost. Giving up might be a good choice.');  // Show the death overlay only on the first death
