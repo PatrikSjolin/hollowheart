@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { buildings } from './gameLogic';
+import { buildings } from './building';
 import { items } from './gameLogic';  // Import the items array from gameLogic
 
 const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
@@ -49,7 +49,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
           <p><strong>Iron:</strong> {character.iron}</p>
           <p><strong>Diamonds:</strong> {character.diamonds}</p>
         </div>
-        
+
         {/* Conversion Section */}
         <h2>Convert Resources</h2>
         <div className="conversion-section">
