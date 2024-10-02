@@ -73,6 +73,14 @@ const App = () => {
   //   };
   // };
 
+  const [highScores, setHighScores] = useState([]);
+  useEffect(() => {
+    fetch('http://192.168.1.242:3003/highscores')  // Replace with your server URL
+      .then(response => response.json())
+      .then(data => setHighScores(data))
+      .catch(error => console.error('Error fetching high scores:', error));
+  }, []);  // Empty array to ensure this only runs once on component mount
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (character && character.ongoingResearch && character.getResearchProgress() > 0) {
@@ -207,12 +215,12 @@ const App = () => {
     <div className="container">
       {/* Language Dropdown */}
       <div className="language-dropdown">
-    <label htmlFor="language">Language: </label>
-    <select id="language" value={language} onChange={handleLanguageChange}>
-      <option value="en">English</option>
-      <option value="sv">Swedish</option>
-    </select>
-  </div>
+        <label htmlFor="language">Language: </label>
+        <select id="language" value={language} onChange={handleLanguageChange}>
+          <option value="en">English</option>
+          <option value="sv">Swedish</option>
+        </select>
+      </div>
       <h1>{translations[language].title}</h1>
 
       {/* Character Name and Level Section */}
@@ -388,9 +396,14 @@ const App = () => {
         Version: {gameVersion}
       </div>
       <div className="highscore-display">
-        <p>Highscore (depth)</p>
-         <p>{character ? `${character.playerName}: ${character.recordDepth}` : 0}</p>
-         <p>Ada: 21</p>
+        <h3>High Scores</h3>
+        <ul>
+          {highScores.map((score, index) => (
+            <li key={index}>
+              {index + 1}. {score.characterName}: {score.score}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

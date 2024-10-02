@@ -81,8 +81,35 @@ export class Character {
     this.saveToLocalStorage(this);
   }
 
-  sendHighscoreToServer() {
+  getHighScores() {
+    fetch('http://localhost:3003/highscores')
+      .then(response => response.json())
+      .then(highScores => {
+        console.log('High Scores:', highScores);
+        // You can render the high scores to the UI or log them here
+        // displayHighScores(highScores);  // Example: pass it to a function that renders the scores
+      })
+      .catch(error => {
+        console.error('Error retrieving high scores:', error);
+      });
+  };
+
+  sendHighscoreToServer(characterName, score) {
     // Send the highscore data to the server (This function will be defined later)
+    fetch('http://localhost:3003/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ characterName, score }),  // Sending character name and score
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('High score submitted:', data.message);
+      })
+      .catch(error => {
+        console.error('Error submitting high score:', error);
+      });
   }
 
   // Method to start exploring (descend)
@@ -95,7 +122,7 @@ export class Character {
     }
     if(this.depth > this.recordDepth) {
       this.recordDepth = this.depth;
-      this.sendHighscoreToServer();  // Send highscore to the server
+      this.sendHighscoreToServer(this.playerName, this.recordDepth);  // Send highscore to the server
     }
     this.logMessage(`You descend to depth ${this.depth}`);
   }
