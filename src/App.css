@@ -31,6 +31,7 @@ h1 {
 
 /* Health Progress Bar */
 .health-bar-container {
+  position: relative;
   margin-bottom: 25px;
 }
 
@@ -41,12 +42,30 @@ h1 {
   height: 40px;
   overflow: hidden;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  position: relative;
 }
 
 #healthBarFill {
   height: 100%;
   background-color: #ff4d4d;
   transition: width 0.3s ease;
+  z-index: 1;
+}
+
+.health-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  pointer-events: none; /* Ensure clicks pass through the text */
 }
 
 /* Resource and Building Sections */

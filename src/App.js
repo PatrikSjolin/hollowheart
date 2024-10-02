@@ -252,16 +252,18 @@ const App = () => {
         ></div>
       )}
 
-      {character && (
-        <section className="health-section">
-          <div className="health-bar-container">
-            <p>Health: {character.currentHealth} / {character.calculateMaxHealth()}</p>
-            <div className="health-bar">
-              <div id="healthBarFill" style={{ width: `${(character.currentHealth / character.calculateMaxHealth()) * 100}%` }}></div>
+    {character && (
+      <section className="health-section">
+        <div className="health-bar-container">
+          <div className="health-bar">
+            <div id="healthBarFill" style={{ width: `${(character.currentHealth / character.calculateMaxHealth()) * 100}%` }}></div>
+            <div className="health-text">
+              Health: {character.currentHealth} / {character.calculateMaxHealth()}
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
+    )}
       {/* Resources Section */}
       {character && (
         <section className="resources-section">
