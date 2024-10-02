@@ -25,6 +25,7 @@ export class Character {
     this.buildings = initialState.buildings || [];
     this.lifeRegen = initialState.lifeRegen || 1; // Add life regeneration stat (1 HP every 20 seconds)
     this.lifeRegenRate = initialState.lifeRegenRate || 20;
+    this.timeSurvivedAtLevel = initialState.timeSurvivedAtLevel || 0;
     this.expBoost = initialState.expBoost || 1;
     this.wood = initialState.wood || 0;
     this.completedResearch = initialState.completedResearch || []; // Store completed research
@@ -107,14 +108,24 @@ export class Character {
       this.isExploring = true;
       if (this.depth === 0 && this.lastDepthVisited > 0) {
         this.depth = this.lastDepthVisited; // Go back to the last visited depth
-      } else {
+        this.logMessage(`You descend to depth ${this.depth}`);
+      }
+      else if(this.depth === 0) {
+        this.depth = 1; // Otherwise, go down by 1 depth
+        this.logMessage(`You descend to depth ${this.depth}`);
+      }
+       else if (this.timeSurvivedAtLevel > 6000) {
         this.depth += 1; // Otherwise, go down by 1 depth
+        this.timeSurvivedAtLevel = 0;
+        this.logMessage(`You descend to depth ${this.depth}`);
+      }
+      else {
+        this.logMessage('Not ready to descend');
       }
       if (this.depth > this.recordDepth) {
         this.recordDepth = this.depth;
         this.sendHighscoreToServer(this.playerName, this.recordDepth);  // Send highscore to the server
       }
-      this.logMessage(`You descend to depth ${this.depth}`);
     }
     else {
       this.logMessage(`You can't decend while being dead.`);
@@ -137,6 +148,7 @@ export class Character {
     if (this.isExploring) {
       const treasureInterval = 5000;
       this.treasureTimer += elapsedTime;
+      this.timeSurvivedAtLevel += elapsedTime;
 
       const intelligenceFactor = this.calculateXpBoostFromIntelligence();
 
@@ -231,6 +243,7 @@ export class Character {
     this.currentHealth = 0;
     this.numberOfDeaths++;
     this.treasureTimer = 0;
+    this.timeSurvivedAtLevel = 0;
     this.experience = this.calculateXpNeededForLevel(this.level - 1);
 
     if (this.numberOfDeaths === 1) {
