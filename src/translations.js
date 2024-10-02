@@ -10,7 +10,14 @@ const translations = {
     welcomeMessage3: 'This is a dangerous and unforgiving journey. Only the strongest and most resilient will make it out alive.',
     highScores: 'High Score',
     english: 'English',
-    swedish: 'Swedish'
+    swedish: 'Swedish',
+    character: 'Character',
+    iron: 'Iron',
+    gold: 'Gold',
+    diamonds: 'Diamonds',
+    coins: 'Coins',
+    wood: 'Wood',
+    stone: 'Stone',
   },
   sv: {
     title: 'Hollowheart',
@@ -23,7 +30,14 @@ const translations = {
     welcomeMessage3: 'This is a dangerous and unforgiving journey. Only the strongest and most resilient will make it out alive.',
     highScores: 'Topplista',
     english: 'Engelska',
-    swedish: 'Svenska'
+    swedish: 'Svenska',
+    character: 'Karaktär',
+    iron: 'Järn',
+    gold: 'Guld',
+    diamonds: 'Diamanter',
+    coins: 'Mynt',
+    wood: 'Ved',
+    stone: 'Sten',
   },
 };
 

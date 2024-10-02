@@ -267,18 +267,6 @@ export class Character {
     this.saveToLocalStorage(this); // Update React state
   }
 
-  addDebugResources() {
-    this.coins += 1000;
-    this.wood += 1000;
-    this.stone += 1000;
-    this.iron += 1000;
-    this.intelligence += 100;
-
-
-    this.logMessage('Added 1000 coins, 100 wood, 100 stone, and 100 iron for debugging.');
-    this.saveToLocalStorage(this); // Save to local storage to persist the resources
-  }
-
   upgradeStat(stat) {
     if (this.unallocatedPoints > 0) {
       this[stat] += 1; // Increment the stat
@@ -430,6 +418,18 @@ export class Character {
       this.stoneTimer -= 15000 * rounds;
     }
     this.saveToLocalStorage(this);
+  }
+
+  addDebugResources() {
+    this.coins += 1000;
+    this.wood += 1000;
+    this.stone += 1000;
+    this.iron += 1000;
+    this.intelligence += 100;
+
+
+    this.logMessage('Added 1000 coins, 100 wood, 100 stone, and 100 iron for debugging.');
+    this.saveToLocalStorage(this); // Save to local storage to persist the resources
   }
 }
 

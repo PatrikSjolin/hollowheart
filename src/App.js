@@ -265,12 +265,12 @@ const App = () => {
       {/* Resources Section */}
       {character && (
         <section className="resources-section">
-          <p>Iron: {character.iron}</p>
-          <p>Gold: {character.gold}</p>
-          <p>Diamonds: {character.diamonds}</p>
-          <p>Coins: {character.coins}</p>
-          <p>Wood: {character.wood} / {character.maxWood}</p>
-          <p>Stone: {character.stone} / {character.maxStone}</p>
+          <p>{translations[language].iron}: {character.iron}</p>
+          <p>{translations[language].gold}: {character.gold}</p>
+          <p>{translations[language].diamonds}: {character.diamonds}</p>
+          <p>{translations[language].coins}: {character.coins}</p>
+          <p>{translations[language].wood}: {character.wood} / {character.maxWood}</p>
+          <p>{translations[language].stone}: {character.stone} / {character.maxStone}</p>
         </section>
       )}
 
@@ -301,11 +301,8 @@ const App = () => {
       {/* Action Buttons */}
       {character && (
         <section className="actions-section">
-          <button className={`character-stats-button ${character.isLevelingUp ? 'glow' : ''}`} onClick={() => setCharacterOverlayVisible(true)}>
-            Character
-          </button>
           <button className="explore-btn" onClick={() => character.startExploring()}>
-            {character.isExploring ? 'Descend Deeper ↓' : 'Descend into the Hole ↓'}
+            {'Descend ↓'}
           </button>
           <button onClick={handleClimbUp} disabled={character.rope === 0 || character.depth === 0}>⬆️</button> {/* Climb Up button */}
           <button
@@ -318,6 +315,9 @@ const App = () => {
             Ascend ↑
           </button>
 
+          <button className={`character-stats-button ${character.isLevelingUp ? 'glow' : ''}`} onClick={() => setCharacterOverlayVisible(true)}>
+            {translations[language].character}
+          </button>
           <button className="shop-btn" onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>Shop</button>
 
           {character.libraryBuilt && (
