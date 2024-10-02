@@ -9,11 +9,9 @@ import translations from './translations'; // Import translations
 import './App.css'; // Use existing styles from your CSS
 
 export const apiUrl = 'https://23ab-2001-9b1-4500-ef00-a4e3-da53-a84b-f3be.ngrok-free.app';
-
-const gameVersion = '0.0.2';
 export const debug = false;
 
-
+const gameVersion = '0.0.2';
 
 // Define saveToLocalStorage function to be used across the app
 const saveToLocalStorage = (character) => {
@@ -28,6 +26,10 @@ const App = () => {
     return savedSettings?.language || 'en';
   });
 
+  // Handle language change
+  const handleLanguageChange = (event) => {
+    setLanguage(event.target.value);
+  };
 
   // Save the selected language in localStorage when it changes
   useEffect(() => {
@@ -42,11 +44,9 @@ const App = () => {
   const [shopOverlayVisible, setShopOverlayVisible] = useState(false); // Shop visibility state
   const [characterOverlayVisible, setCharacterOverlayVisible] = useState(false); // Character overlay visibility state
   const [researchOverlayVisible, setResearchOverlayVisible] = useState(false); // Character overlay visibility state
-
-  // Handle language change
-  const handleLanguageChange = (event) => {
-    setLanguage(event.target.value);
-  };
+  const [generalMessage, setGeneralMessage] = useState(null);
+  const [playerName, setPlayerName] = useState(""); // Add player name state
+  const [highScores, setHighScores] = useState([]);
 
   // Logging function
   const logMessage = (message) => {
@@ -59,23 +59,6 @@ const App = () => {
     setLog((prevLog) => [...prevLog, `${timestamp}${message}`]);
   };
 
-  const [generalMessage, setGeneralMessage] = useState(null);
-  const [playerName, setPlayerName] = useState(""); // Add player name state
-
-  // function startMusic() {
-  //   // Start playing the music when the component mounts
-  //   const audio = new Audio('/ethereal-ambient-music-55115.mp3'); // The path to the MP3 file
-  //   audio.loop = true; // Loop the music
-  //   audio.play().catch((error) => {
-  //     console.log("Error playing background music:", error);
-  //   });
-
-  //   return () => {
-  //     audio.pause(); // Pause the music when the component unmounts
-  //   };
-  // };
-
-  const [highScores, setHighScores] = useState([]);
   useEffect(() => {
     fetch(apiUrl + '/highscores', {
       headers: new Headers({
@@ -218,16 +201,7 @@ const App = () => {
 
   return (
     <div className="container">
-      {/* Language Dropdown */}
-      <div className="language-dropdown">
-        <label htmlFor="language">Language: </label>
-        <select id="language" value={language} onChange={handleLanguageChange}>
-          <option value="en">{translations[language].english}</option>
-          <option value="sv">{translations[language].swedish}</option>
-        </select>
-      </div>
       <h1>{translations[language].title}</h1>
-
       {/* Character Name and Level Section */}
       {character && (
         <section className="character-info">
@@ -241,29 +215,19 @@ const App = () => {
       {character && (
         <p>Current Depth: {character.depth}</p>
       )}
-      {/* Sun Element */}
-      {character && (
-        <div
-          id="sun"
-          style={{
-            backgroundColor: `rgba(255, 223, 0, ${Math.max(1 - character.depth * 0.1, 0.05)})`,
-            boxShadow: `0 0 30px rgba(255, 223, 0, ${0.8 - character.depth * 0.1})`
-          }}
-        ></div>
-      )}
 
-    {character && (
-      <section className="health-section">
-        <div className="health-bar-container">
-          <div className="health-bar">
-            <div id="healthBarFill" style={{ width: `${(character.currentHealth / character.calculateMaxHealth()) * 100}%` }}></div>
-            <div className="health-text">
-              Health: {character.currentHealth} / {character.calculateMaxHealth()}
+      {character && (
+        <section className="health-section">
+          <div className="health-bar-container">
+            <div className="health-bar">
+              <div id="healthBarFill" style={{ width: `${(character.currentHealth / character.calculateMaxHealth()) * 100}%` }}></div>
+              <div className="health-text">
+                Health: {character.currentHealth} / {character.calculateMaxHealth()}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-    )}
+        </section>
+      )}
       {/* Resources Section */}
       {character && (
         <section className="resources-section">
@@ -306,7 +270,6 @@ const App = () => {
           <button className="explore-btn" onClick={() => character.startExploring()}>
             {'Descend ↓'}
           </button>
-          <button onClick={handleClimbUp} disabled={character.rope === 0 || character.depth === 0}>⬆️</button> {/* Climb Up button */}
           <button
             className={`explore-btn ${!character.isExploring ? 'disabled' : ''}`}
             onClick={() => {
@@ -316,6 +279,7 @@ const App = () => {
           >
             Ascend ↑
           </button>
+          <button onClick={handleClimbUp} disabled={character.rope === 0 || character.depth === 0}>⬆️</button> {/* Climb Up button */}
 
           <button className={`character-stats-button ${character.isLevelingUp ? 'glow' : ''}`} onClick={() => setCharacterOverlayVisible(true)}>
             {translations[language].character}
@@ -376,8 +340,6 @@ const App = () => {
           onClose={() => setGeneralMessage(null)}
         />
       )}
-
-
       {firstTimeOverlayVisible && (
         <div className="overlay">
           <div className="overlay-content">
@@ -397,17 +359,36 @@ const App = () => {
           </div>
         </div>
       )}
+      {/* Language Dropdown */}
+      <div className="language-dropdown">
+        <label htmlFor="language">Language: </label>
+        <select id="language" value={language} onChange={handleLanguageChange}>
+          <option value="en">{translations[language].english}</option>
+          <option value="sv">{translations[language].swedish}</option>
+        </select>
+      </div>
+
+      {/* Sun Element */}
+      {character && (
+        <div
+          id="sun"
+          style={{
+            backgroundColor: `rgba(255, 223, 0, ${Math.max(1 - character.depth * 0.1, 0.05)})`,
+            boxShadow: `0 0 30px rgba(255, 223, 0, ${0.8 - character.depth * 0.1})`
+          }}
+        ></div>
+      )}
+
       <div className="game-version">
         Version: {gameVersion}
       </div>
       <div className="highscore-display">
         <h3>{translations[language].highScores}</h3>
-        <ul>
           {highScores.map((score, index) => (
-            <p>{index + 1}. {score.characterName}: {score.score}</p>
+            <p key={`score-${index}`}>{index + 1}. {score.characterName}: {score.score}</p>
           ))}
-        </ul>
       </div>
+
     </div>
   );
 };

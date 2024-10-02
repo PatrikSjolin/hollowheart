@@ -70,17 +70,15 @@ export class Character {
     const regenInterval = this.lifeRegenRate * 1000;
 
     if (this.regenTimer >= regenInterval) {
-
+      
       const rounds = Math.floor(this.regenTimer / regenInterval);
+
       if (this.currentHealth < this.health) {
         this.currentHealth = Math.min(this.currentHealth + (this.lifeRegen) * rounds, this.health);
         this.logMessage(`Regenerated ${this.lifeRegen * rounds} health. Current health: ${this.currentHealth}`);
-        this.saveToLocalStorage(this); // Save state after regeneration
       }
       this.regenTimer = this.regenTimer - (regenInterval * rounds);
     }
-
-    this.saveToLocalStorage(this);
   }
 
   sendHighscoreToServer(characterName, score) {
@@ -264,7 +262,6 @@ export class Character {
       this.isLevelingUp = false;
       this.saveToLocalStorage(this); // Save the updated state
     }, 3000);
-    this.saveToLocalStorage(this); // Update React state
   }
 
   upgradeStat(stat) {
@@ -383,8 +380,6 @@ export class Character {
   }
 
   generateResources(elapsedTime) {
-
-    // if(woodGenerators)
     this.woodTimer += elapsedTime;
     if (this.woodTimer > 10000) {
       // Find all wood-generating buildings
@@ -417,7 +412,6 @@ export class Character {
       }
       this.stoneTimer -= 15000 * rounds;
     }
-    this.saveToLocalStorage(this);
   }
 
   addDebugResources() {
