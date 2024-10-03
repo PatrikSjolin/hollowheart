@@ -19,6 +19,8 @@ const translations = {
     coins: 'Coins',
     wood: 'Wood',
     stone: 'Stone',
+    descend: 'Descend ↓',
+    ascend: 'Ascend ↑',
   },
   sv: {
     title: 'Hollowheart',
@@ -39,6 +41,8 @@ const translations = {
     coins: 'Mynt',
     wood: 'Ved',
     stone: 'Sten',
+    descend: 'Gå ner ↓',
+    ascend: 'Gå upp ↑',
   },
 };
 

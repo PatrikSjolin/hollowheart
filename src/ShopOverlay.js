@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { buildings } from './building';
+import translations from './translations';
 
 const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
   const [activeTab, setActiveTab] = useState('conversion');  // State to manage active tab
@@ -7,7 +8,56 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
     iron: 0,
     gold: 0,
     diamonds: 0,
-  });
+  });  
+
+  const initializeShopStock = () => {
+    const defaultItems = [
+      {
+        name: 'Health restore',
+        type: 'consumable',
+        stacks: false,
+        description: 'Restores 100 health points.',
+        cost: { coins: 10 },
+        effect: (character) => {
+          character.useHealingPotion(); // Apply the healing effect
+        }
+      },
+      {
+        name: 'Rope',
+        type: 'special',
+        stacks: true,
+        description: 'Used to climb up one depth.',
+        cost: { coins: 10 },
+      },
+      {
+        name: 'Broken sword',
+        type: 'equipable',
+        stacks: false,
+        slot: 'weapon',
+        description: 'A "sword" that "increases" your attack power by 1.',
+        cost: { coins: 50 },
+        bonus: { attack: 5 },
+      },
+      {
+        name: 'Chest Armor',
+        type: 'equipable',
+        stacks: false,
+        slot: 'chest',
+        description: 'Provides 5 extra armor points.',
+        cost: { coins: 80 },
+        bonus: { armor: 5 },
+      }
+    ];
+  
+    const savedShopStock = JSON.parse(localStorage.getItem('shopStock'));
+    if (!savedShopStock) {
+      localStorage.setItem('shopStock', JSON.stringify(defaultItems));
+      return defaultItems;
+    }
+    return savedShopStock;
+  };
+
+  const [shopItems, setShopItems] = useState(initializeShopStock());  // Initialize with the shop stock
 
   const conversionRates = {
     iron: 1,
@@ -20,6 +70,19 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
       ...prevState,
       [resource]: value,
     }));
+  };
+
+  useEffect(() => {
+    const savedShopStock = JSON.parse(localStorage.getItem('shopStock'));
+    if (savedShopStock) {
+      setShopItems(savedShopStock);  // Restore the shop items from localStorage
+    }
+  }, []);
+
+  const addNewItemToShop = (newItem) => {
+    const updatedShopStock = [...shopItems, newItem];
+    setShopItems(updatedShopStock);
+    localStorage.setItem('shopStock', JSON.stringify(updatedShopStock));
   };
 
   // Handle max button click to set the slider to the maximum value
@@ -39,57 +102,6 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
     }));
   };
 
-  const items = [
-    {
-      name: 'Health restore',
-      type: 'consumable',
-      stacks: false,
-      description: 'Restores 100 health points.',
-      cost: { coins: 10 },
-      effect: (character) => {
-        character.useHealingPotion(); // Apply the healing effect
-      }
-    },
-    {
-      name: 'Rope',
-      type: 'special',
-      stacks: true,
-      description: 'Used to climb up one depth.',
-      cost: { coins: 10 },
-      effect: (character) => {
-        character.buyRope(); // Add one rope to the inventory
-      }
-    },
-    {
-      name: 'Broken sword',
-      type: 'equipable',  // Specify the item type
-      stacks: false,
-      slot: 'weapon',
-      description: 'A "sword" that "increases" your attack power by 1.',
-      cost: { coins: 50 },
-      effect: (character) => {
-        character.equipItem('weapon', {
-          name: 'Sword',
-          bonus: { attack: 10 }
-        });
-      }
-    },
-    {
-      name: 'Chest Armor',
-      type: 'equipable',
-      stacks: false,
-      slot: 'chest',
-      description: 'Provides 5 extra armor points.',
-      cost: { coins: 80 },
-      effect: (character) => {
-        character.equipItem('chest', {
-          name: 'Chest Armor',
-          bonus: { armor: 5 }
-        });
-      }
-    }
-  ];
-
     // Close the overlay when clicking outside the overlay content
     const handleClickOutside = (e) => {
       if (e.target.classList.contains('overlay')) {
@@ -103,7 +115,27 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
         setShopOverlayVisible(false);
       }
     };
-  
+  const handleBuyItem = (item, index) => {
+  if (character.coins >= item.cost.coins) {
+    if (item.type === 'consumable') {
+      item.effect(character);  // Consumable is used immediately
+      character.logMessage(`${item.name} used.`);
+    } else {
+      // Add equipable or stackable items to inventory
+      character.addItemToInventory(item);
+    }
+    character.coins -= item.cost.coins;
+    setCharacter(character);  // Update character state
+
+    // If the item is not consumable or special, remove it from the shop stock
+    if (item.type !== 'consumable' && item.type !== 'special') {
+      const updatedShopStock = shopItems.filter((shopItem, i) => i !== index);
+      setShopItems(updatedShopStock);
+      localStorage.setItem('shopStock', JSON.stringify(updatedShopStock));  // Save updated stock to localStorage
+    }
+  }
+};
+
     useEffect(() => {
       // Add event listener for click outside
       document.addEventListener('click', handleClickOutside);
@@ -170,7 +202,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
 
     {/* Add Consumables here */}
     <h2>Consumables</h2>
-    {items.filter(item => item.type === 'consumable').map((item, index) => (
+    {shopItems.filter(item => item.type === 'consumable').map((item, index) => (
       <div key={index} className="item-block">
         <div className="item-info">
           <p className="item-name">{item.name}</p>
@@ -184,7 +216,8 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
         <button
           onClick={() => {
             if (character.coins >= item.cost.coins) {
-              item.effect(character); // Consumable is used immediately
+              // item.effect(character); // Consumable is used immediately
+              character.useHealingPotion();
               character.logMessage(`${item.name} used.`);
               character.coins -= item.cost.coins;
               setCharacter(character);
@@ -241,43 +274,31 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
             </div>
           )}
 
-          {activeTab === 'items' && (
-            <div className="items-section">
-              <h2>Buy Items</h2>
-              {items.filter(item => item.type !== 'consumable').map((item, index) => (
-                <div key={index} className="item-block">
-                  <div className="item-info">
-                    <p className="item-name">{item.name}</p>
-                    <p className="item-description">{item.description}</p>
-                    <p className="item-cost">
-                      {Object.entries(item.cost).map(([resource, amount]) => (
-                        <span key={resource}> {resource}: {amount} </span>
-                      ))}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (character.coins >= item.cost.coins) {
-                        if (item.type === 'consumable') {
-                          item.effect(character); // Consumable is used immediately
-                          character.logMessage(`${item.name} used.`);
-                        } else {
-                          // Add stackable or equippable items to the inventory
-                          character.addItemToInventory(item);
-                        }
-                        character.coins -= item.cost.coins;
-                        setCharacter(character);  // Update character state
-                      }
-                    }}
-                    disabled={character.coins < item.cost.coins}
-                    className="shop-button"
-                  >
-                    Buy
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+{activeTab === 'items' && (
+  <div className="items-section">
+    <h2>Buy Items</h2>
+    {shopItems.filter(item => item.type !== 'consumable').map((item, index) => (
+      <div key={index} className="item-block">
+        <div className="item-info">
+          <p className="item-name">{item.name}</p>
+          <p className="item-description">{item.description}</p>
+          <p className="item-cost">
+            {Object.entries(item.cost).map(([resource, amount]) => (
+              <span key={resource}> {resource}: {amount} </span>
+            ))}
+          </p>
+        </div>
+        <button
+          onClick={() => handleBuyItem(item, index)}  // Call handleBuyItem when the item is purchased
+          disabled={character.coins < item.cost.coins}
+          className="shop-button"
+        >
+          Buy
+        </button>
+      </div>
+    ))}
+  </div>
+)}
         </div>
       </div>
     </div>

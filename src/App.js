@@ -5,13 +5,14 @@ import ResearchOverlay from './ResearchOverlay';  // Add this line
 import { Character } from './gameLogic'; // Import character logic
 import MessageOverlay from './MessageOverlay';
 import translations from './translations'; // Import translations
+// import { initializeShopStock } from './someUtilityFile';  // Ensure you import the initialization function
 
 import './App.css'; // Use existing styles from your CSS
 
 export const apiUrl = 'https://23ab-2001-9b1-4500-ef00-a4e3-da53-a84b-f3be.ngrok-free.app';
 export const debug = false;
 
-const gameVersion = '0.0.2';
+const gameVersion = '0.0.3';
 
 // Define saveToLocalStorage function to be used across the app
 const saveToLocalStorage = (character) => {
@@ -174,6 +175,11 @@ const App = () => {
       localStorage.removeItem('characterState');  // Clear saved character in localStorage
       setLog([]);  // Clear the log
       console.clear();
+
+       // Reset the shop items to default
+      // const defaultItems = initializeShopStock();
+      // setShopItems(defaultItems);  // Reset the shop state
+      localStorage.removeItem('shopStock');
     }
   };
 
@@ -268,7 +274,7 @@ const App = () => {
       {character && (
         <section className="actions-section">
           <button className="explore-btn" onClick={() => character.startExploring()}>
-            {'Descend ↓'}
+            {translations[language].descend}
           </button>
           <button
             className={`explore-btn ${!character.isExploring ? 'disabled' : ''}`}
@@ -277,7 +283,7 @@ const App = () => {
             }}
             disabled={!character.isExploring}
           >
-            Ascend ↑
+            {translations[language].ascend}
           </button>
           <button
   onClick={handleClimbUp}

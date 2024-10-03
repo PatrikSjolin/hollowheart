@@ -31,12 +31,12 @@ export class Character {
     this.completedResearch = initialState.completedResearch || []; // Store completed research
     this.stone = initialState.stone || 0;
     this.inventory = initialState.inventory || [];  // Add an inventory to store items
-    this.equipment = {
+    this.equipment = initialState.equipment || {
       weapon: null,
       chest: null,
       boots: null,
-      gloves: null
-    };
+      gloves: null,
+    }; // Make sure equipment is stored
     this.regenTimer = 0; // Initialize regen timer for health regeneration
     this.treasureTimer = 0;
     this.numberOfDeaths = initialState.numberOfDeaths || 0;
@@ -183,6 +183,8 @@ export class Character {
 
       const intelligenceFactor = this.calculateXpBoostFromIntelligence();
 
+
+
       if (this.treasureTimer > treasureInterval) {
         // Simulate finding resources and gaining experience
         const resourceFound = {
@@ -195,6 +197,18 @@ export class Character {
         this.diamonds += resourceFound.diamonds;
         this.treasureTimer = this.treasureTimer - treasureInterval;
         this.logMessage(`You found ${resourceFound.iron} iron, ${resourceFound.gold} gold, and ${resourceFound.diamonds} diamonds.`);
+
+
+
+
+        const itemFindChance = 0.01;  // 10% chance to find an item
+        const randomChance = Math.random();
+    
+        if (randomChance < itemFindChance) {
+          const foundItem = this.generateItem(this.depth, this.level, this.intelligence);
+          this.addItemToInventory(foundItem);
+          this.logMessage(`You found a ${foundItem.name}!`);
+        }
       }
 
       const hazardInterval = 1000;
@@ -210,6 +224,15 @@ export class Character {
         this.hazardTimer = this.hazardTimer - hazardInterval;
       }
     }
+  }
+
+  generateItem(depth, level, intelligence) {
+    return  {
+      name: 'Random Item',  // Replace with item generation logic
+      type: 'equipable',
+      slot: 'weapon',
+      bonus: { attack: 5 },
+    };
   }
 
   calculateXpNeededForLevel(level) {
@@ -286,7 +309,12 @@ export class Character {
   }
 
   calculateArmor() {
-    return this.strength * 4;
+    let armor = this.strength * 4;  // Base armor from strength
+  if (this.equipment.chest) {
+    armor += this.equipment.chest.bonus.armor;  // Add armor from equipped chest item
+  }
+  // Add bonuses from other equipped items as needed
+  return armor;
   }
 
   // Method for the character to die and reset
