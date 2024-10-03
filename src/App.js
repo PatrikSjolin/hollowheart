@@ -354,10 +354,10 @@ const App = () => {
           <button className={`character-stats-button ${character.isLevelingUp ? 'glow' : ''}`} onClick={() => setCharacterOverlayVisible(true)}>
             {translations[language].character}
           </button>
-          <button className="shop-btn" onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>Shop</button>
+          <button onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>Shop</button>
 
           {character.libraryBuilt && (
-            <button className="character-btn" onClick={() => setResearchOverlayVisible(true)}>Research</button>
+            <button onClick={() => setResearchOverlayVisible(true)}>Research</button>
           )}
 
           {researchOverlayVisible && (
@@ -371,7 +371,7 @@ const App = () => {
           )}
 
           {/* Give Up Button */}
-          <button className="give-up-btn" onClick={resetGame}>{translations[language].giveUp}</button>
+          <button onClick={resetGame}>{translations[language].giveUp}</button>
           {/* Debug button */}
           {debug && (<button className="debug-btn" onClick={() => {
             character.addDebugResources();

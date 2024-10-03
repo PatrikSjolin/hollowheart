@@ -183,8 +183,6 @@ export class Character {
 
       const intelligenceFactor = this.calculateXpBoostFromIntelligence();
 
-
-
       if (this.treasureTimer > treasureInterval) {
         // Simulate finding resources and gaining experience
         const resourceFound = {
@@ -198,16 +196,20 @@ export class Character {
         this.treasureTimer = this.treasureTimer - treasureInterval;
         this.logMessage(`You found ${resourceFound.iron} iron, ${resourceFound.gold} gold, and ${resourceFound.diamonds} diamonds.`);
 
-
-
-
-        const itemFindChance = 0.01 * intelligenceFactor;  // 1% chance to find an item
+        const itemFindChance = 0.1 * intelligenceFactor;  // 1% chance to find an item
         const randomChance = Math.random();
 
         if (randomChance < itemFindChance) {
           const foundItem = this.generateItem(this.depth, this.level, this.intelligence);
-          this.addItemToInventory(foundItem);
-          this.logMessage(`You found a ${foundItem.name}!`);
+          if (foundItem !== undefined) {
+            if (foundItem.type === 'consumable') {
+              this.useHealingPotion();
+            } else {
+              this.addItemToInventory(foundItem);
+            }
+
+            this.logMessage(`You found a ${foundItem.name}!`);
+          }
         }
       }
 
@@ -226,13 +228,97 @@ export class Character {
     }
   }
 
-  generateItem(depth, level, intelligence) {
+
+  generateArmor(depth, level, intelligence) {
+    const intelligenceFactor = this.calculateQuantityBoostFromIntelligence();
+    const armorBonus = Math.floor(Math.random() * 10 * intelligenceFactor * (depth + 1) / depth);
+    let finalSlot = '';
+
+    const slotRoll = Math.floor(Math.random() * 3);
+
+    if (slotRoll === 0) {
+      finalSlot = 'chest';
+    } else if (slotRoll === 1) {
+      finalSlot = 'gloves';
+    } else if (slotRoll === 2) {
+      finalSlot = 'boots';
+    }
+
+    const name = `Rotten ${finalSlot} of trash`;
+
     return {
-      name: 'Random Item',  // Replace with item generation logic
+      name: name,
       type: 'equipable',
-      slot: 'weapon',
-      bonus: { attack: 5 },
+      stacks: false,
+      slot: finalSlot,
+      description: `Provides ${armorBonus} extra armor points.`,
+      cost: { coins: 80 },
+      bonus: { armor: armorBonus },
     };
+  }
+
+  generateWeapon(depth, level, intelligence) {
+    return {
+      name: 'Destroyed stick of crap',
+      type: 'equipable',
+      stacks: false,
+      slot: 'weapon',
+      description: `Provides 0 extra damage.`,
+      cost: { coins: 80 },
+      bonus: { attack: 0 },
+    };
+  }
+
+
+  generateEquipableItem(depth, level, intelligence) {
+
+    const typeOfSlot = Math.floor(Math.random * 2);
+
+    if (typeOfSlot === 0) {
+      return this.generateWeapon(depth, level, intelligence);
+    }
+    else if (typeOfSlot === 1) {
+      return this.generateArmor(depth, level, intelligence);
+    }
+  }
+
+  generateSpecial(depth, level, intelligence) {
+    return {
+      name: `Rope`,
+      type: 'special',
+      stacks: true,
+      description: 'Used to climb up one depth.',
+      cost: { coins: 10 },
+    };
+  }
+
+  generateConsumable(depth, level, intelligence) {
+    return {
+      name: 'Health restore',
+      type: 'consumable',
+      stacks: false,
+      description: 'Restores 100 health points.',
+      cost: { coins: 10 },
+      effect: (character) => {
+        character.useHealingPotion(); // Apply the healing effect
+      }
+    }
+  }
+
+  generateItem(depth, level, intelligence) {
+
+    const typeOfItem = Math.floor(Math.random() * 3);
+
+    if (typeOfItem === 0) {
+
+      return this.generateEquipableItem(depth, level, intelligence);
+    }
+    else if (typeOfItem === 1) {
+      return this.generateSpecial(depth, level, intelligence);
+    }
+    else if (typeOfItem === 2) {
+      return this.generateConsumable(depth, level, intelligence);
+    }
   }
 
   calculateXpNeededForLevel(level) {
@@ -417,11 +503,9 @@ export class Character {
   }
 
   useHealingPotion() {
-    if (this.coins >= 10) {
-      this.currentHealth = Math.min(this.health, this.currentHealth + 100);
-      this.logMessage('You bought a health potion.');
-      this.saveToLocalStorage(this);
-    }
+    this.currentHealth = Math.min(this.health, this.currentHealth + 100);
+    this.logMessage('You used a health potion.');
+    this.saveToLocalStorage(this);
   }
 
   startResearch(research, duration) {
@@ -498,8 +582,6 @@ export class Character {
     this.stone += 1000;
     this.iron += 1000;
     this.intelligence += 100;
-
-
     this.logMessage('Added 1000 coins, 100 wood, 100 stone, and 100 iron for debugging.');
     this.saveToLocalStorage(this); // Save to local storage to persist the resources
   }

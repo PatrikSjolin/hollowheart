@@ -63,8 +63,6 @@ const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible, r
         setCharacter(character);
     };
 
-
-
     // Close the overlay when clicking outside the overlay content
     const handleClickOutside = (e) => {
         if (e.target.classList.contains('overlay')) {
