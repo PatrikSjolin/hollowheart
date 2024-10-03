@@ -8,7 +8,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
     iron: 0,
     gold: 0,
     diamonds: 0,
-  });  
+  });
 
   const initializeShopStock = () => {
     const defaultItems = [
@@ -48,7 +48,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
         bonus: { armor: 5 },
       }
     ];
-  
+
     const savedShopStock = JSON.parse(localStorage.getItem('shopStock'));
     if (!savedShopStock) {
       localStorage.setItem('shopStock', JSON.stringify(defaultItems));
@@ -102,52 +102,52 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
     }));
   };
 
-    // Close the overlay when clicking outside the overlay content
-    const handleClickOutside = (e) => {
-      if (e.target.classList.contains('overlay')) {
-        setShopOverlayVisible(false);
-      }
-    };
-  
-    // Close the overlay when pressing Escape
-    const handleEscapeKey = (e) => {
-      if (e.key === 'Escape') {
-        setShopOverlayVisible(false);
-      }
-    };
+  // Close the overlay when clicking outside the overlay content
+  const handleClickOutside = (e) => {
+    if (e.target.classList.contains('overlay')) {
+      setShopOverlayVisible(false);
+    }
+  };
+
+  // Close the overlay when pressing Escape
+  const handleEscapeKey = (e) => {
+    if (e.key === 'Escape') {
+      setShopOverlayVisible(false);
+    }
+  };
   const handleBuyItem = (item, index) => {
-  if (character.coins >= item.cost.coins) {
-    if (item.type === 'consumable') {
-      item.effect(character);  // Consumable is used immediately
-      character.logMessage(`${item.name} used.`);
-    } else {
-      // Add equipable or stackable items to inventory
-      character.addItemToInventory(item);
-    }
-    character.coins -= item.cost.coins;
-    setCharacter(character);  // Update character state
+    if (character.coins >= item.cost.coins) {
+      if (item.type === 'consumable') {
+        item.effect(character);  // Consumable is used immediately
+        character.logMessage(`${item.name} used.`);
+      } else {
+        // Add equipable or stackable items to inventory
+        character.addItemToInventory(item);
+      }
+      character.coins -= item.cost.coins;
+      setCharacter(character);  // Update character state
 
-    // If the item is not consumable or special, remove it from the shop stock
-    if (item.type !== 'consumable' && item.type !== 'special') {
-      const updatedShopStock = shopItems.filter((shopItem, i) => i !== index);
-      setShopItems(updatedShopStock);
-      localStorage.setItem('shopStock', JSON.stringify(updatedShopStock));  // Save updated stock to localStorage
+      // If the item is not consumable or special, remove it from the shop stock
+      if (item.type !== 'consumable' && item.type !== 'special') {
+        const updatedShopStock = shopItems.filter((shopItem, i) => i !== (index + 1));
+        setShopItems(updatedShopStock);
+        localStorage.setItem('shopStock', JSON.stringify(updatedShopStock));  // Save updated stock to localStorage
+      }
     }
-  }
-};
+  };
 
-    useEffect(() => {
-      // Add event listener for click outside
-      document.addEventListener('click', handleClickOutside);
-      // Add event listener for escape key
-      document.addEventListener('keydown', handleEscapeKey);
-  
-      // Cleanup event listeners on component unmount
-      return () => {
-        document.removeEventListener('click', handleClickOutside);
-        document.removeEventListener('keydown', handleEscapeKey);
-      };
-    }, []);
+  useEffect(() => {
+    // Add event listener for click outside
+    document.addEventListener('click', handleClickOutside);
+    // Add event listener for escape key
+    document.addEventListener('keydown', handleEscapeKey);
+
+    // Cleanup event listeners on component unmount
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, []);
 
   return (
     <div className="overlay">
@@ -173,65 +173,65 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
 
         {/* Fixed Height for Tab Content */}
         <div className="tab-content">
-        {activeTab === 'conversion' && (
-  <div className="conversion-section">
-    <h2>Convert Resources</h2>
-    {['iron', 'gold', 'diamonds'].map(resource => (
-      <div key={resource} className="conversion-row">
-        <p>{resource.charAt(0).toUpperCase() + resource.slice(1)}: {character[resource]}</p>
-        <p>Convert to {convertAmount[resource] * conversionRates[resource]} coins</p>
-        <input
-          type="range"
-          min="0"
-          max={character[resource]}
-          value={convertAmount[resource]}
-          onChange={(e) => handleSliderChange(resource, e.target.value)}
-        />
-        <span>{convertAmount[resource]}</span>
+          {activeTab === 'conversion' && (
+            <div className="conversion-section">
+              <h2>Convert Resources</h2>
+              {['iron', 'gold', 'diamonds'].map(resource => (
+                <div key={resource} className="conversion-row">
+                  <p>{resource.charAt(0).toUpperCase() + resource.slice(1)}: {character[resource]}</p>
+                  <p>Convert to {convertAmount[resource] * conversionRates[resource]} coins</p>
+                  <input
+                    type="range"
+                    min="0"
+                    max={character[resource]}
+                    value={convertAmount[resource]}
+                    onChange={(e) => handleSliderChange(resource, e.target.value)}
+                  />
+                  <span>{convertAmount[resource]}</span>
 
-        {/* Max Button */}
-        <button onClick={() => handleMaxClick(resource)} className="max-button">
-          Max
-        </button>
+                  {/* Max Button */}
+                  <button onClick={() => handleMaxClick(resource)} className="max-button">
+                    Max
+                  </button>
 
-        <button onClick={() => handleConvert(resource)} disabled={convertAmount[resource] <= 0 || character.isExploring} className="shop-button">
-          Convert
-        </button>
-      </div>
-    ))}
+                  <button onClick={() => handleConvert(resource)} disabled={convertAmount[resource] <= 0 || character.isExploring} className="shop-button">
+                    Convert
+                  </button>
+                </div>
+              ))}
 
-    {/* Add Consumables here */}
-    <h2>Consumables</h2>
-    {shopItems.filter(item => item.type === 'consumable').map((item, index) => (
-      <div key={index} className="item-block">
-        <div className="item-info">
-          <p className="item-name">{item.name}</p>
-          <p className="item-description">{item.description}</p>
-          <p className="item-cost">
-            {Object.entries(item.cost).map(([resource, amount]) => (
-              <span key={resource}> {resource}: {amount} </span>
-            ))}
-          </p>
-        </div>
-        <button
-          onClick={() => {
-            if (character.coins >= item.cost.coins) {
-              // item.effect(character); // Consumable is used immediately
-              character.useHealingPotion();
-              character.logMessage(`${item.name} used.`);
-              character.coins -= item.cost.coins;
-              setCharacter(character);
-            }
-          }}
-          disabled={character.coins < item.cost.coins}
-          className="shop-button"
-        >
-          Buy
-        </button>
-      </div>
-    ))}
-  </div>
-)}
+              {/* Add Consumables here */}
+              <h2>Consumables</h2>
+              {shopItems.filter(item => item.type === 'consumable').map((item, index) => (
+                <div key={index} className="item-block">
+                  <div className="item-info">
+                    <p className="item-name">{item.name}</p>
+                    <p className="item-description">{item.description}</p>
+                    <p className="item-cost">
+                      {Object.entries(item.cost).map(([resource, amount]) => (
+                        <span key={resource}> {resource}: {amount} </span>
+                      ))}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (character.coins >= item.cost.coins) {
+                        // item.effect(character); // Consumable is used immediately
+                        character.useHealingPotion();
+                        character.logMessage(`${item.name} used.`);
+                        character.coins -= item.cost.coins;
+                        setCharacter(character);
+                      }
+                    }}
+                    disabled={character.coins < item.cost.coins}
+                    className="shop-button"
+                  >
+                    Buy
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
           {activeTab === 'buildings' && (
             <div className="buildings-section">
               <h2>Buy Buildings</h2>
@@ -274,31 +274,32 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
             </div>
           )}
 
-{activeTab === 'items' && (
-  <div className="items-section">
-    <h2>Buy Items</h2>
-    {shopItems.filter(item => item.type !== 'consumable').map((item, index) => (
-      <div key={index} className="item-block">
-        <div className="item-info">
-          <p className="item-name">{item.name}</p>
-          <p className="item-description">{item.description}</p>
-          <p className="item-cost">
-            {Object.entries(item.cost).map(([resource, amount]) => (
-              <span key={resource}> {resource}: {amount} </span>
-            ))}
-          </p>
-        </div>
-        <button
-          onClick={() => handleBuyItem(item, index)}  // Call handleBuyItem when the item is purchased
-          disabled={character.coins < item.cost.coins}
-          className="shop-button"
-        >
-          Buy
-        </button>
-      </div>
-    ))}
-  </div>
-)}
+          {activeTab === 'items' && (
+            <div className="items-section">
+              <h2>Buy Items</h2>
+              {shopItems.filter(item => item.type !== 'consumable').map((item, index) => (
+                <div key={index} className="item-block">
+                  <div className="item-info">
+                    <p className="item-name">{item.name}</p>
+                    <p className="item-description">{item.description}</p>
+                    <p className="item-cost">
+                      {Object.entries(item.cost).map(([resource, amount]) => (
+                        <span key={resource}> {resource}: {amount} </span>
+                      ))}
+                    </p>
+                  </div>
+                  <button
+
+                    onClick={() => handleBuyItem(item, index)}  // Call handleBuyItem when the item is purchased
+                    disabled={character.coins < item.cost.coins}
+                    className="shop-button"
+                  >
+                    Buy
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -82,7 +82,7 @@ export class Character {
     const regenInterval = this.lifeRegenRate * 1000;
 
     if (this.regenTimer >= regenInterval) {
-      
+
       const rounds = Math.floor(this.regenTimer / regenInterval);
 
       if (this.currentHealth < this.health) {
@@ -141,11 +141,11 @@ export class Character {
         this.depth = this.lastDepthVisited; // Go back to the last visited depth
         this.logMessage(`You descend to depth ${this.depth}`);
       }
-      else if(this.depth === 0) {
+      else if (this.depth === 0) {
         this.depth = 1; // Otherwise, go down by 1 depth
         this.logMessage(`You descend to depth ${this.depth}`);
       }
-       else if (this.timeSurvivedAtLevel > 6000) {
+      else if (this.timeSurvivedAtLevel > 6000) {
         this.depth += 1; // Otherwise, go down by 1 depth
         this.timeSurvivedAtLevel = 0;
         this.logMessage(`You descend to depth ${this.depth}`);
@@ -203,7 +203,7 @@ export class Character {
 
         const itemFindChance = 0.01;  // 10% chance to find an item
         const randomChance = Math.random();
-    
+
         if (randomChance < itemFindChance) {
           const foundItem = this.generateItem(this.depth, this.level, this.intelligence);
           this.addItemToInventory(foundItem);
@@ -227,7 +227,7 @@ export class Character {
   }
 
   generateItem(depth, level, intelligence) {
-    return  {
+    return {
       name: 'Random Item',  // Replace with item generation logic
       type: 'equipable',
       slot: 'weapon',
@@ -236,7 +236,7 @@ export class Character {
   }
 
   calculateXpNeededForLevel(level) {
-    if(level === 0)
+    if (level === 0)
       return 0;
 
     return Math.floor(200 * Math.pow(1.5, level - 1));
@@ -269,31 +269,31 @@ export class Character {
 
   sendHighscoreToServer(characterName, score) {
     fetch(apiUrl + '/submit', {
-       method: 'POST',
-       headers: {
-          'Content-Type': 'application/json',
-          "ngrok-skip-browser-warning": "69420",
-       },
-       body: JSON.stringify({ characterName, score }),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        "ngrok-skip-browser-warning": "69420",
+      },
+      body: JSON.stringify({ characterName, score }),
     })
-    .then(response => response.json())
-    .then(data => {
-       console.log('High score submitted:', data.message);
-       // Fetch updated high scores after submission
-       fetch(apiUrl + '/highscores', {
+      .then(response => response.json())
+      .then(data => {
+        console.log('High score submitted:', data.message);
+        // Fetch updated high scores after submission
+        fetch(apiUrl + '/highscores', {
           headers: new Headers({
-             "ngrok-skip-browser-warning": "69420",
+            "ngrok-skip-browser-warning": "69420",
           }),
-       })
-       .then(response => response.json())
-       .then(updatedData => this.setHighScores(updatedData)) // Update the local high scores state
-       .catch(error => console.error('Error fetching updated high scores:', error));
-    })
-    .catch(error => {
-       console.error('Error submitting high score:', error);
-    });
- }
- 
+        })
+          .then(response => response.json())
+          .then(updatedData => this.setHighScores(updatedData)) // Update the local high scores state
+          .catch(error => console.error('Error fetching updated high scores:', error));
+      })
+      .catch(error => {
+        console.error('Error submitting high score:', error);
+      });
+  }
+
 
   calculateQuantityBoostFromIntelligence() {
     return (1 + this.intelligence) / this.intelligence;
@@ -303,18 +303,18 @@ export class Character {
     return (1 + this.intelligence) / this.intelligence;
   }
 
-  calculateDamageReductionFromArmor(){
+  calculateDamageReductionFromArmor() {
     const armor = this.calculateArmor();
     return (armor / (armor + 120));
   }
 
   calculateArmor() {
     let armor = this.strength * 4;  // Base armor from strength
-  if (this.equipment.chest) {
-    armor += this.equipment.chest.bonus.armor;  // Add armor from equipped chest item
-  }
-  // Add bonuses from other equipped items as needed
-  return armor;
+    if (this.equipment.chest) {
+      armor += this.equipment.chest.bonus.armor;  // Add armor from equipped chest item
+    }
+    // Add bonuses from other equipped items as needed
+    return armor;
   }
 
   // Method for the character to die and reset
