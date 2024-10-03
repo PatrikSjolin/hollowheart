@@ -279,7 +279,14 @@ const App = () => {
           >
             Ascend ↑
           </button>
-          <button onClick={handleClimbUp} disabled={character.rope === 0 || character.depth === 0}>⬆️</button> {/* Climb Up button */}
+          <button
+  onClick={handleClimbUp}
+  disabled={
+    !character.inventory.some(item => item.name === 'Rope' && item.quantity > 0) || character.depth === 0 || character.depth === 1
+  }
+>
+  ⬆️
+</button>
 
           <button className={`character-stats-button ${character.isLevelingUp ? 'glow' : ''}`} onClick={() => setCharacterOverlayVisible(true)}>
             {translations[language].character}
@@ -384,9 +391,9 @@ const App = () => {
       </div>
       <div className="highscore-display">
         <h3>{translations[language].highScores}</h3>
-          {highScores.map((score, index) => (
-            <p key={`score-${index}`}>{index + 1}. {score.characterName}: {score.score}</p>
-          ))}
+        {highScores.map((score, index) => (
+          <p key={`score-${index}`}>{index + 1}. {score.characterName}: {score.score}</p>
+        ))}
       </div>
 
     </div>

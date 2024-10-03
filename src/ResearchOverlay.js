@@ -1,4 +1,5 @@
 import { debug } from './App';
+import React, { useEffect } from 'react';
 
 const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible, researchTimers }) => {
 
@@ -60,6 +61,35 @@ const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible, r
         character.startResearch(research, duration);
         setCharacter(character);
     };
+
+    
+
+    // Close the overlay when clicking outside the overlay content
+    const handleClickOutside = (e) => {
+        if (e.target.classList.contains('overlay')) {
+            setResearchOverlayVisible(false);
+        }
+      };
+    
+      // Close the overlay when pressing Escape
+      const handleEscapeKey = (e) => {
+        if (e.key === 'Escape') {
+            setResearchOverlayVisible(false);
+        }
+      };
+    
+      useEffect(() => {
+        // Add event listener for click outside
+        document.addEventListener('click', handleClickOutside);
+        // Add event listener for escape key
+        document.addEventListener('keydown', handleEscapeKey);
+    
+        // Cleanup event listeners on component unmount
+        return () => {
+          document.removeEventListener('click', handleClickOutside);
+          document.removeEventListener('keydown', handleEscapeKey);
+        };
+      }, []);
 
     return (
         <div className="overlay">

@@ -30,9 +30,15 @@ export class Character {
     this.wood = initialState.wood || 0;
     this.completedResearch = initialState.completedResearch || []; // Store completed research
     this.stone = initialState.stone || 0;
+    this.inventory = initialState.inventory || [];  // Add an inventory to store items
+    this.equipment = {
+      weapon: null,
+      chest: null,
+      boots: null,
+      gloves: null
+    };
     this.regenTimer = 0; // Initialize regen timer for health regeneration
     this.treasureTimer = 0;
-    this.rope = initialState.rope || 0; // Add rope item to the character
     this.numberOfDeaths = initialState.numberOfDeaths || 0;
     this.hazardTimer = 0;
     this.woodTimer = 0;
@@ -55,14 +61,19 @@ export class Character {
   }
 
   climbUp() {
-    if (this.rope > 0 && this.depth > 0) {
-      this.depth -= 1; // Climb up one depth
-      this.rope -= 1; // Consume one rope
-      this.logMessage(`You climbed up to depth ${this.depth} using one rope.`);
-    } else if (this.rope === 0) {
-      this.logMessage('You do not have any ropes to climb up.');
+    if (this.depth > 0) {
+      this.depth -= 1;
+      const rope = this.inventory.find(item => item.name === 'Rope');
+      if (rope) {
+        rope.quantity -= 1; // Decrease rope count by 1
+        if (rope.quantity === 0) {
+          // Remove the item if quantity is 0
+          this.inventory = this.inventory.filter(item => item.name !== 'Rope');
+        }
+      }
+      this.logMessage('You used a rope to climb up one depth.');
+      this.saveToLocalStorage(this);
     }
-    this.saveToLocalStorage(this);
   }
 
   // Regenerate health based on lifeRegen stat
@@ -76,11 +87,51 @@ export class Character {
 
       if (this.currentHealth < this.health) {
         this.currentHealth = Math.min(this.currentHealth + (this.lifeRegen) * rounds, this.health);
-        this.logMessage(`Regenerated ${this.lifeRegen * rounds} health. Current health: ${this.currentHealth}`);
+        this.logMessage(`Regenerated ${this.lifeRegen * rounds} health.`);
       }
       this.regenTimer = this.regenTimer - (regenInterval * rounds);
     }
   }
+  equipItem(slot, item) {
+    if (this.equipment[slot]) {
+      this.logMessage(`You unequipped ${this.equipment[slot].name}.`);
+      // Remove the effects of the previously equipped item (if any)
+      // this.removeItemBonus(this.equipment[slot]);
+    }
+    this.equipment[slot] = item; // Assign the item to the equipment slot
+    this.inventory = this.inventory.filter(inventoryItem => inventoryItem.name !== item.name); // Remove from inventory
+    this.logMessage(`You equipped ${item.name}.`);
+    this.saveToLocalStorage(this); // Save changes
+  }
+
+  unequipItem(slot) {
+    const item = this.equipment[slot];
+    if (item) {
+      this.addItemToInventory(item);  // Add the unequipped item back to the inventory
+      this.logMessage(`You unequipped ${item.name}.`);
+      this.equipment[slot] = null;  // Remove the item from the slot
+      this.saveToLocalStorage(this);
+    }
+  }
+
+  // Add items to the inventory
+  addItemToInventory(item) {
+    // Check if the item stacks
+    if (item.stacks) {
+      const existingItem = this.inventory.find(invItem => invItem.name === item.name);
+      if (existingItem) {
+        existingItem.quantity += 1; // Increment the quantity
+      } else {
+        item.quantity = 1; // Add a quantity property to new stackable items
+        this.inventory.push(item);
+      }
+    } else {
+      this.inventory.push(item);  // Non-stackable items just get added
+    }
+    this.logMessage(`You acquired ${item.name}.`);
+    this.saveToLocalStorage(this);
+  }
+
 
   // Method to start exploring (descend)
   startExploring() {
@@ -180,7 +231,7 @@ export class Character {
       const damageTaken = Math.floor(damage * (1 - damageReduction));
 
       this.currentHealth -= damageTaken;
-      this.logMessage(`You encountered a hazard and took ${damageTaken} damage! Current health: ${this.currentHealth}.`);
+      this.logMessage(`You encountered a hazard and took ${damageTaken} damage.`);
 
       const expGained = Math.floor(this.calculateXpBoostFromIntelligence() * this.depth * Math.floor(Math.random() * 20) + 5); // Random exp gained
       this.experience += expGained;
@@ -337,15 +388,6 @@ export class Character {
     this.logMessage(`Unlocked feature: ${feature}`);
   }
 
-  buyRope() {
-    if (this.coins >= 10) {
-      this.rope += 1; // Buying one rope at a time
-      this.coins -= 10;
-      this.logMessage('You bought a rope.');
-      this.saveToLocalStorage(this);
-    }
-  }
-
   useHealingPotion() {
     if (this.coins >= 10) {
       this.currentHealth = Math.min(this.health, this.currentHealth + 100);
@@ -435,22 +477,3 @@ export class Character {
     this.saveToLocalStorage(this); // Save to local storage to persist the resources
   }
 }
-
-export const items = [
-  {
-    name: 'Health Potion',
-    description: 'Restores 100 health points.',
-    cost: { coins: 10 },
-    effect: (character) => {
-      character.useHealingPotion(); // Apply the healing effect
-    }
-  },
-  {
-    name: 'Rope',
-    description: 'Used to climb up one depth.',
-    cost: { coins: 10 },
-    effect: (character) => {
-      character.buyRope(); // Add one rope to the inventory
-    }
-  }
-];

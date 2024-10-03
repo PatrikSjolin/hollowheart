@@ -671,3 +671,48 @@ button:disabled {
   outline: none;
   border-color: #4caf50;
 }
+
+/* Other styling for max button and shop as needed */
+.max-button {
+  padding: 5px 10px;
+  background-color: #ffcc00;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.max-button:hover {
+  background-color: #ff9900;
+}
+
+/* Tab content area */
+.tab-content {
+  min-height: 300px; /* Set a fixed height to avoid jumping when switching tabs */
+  padding: 10px;
+  background-color: #333;
+  border-radius: 10px;
+}
+
+.overlay-content {
+  min-height: 600px;  /* Adjust this value based on your needs */
+  max-height: 600px;  /* Set max height to prevent content from growing too large */
+  overflow-y: auto;   /* Enable scrolling if content exceeds the max height */
+}
+
+/* Resource Display Styling */
+.resources-display {
+  display: flex;
+  justify-content: space-between; /* Space items evenly */
+  padding: 10px;
+  background-color: #444;
+  border-radius: 10px;
+  margin-bottom: 20px; /* Add spacing below */
+}
+
+.resources-display p {
+  margin: 0 10px;
+  font-size: 1rem;
+}
