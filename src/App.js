@@ -346,9 +346,7 @@ const App = () => {
           </button>
           <button
             onClick={handleClimbUp}
-            disabled={
-              !character.inventory.some(item => item.name === 'Rope' && item.quantity > 0) || character.depth === 0 || character.depth === 1
-            }
+            disabled={!character.inventory.some(item => (item.name === 'Rope' || item.name === 'Rep') && item.quantity > 0) || character.depth === 0 || character.depth === 1 }
           >
             ⬆️
           </button>
