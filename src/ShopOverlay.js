@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { buildings } from './building';
 import translations from './translations';
 
-const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
+const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language }) => {
   const [activeTab, setActiveTab] = useState('conversion');  // State to manage active tab
   const [convertAmount, setConvertAmount] = useState({
     iron: 0,
@@ -23,7 +23,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
         }
       },
       {
-        name: 'Rope',
+        name: `${translations[language].rope}`,
         type: 'special',
         stacks: true,
         description: 'Used to climb up one depth.',
@@ -156,12 +156,12 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible }) => {
 
         {/* Resource Display at the top */}
         <div className="resources-display">
-          <p><strong>Coins:</strong> {character.coins}</p>
-          <p><strong>Wood:</strong> {character.wood}</p>
-          <p><strong>Stone:</strong> {character.stone}</p>
-          <p><strong>Iron:</strong> {character.iron}</p>
-          <p><strong>Gold:</strong> {character.gold}</p>
-          <p><strong>Diamonds:</strong> {character.diamonds}</p>
+          <p><strong>{translations[language].coins}:</strong> {character.coins}</p>
+          <p><strong>{translations[language].wood}:</strong> {character.wood}</p>
+          <p><strong>{translations[language].stone}:</strong> {character.stone}</p>
+          <p><strong>{translations[language].iron}:</strong> {character.iron}</p>
+          <p><strong>{translations[language].gold}:</strong> {character.gold}</p>
+          <p><strong>{translations[language].diamonds}:</strong> {character.diamonds}</p>
         </div>
 
         {/* Tab Navigation */}

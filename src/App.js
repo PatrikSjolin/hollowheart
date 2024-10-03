@@ -5,7 +5,6 @@ import ResearchOverlay from './ResearchOverlay';  // Add this line
 import { Character } from './gameLogic'; // Import character logic
 import MessageOverlay from './MessageOverlay';
 import translations from './translations'; // Import translations
-// import { initializeShopStock } from './someUtilityFile';  // Ensure you import the initialization function
 
 import './App.css'; // Use existing styles from your CSS
 
@@ -176,7 +175,7 @@ const App = () => {
       setLog([]);  // Clear the log
       console.clear();
 
-       // Reset the shop items to default
+      // Reset the shop items to default
       // const defaultItems = initializeShopStock();
       // setShopItems(defaultItems);  // Reset the shop state
       localStorage.removeItem('shopStock');
@@ -228,7 +227,7 @@ const App = () => {
             <div className="health-bar">
               <div id="healthBarFill" style={{ width: `${(character.currentHealth / character.calculateMaxHealth()) * 100}%` }}></div>
               <div className="health-text">
-                Health: {character.currentHealth} / {character.calculateMaxHealth()}
+                {translations[language].health}: {character.currentHealth} / {character.calculateMaxHealth()}
               </div>
             </div>
           </div>
@@ -249,7 +248,7 @@ const App = () => {
       {/* Buildings Section */}
       {character && character.buildings.length > 0 && (
         <section className="buildings-section">
-          <h3>Owned Buildings:</h3>
+          <h3>{translations[language].ownedBuildings}:</h3>
           {Object.entries(getBuildingCounts(character.buildings)).map(([name, count], index) => (
             <p key={index}>{name} x{count}</p>
           ))}
@@ -258,7 +257,7 @@ const App = () => {
       {/* Display ongoing research under buildings */}
       {character && character.ongoingResearch && (
         <div className="research-progress">
-          <p>Ongoing Research: {character.ongoingResearch.name}</p>
+          <p>{translations[language].ongoingResearch}: {character.ongoingResearch.name}</p>
           <div className="progress-bar">
             <div
               className="progress"
@@ -286,13 +285,13 @@ const App = () => {
             {translations[language].ascend}
           </button>
           <button
-  onClick={handleClimbUp}
-  disabled={
-    !character.inventory.some(item => item.name === 'Rope' && item.quantity > 0) || character.depth === 0 || character.depth === 1
-  }
->
-  ⬆️
-</button>
+            onClick={handleClimbUp}
+            disabled={
+              !character.inventory.some(item => item.name === 'Rope' && item.quantity > 0) || character.depth === 0 || character.depth === 1
+            }
+          >
+            ⬆️
+          </button>
 
           <button className={`character-stats-button ${character.isLevelingUp ? 'glow' : ''}`} onClick={() => setCharacterOverlayVisible(true)}>
             {translations[language].character}
@@ -309,6 +308,7 @@ const App = () => {
               setCharacter={setCharacter}
               setResearchOverlayVisible={setResearchOverlayVisible}
               researchTimers={researchTimers}
+              language={language}
             />
           )}
 
@@ -335,6 +335,7 @@ const App = () => {
           character={character}
           setCharacter={setCharacter}
           setCharacterOverlayVisible={setCharacterOverlayVisible}
+          language={language}
         />
       )}
 
@@ -343,6 +344,7 @@ const App = () => {
           character={character}
           setCharacter={setCharacter}
           setShopOverlayVisible={setShopOverlayVisible}
+          language={language}
         />
       )}
 
@@ -351,12 +353,13 @@ const App = () => {
           title={generalMessage.title}
           message={generalMessage.message}
           onClose={() => setGeneralMessage(null)}
+          language={language}
         />
       )}
       {firstTimeOverlayVisible && (
         <div className="overlay">
           <div className="overlay-content">
-            <h2>Welcome to Hollowheart</h2>
+            <h2>{translations[language].welcomeTitle}</h2>
             <p>{translations[language].welcomeMessage1}</p>
             <p>{translations[language].welcomeMessage2}</p>
             <p>{translations[language].welcomeMessage3}</p>
@@ -374,7 +377,7 @@ const App = () => {
       )}
       {/* Language Dropdown */}
       <div className="language-dropdown">
-        <label htmlFor="language">Language: </label>
+        <label htmlFor="language">{translations[language].language}: </label>
         <select id="language" value={language} onChange={handleLanguageChange}>
           <option value="en">{translations[language].english}</option>
           <option value="sv">{translations[language].swedish}</option>

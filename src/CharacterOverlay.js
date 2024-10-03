@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { debug } from './App';
+import translations from './translations';
 
-const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible }) => {
+const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible, language }) => {
 
   // Close the overlay when clicking outside the overlay content
   const handleClickOutside = (e) => {
@@ -37,7 +38,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible 
         <h2>Character Stats</h2>
 
         <div className="stat-row">
-          <p><strong>Strength:</strong> {character.strength}</p>
+          <p><strong>{translations[language].strength}:</strong> {character.strength}</p>
           <p>Improves armor and survivability</p>
           <button
             onClick={() => {

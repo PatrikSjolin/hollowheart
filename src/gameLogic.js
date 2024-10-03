@@ -419,7 +419,6 @@ export class Character {
   useHealingPotion() {
     if (this.coins >= 10) {
       this.currentHealth = Math.min(this.health, this.currentHealth + 100);
-      this.coins -= 10;
       this.logMessage('You bought a health potion.');
       this.saveToLocalStorage(this);
     }

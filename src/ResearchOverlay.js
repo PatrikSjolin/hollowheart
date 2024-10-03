@@ -1,7 +1,8 @@
 import { debug } from './App';
 import React, { useEffect } from 'react';
+import translations from './translations'; // Import translations
 
-const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible, researchTimers }) => {
+const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible, researchTimers, language }) => {
 
     // Research options
     const researches = [
@@ -62,40 +63,40 @@ const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible, r
         setCharacter(character);
     };
 
-    
+
 
     // Close the overlay when clicking outside the overlay content
     const handleClickOutside = (e) => {
         if (e.target.classList.contains('overlay')) {
             setResearchOverlayVisible(false);
         }
-      };
-    
-      // Close the overlay when pressing Escape
-      const handleEscapeKey = (e) => {
+    };
+
+    // Close the overlay when pressing Escape
+    const handleEscapeKey = (e) => {
         if (e.key === 'Escape') {
             setResearchOverlayVisible(false);
         }
-      };
-    
-      useEffect(() => {
+    };
+
+    useEffect(() => {
         // Add event listener for click outside
         document.addEventListener('click', handleClickOutside);
         // Add event listener for escape key
         document.addEventListener('keydown', handleEscapeKey);
-    
+
         // Cleanup event listeners on component unmount
         return () => {
-          document.removeEventListener('click', handleClickOutside);
-          document.removeEventListener('keydown', handleEscapeKey);
+            document.removeEventListener('click', handleClickOutside);
+            document.removeEventListener('keydown', handleEscapeKey);
         };
-      }, []);
+    }, []);
 
     return (
         <div className="overlay">
             <div className="overlay-content">
                 <span className="close-btn" onClick={() => setResearchOverlayVisible(false)}>&times;</span>
-                <h2>Research</h2>
+                <h2>{translations[language].research}</h2>
                 <p>Choose a research to enhance your character's abilities. More research options will be available by progressing in various ways.</p>
 
                 {/* List available researches */}
