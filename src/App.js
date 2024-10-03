@@ -87,9 +87,9 @@ const App = () => {
     if (savedCharacter) {
       const parsedCharacter = JSON.parse(savedCharacter);
       setFirstTimeOverlayVisible(false); // Hide intro if character exists
-      setCharacter(new Character(saveToLocalStorage, logMessage, setGeneralMessage, parsedCharacter)); // Load character from storage
+      setCharacter(new Character(saveToLocalStorage, logMessage, setGeneralMessage, setHighScores, parsedCharacter)); // Load character from storage
     } else {
-      const newCharacter = new Character(saveToLocalStorage, logMessage, setGeneralMessage); // Create new character if none exists
+      const newCharacter = new Character(saveToLocalStorage, logMessage, setGeneralMessage, setHighScores); // Create new character if none exists
       setCharacter(newCharacter);
     }
   }, []);
@@ -149,7 +149,7 @@ const App = () => {
     console.log("starting game");
     if (character === null) {
       // Create a new character and set playerName to the entered name
-      const newCharacter = new Character(saveToLocalStorage, logMessage, showGeneralMessage, { playerName: name });
+      const newCharacter = new Character(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores, { playerName: name });
       setCharacter(newCharacter);
     } else {
       // Update the name if the character already exists

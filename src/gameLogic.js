@@ -1,7 +1,7 @@
 import { apiUrl } from './App';
 
 export class Character {
-  constructor(saveToLocalStorage, logMessage, showGeneralMessage, initialState = {}) {
+  constructor(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores, initialState = {}) {
     this.playerName = initialState.playerName || 'Soldier';  // Fix here
     this.level = initialState.level || 1;
     this.strength = initialState.strength || 10;
@@ -46,6 +46,7 @@ export class Character {
     saveToLocalStorage(this);
     this.logMessage = logMessage;
     this.showGeneralMessage = showGeneralMessage;
+    this.setHighScores = setHighScores;
   }
 
   // Calculate max health based on vitality (10 HP per point of vitality)
@@ -79,25 +80,6 @@ export class Character {
       }
       this.regenTimer = this.regenTimer - (regenInterval * rounds);
     }
-  }
-
-  sendHighscoreToServer(characterName, score) {
-    // Send the highscore data to the server (This function will be defined later)
-    fetch(apiUrl + '/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        "ngrok-skip-browser-warning": "69420",
-      },
-      body: JSON.stringify({ characterName, score }),  // Sending character name and score
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('High score submitted:', data.message);
-      })
-      .catch(error => {
-        console.error('Error submitting high score:', error);
-      });
   }
 
   // Method to start exploring (descend)
@@ -199,7 +181,6 @@ export class Character {
 
       this.currentHealth -= damageTaken;
       this.logMessage(`You encountered a hazard and took ${damageTaken} damage! Current health: ${this.currentHealth}.`);
-      console.log(`actual damage: ${damage}, reduction: ${damageReduction}`);
 
       const expGained = Math.floor(this.calculateXpBoostFromIntelligence() * this.depth * Math.floor(Math.random() * 20) + 5); // Random exp gained
       this.experience += expGained;
@@ -211,6 +192,34 @@ export class Character {
       }
     }
   }
+
+  sendHighscoreToServer(characterName, score) {
+    fetch(apiUrl + '/submit', {
+       method: 'POST',
+       headers: {
+          'Content-Type': 'application/json',
+          "ngrok-skip-browser-warning": "69420",
+       },
+       body: JSON.stringify({ characterName, score }),
+    })
+    .then(response => response.json())
+    .then(data => {
+       console.log('High score submitted:', data.message);
+       // Fetch updated high scores after submission
+       fetch(apiUrl + '/highscores', {
+          headers: new Headers({
+             "ngrok-skip-browser-warning": "69420",
+          }),
+       })
+       .then(response => response.json())
+       .then(updatedData => this.setHighScores(updatedData)) // Update the local high scores state
+       .catch(error => console.error('Error fetching updated high scores:', error));
+    })
+    .catch(error => {
+       console.error('Error submitting high score:', error);
+    });
+ }
+ 
 
   calculateQuantityBoostFromIntelligence() {
     return (1 + this.intelligence) / this.intelligence;
