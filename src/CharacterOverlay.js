@@ -147,15 +147,27 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible,
         {/* <h3>Inventory</h3> */}
         <h3>Inventory</h3>
         <div className="inventory-items">
-          {character.inventory.length > 0 ? character.inventory.map((item, index) => (
-            <div key={index}>
-              <p>{item.name} {item.stacks ? `x${item.quantity}` : ''}</p>  {/* Show quantity for stackable items */}
-              {item.type === 'equipable' && (
-                <button onClick={() => character.equipItem(item.slot, item)}>Equip</button>
-              )}
-            </div>
-          )) : <p>No items in inventory</p>}
-        </div>
+  {character.inventory.length > 0 ? character.inventory.map((item, index) => (
+    <div key={index} className="item-block">
+      <div className="item-info">
+        <p className="item-name">{item.name} {item.stacks ? `x${item.quantity}` : ''}</p>
+        {item.description && (
+          <p className="item-description">{item.description}</p>  // Show description if available
+        )}
+      </div>
+      
+      {/* Render equip button for equippable items */}
+      {item.type === 'equipable' && (
+        <button
+          onClick={() => character.equipItem(item.slot, item)}
+          className="equip-button"
+        >
+          Equip
+        </button>
+      )}
+    </div>
+  )) : <p>No items in inventory</p>}
+</div>
 
 
         {debug && (<p>Experience: {character.experience} / {Math.floor(200 * Math.pow(1.5, character.level - 1))} </p>)}

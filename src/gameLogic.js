@@ -201,7 +201,7 @@ export class Character {
 
 
 
-        const itemFindChance = 0.01;  // 10% chance to find an item
+        const itemFindChance = 0.01 * intelligenceFactor;  // 1% chance to find an item
         const randomChance = Math.random();
 
         if (randomChance < itemFindChance) {

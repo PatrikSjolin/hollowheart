@@ -218,7 +218,7 @@ const App = () => {
       )}
 
       {character && (
-        <p>Current Depth: {character.depth}</p>
+        <p>{translations[language].currentDepth}: {character.depth} / {character.lastDepthVisited}</p>
       )}
 
       {character && (

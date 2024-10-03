@@ -154,32 +154,36 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
       <div className="overlay-content">
         <span className="close-btn" onClick={() => setShopOverlayVisible(false)}>&times;</span>
 
-        {/* Resource Display at the top */}
-        <div className="resources-display">
-          <p><strong>{translations[language].coins}:</strong> {character.coins}</p>
-          <p><strong>{translations[language].wood}:</strong> {character.wood}</p>
-          <p><strong>{translations[language].stone}:</strong> {character.stone}</p>
-          <p><strong>{translations[language].iron}:</strong> {character.iron}</p>
-          <p><strong>{translations[language].gold}:</strong> {character.gold}</p>
-          <p><strong>{translations[language].diamonds}:</strong> {character.diamonds}</p>
-        </div>
-
         {/* Tab Navigation */}
         <div className="shop-tabs">
-          <button onClick={() => setActiveTab('conversion')} className={activeTab === 'conversion' ? 'active' : ''}>Convert Resources</button>
-          <button onClick={() => setActiveTab('buildings')} className={activeTab === 'buildings' ? 'active' : ''}>Buy Buildings</button>
-          <button onClick={() => setActiveTab('items')} className={activeTab === 'items' ? 'active' : ''}>Buy Items</button>
+          <button
+            onClick={() => setActiveTab('conversion')}
+            className={activeTab === 'conversion' ? 'active' : ''}
+          >
+            {translations[language].convertResources}
+          </button>
+          <button
+            onClick={() => setActiveTab('buildings')}
+            className={activeTab === 'buildings' ? 'active' : ''}
+          >
+            {translations[language].buyBuildings}
+          </button>
+          <button
+            onClick={() => setActiveTab('items')}
+            className={activeTab === 'items' ? 'active' : ''}
+          >
+            {translations[language].buyItems}
+          </button>
         </div>
 
         {/* Fixed Height for Tab Content */}
         <div className="tab-content">
           {activeTab === 'conversion' && (
             <div className="conversion-section">
-              <h2>Convert Resources</h2>
               {['iron', 'gold', 'diamonds'].map(resource => (
                 <div key={resource} className="conversion-row">
                   <p>{resource.charAt(0).toUpperCase() + resource.slice(1)}: {character[resource]}</p>
-                  <p>Convert to {convertAmount[resource] * conversionRates[resource]} coins</p>
+                  <p>{translations[language].convertTo} {convertAmount[resource] * conversionRates[resource]} {translations[language].coins}</p>
                   <input
                     type="range"
                     min="0"
@@ -195,13 +199,13 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
                   </button>
 
                   <button onClick={() => handleConvert(resource)} disabled={convertAmount[resource] <= 0 || character.isExploring} className="shop-button">
-                    Convert
+                    {translations[language].trade}
                   </button>
                 </div>
               ))}
 
               {/* Add Consumables here */}
-              <h2>Consumables</h2>
+              <h2>{translations[language].buyConsumables}</h2>
               {shopItems.filter(item => item.type === 'consumable').map((item, index) => (
                 <div key={index} className="item-block">
                   <div className="item-info">
@@ -226,7 +230,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
                     disabled={character.coins < item.cost.coins}
                     className="shop-button"
                   >
-                    Buy
+                    {translations[language].buy}
                   </button>
                 </div>
               ))}
@@ -234,7 +238,6 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
           )}
           {activeTab === 'buildings' && (
             <div className="buildings-section">
-              <h2>Buy Buildings</h2>
               {buildings.filter(building => building.isUnlocked(character)).map((building, index) => (
                 <div key={index} className="building-block">
                   <div className="building-info">
@@ -267,7 +270,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
                     })}
                     className="shop-button"
                   >
-                    Buy
+                    {translations[language].buy}
                   </button>
                 </div>
               ))}
@@ -276,7 +279,6 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
 
           {activeTab === 'items' && (
             <div className="items-section">
-              <h2>Buy Items</h2>
               {shopItems.filter(item => item.type !== 'consumable').map((item, index) => (
                 <div key={index} className="item-block">
                   <div className="item-info">
@@ -294,12 +296,23 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
                     disabled={character.coins < item.cost.coins}
                     className="shop-button"
                   >
-                    Buy
+                    {translations[language].buy}
                   </button>
                 </div>
               ))}
             </div>
           )}
+
+
+          {/* Resource Display at the top */}
+          <div className="resources-display">
+            <p><strong>{translations[language].coins}:</strong> {character.coins}</p>
+            <p><strong>{translations[language].wood}:</strong> {character.wood}</p>
+            <p><strong>{translations[language].stone}:</strong> {character.stone}</p>
+            <p><strong>{translations[language].iron}:</strong> {character.iron}</p>
+            <p><strong>{translations[language].gold}:</strong> {character.gold}</p>
+            <p><strong>{translations[language].diamonds}:</strong> {character.diamonds}</p>
+          </div>
         </div>
       </div>
     </div>
