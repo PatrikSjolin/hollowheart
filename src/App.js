@@ -26,6 +26,15 @@ const App = () => {
     return savedSettings?.language || 'en';
   });
 
+  const [stars, setStars] = useState([]);  // Store star positions in state
+  const [starColors, setStarColors] = useState([]);  // Store colors of the stars
+
+  useEffect(() => {
+    // Generate stars only once when the component mounts
+    setStars(generateStars(100));
+  }, []);  // Empty dependency array ensures this runs only once
+
+
   // Handle language change
   const handleLanguageChange = (event) => {
     setLanguage(event.target.value);
@@ -79,6 +88,15 @@ const App = () => {
 
     return () => clearInterval(interval);
   }, [character, setCharacter]);
+
+  useEffect(() => {
+    if (character && character.depth !== undefined) {
+      console.log(character.depth);
+      const colors = getStarColors(character.depth);
+      setStarColors(colors);  // Update the star colors when the depth changes
+    }
+  }, [character?.depth]);  // Track changes in character
+
 
   // Load character state from localStorage when the app first loads
   useEffect(() => {
@@ -204,8 +222,50 @@ const App = () => {
     setCharacter(character);
   };
 
+  const getStarColors = (depth) => {
+    if (depth >= 1 && depth <= 4) {
+      return ['#A0522D', '#8B4513', '#D2691E']; // Brown-themed stars
+    } else if (depth >= 5 && depth <= 9) {
+      return ['#FF4500', '#DC143C', '#B22222']; // Red-themed stars
+    } else if (depth >= 10 && depth <= 19) {
+      return ['#4682B4', '#5F9EA0', '#1E90FF']; // Blue-themed stars
+    } else if (depth >= 20 && depth <= 29) {
+      return ['#8A2BE2', '#9400D3', '#9932CC']; // Purple-themed stars
+    } 
+    // More intervals can be added here
+    return ['#ffffff']; // Default white for other depths
+  };
+  
+  const generateStars = (numStars) => {
+    const newStars = [];
+    for (let i = 0; i < numStars; i++) {
+      const size = Math.random() * 8 + 1; // Random size for each star
+      const top = Math.random() * 100 + '%'; // Random top position
+      const left = Math.random() * 100 + '%'; // Random left position
+      newStars.push({ top, left, size });
+    }
+    return newStars;
+  };
+
+
   return (
+    
     <div className="container">
+          <div id="star-container">
+        {stars.map((star, index) => (
+          <div
+            key={index}
+            className="star"
+            style={{
+              top: star.top,
+              left: star.left,
+              width: star.size,
+              height: star.size,
+              backgroundColor: starColors[Math.floor(Math.random() * starColors.length)],
+            }}
+          ></div>
+        ))}
+      </div>
       <h1>{translations[language].title}</h1>
       {/* Character Name and Level Section */}
       {character && (
