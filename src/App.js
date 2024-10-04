@@ -380,6 +380,20 @@ const App = () => {
         </div>
 
       )}
+
+{character && character.depth > 0 && character.currentMonsters.length > 0 && (
+<div>
+  <h3>Active Monsters:</h3>
+  <ul>
+    {character.currentMonsters.map((monster, index) => (
+      <li key={index}>
+        {monster.name} - {monster.health} HP
+      </li>
+    ))}
+  </ul>
+</div>
+)}
+
       {/* Action Buttons */}
       {character && (
         <section className="actions-section">

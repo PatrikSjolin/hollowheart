@@ -1,5 +1,6 @@
 import { debug } from './App';
 import { Item } from './item'
+import { Monster } from './Monster'
 
 export class Character {
   constructor(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores, initialState = {}) {
@@ -27,6 +28,7 @@ export class Character {
     this.lifeRegenRate = initialState.lifeRegenRate || 20;
     this.timeSurvivedAtLevel = initialState.timeSurvivedAtLevel || 0;
     this.expBoost = initialState.expBoost || 1;
+    this.attackTimer = initialState.attackTimer || 0;
     this.wood = initialState.wood || 0;
     this.completedResearch = initialState.completedResearch || []; // Store completed research
     this.stone = initialState.stone || 0;
@@ -35,6 +37,7 @@ export class Character {
     this.maxStone = initialState.maxStone || 100;  // Initial maximum amount of stone
     this.numberOfDeaths = initialState.numberOfDeaths || 0;
     this.libraryBuilt = initialState.libraryBuilt || false;
+    this.currentMonsters = initialState.currentMonsters || [];  // Initialize as an empty array to hold multiple monsters
     this.inventory = initialState.inventory || [];  // Add an inventory to store items
     this.equipment = initialState.equipment || {
       weapon: null,
@@ -57,12 +60,20 @@ export class Character {
     saveToLocalStorage(this);
   }
 
+  calculateDamate() {
+    return Math.floor(this.strength * 0.5 * (Math.random() + 1));
+  }
+
+  calculateAttackSpeed() {
+    return (1 - (this.dexterity / (this.dexterity + 15))) * 1000;
+  }
+
   // Calculate max health based on vitality (10 HP per point of vitality)
   calculateMaxHealth() {
     return this.vitality * 10;
   }
 
-  calculateQualityBoostFromIntelligence(){
+  calculateQualityBoostFromIntelligence() {
     return 1 + (this.intelligence / (this.intelligence + 100));
   }
 
@@ -84,10 +95,10 @@ export class Character {
     if (this.equipment.chest) {
       armor += this.equipment.chest.bonus.armor;  // Add armor from equipped chest item
     }
-    if(this.equipment.boots) {
+    if (this.equipment.boots) {
       armor += this.equipment.boots.bonus.armor;
     }
-    if(this.equipment.gloves) {
+    if (this.equipment.gloves) {
       armor += this.equipment.gloves.bonus.armor;
     }
     // Add bonuses from other equipped items as needed
@@ -99,6 +110,17 @@ export class Character {
       return 0;
 
     return Math.floor(200 * Math.pow(1.5, level - 1));
+  }
+
+  rehydrateMonsters(monsterDataArray) {
+    return monsterDataArray.map(monsterData => {
+      return new Monster(
+        monsterData.name,
+        monsterData.health,
+        monsterData.damage,
+        monsterData.attackInterval
+      );
+    });
   }
 
   // Regenerate health based on lifeRegen stat
@@ -172,6 +194,7 @@ export class Character {
   climbUp() {
     if (this.depth > 0) {
       this.depth -= 1;
+      this.currentMonsters = [];
       const rope = this.inventory.find(item => item.name === 'Rope');
       if (rope) {
         rope.quantity -= 1; // Decrease rope count by 1
@@ -188,6 +211,7 @@ export class Character {
   // Method to start exploring (descend)
   startExploring() {
     if (this.currentHealth > 0) {
+      this.currentMonsters = this.rehydrateMonsters(this.currentMonsters);
       this.isExploring = true;
       if (this.depth === 0 && this.lastDepthVisited > 0) {
         this.depth = this.lastDepthVisited; // Go back to the last visited depth
@@ -219,6 +243,69 @@ export class Character {
       this.timeSurvivedAtLevel += elapsedTime;
 
       const intelligenceFactor = this.calculateXpBoostFromIntelligence();
+      this.attackTimer += elapsedTime;
+      const rounds = Math.round(this.attackTimer / this.calculateAttackSpeed());
+      this.currentMonsters.forEach((monster, index) => {
+        monster.attackTimer += elapsedTime;
+
+        const firstStrike = Math.random();
+        if (firstStrike < 0.5) {
+
+          if (monster.attackTimer > monster.attackInterval) {
+            monster.attack(this);  // Monster attacks the character
+            monster.attackTimer -= monster.attackInterval;
+          }
+
+          if (this.currentHealth <= 0) {
+            this.die();
+          }
+
+          if (this.attackTimer > this.calculateAttackSpeed()) {
+            const damageDealt = this.calculateDamate();
+            monster.health -= (damageDealt * rounds);
+            this.logMessage(`You dealt ${rounds}x ${damageDealt} damage to the ${monster.name}.`);
+          }
+
+          // Check if the monster is dead
+          if (monster.health <= 0) {
+            const expGained = Math.floor(this.calculateXpBoostFromIntelligence() * this.depth * Math.floor(Math.random() * 4) + 5); // Random exp gained
+            this.experience += expGained;
+            const coinsGained = 1;
+            this.coins += coinsGained;
+            this.logMessage(`You defeated the ${monster.name}! and gained ${expGained} experience.`);
+            this.currentMonsters.splice(index, 1);  // Remove the monster from the array
+          }
+        } else {
+          if (this.attackTimer > this.calculateAttackSpeed()) {
+            const damageDealt = this.calculateDamate();
+            monster.health -= (damageDealt * rounds);
+            this.logMessage(`You dealt ${rounds}x ${damageDealt} damage to the ${monster.name}.`);
+          }
+
+          // Check if the monster is dead
+          if (monster.health <= 0) {
+            const expGained = Math.floor(this.calculateXpBoostFromIntelligence() * this.depth * Math.floor(Math.random() * 4) + 5); // Random exp gained
+            this.experience += expGained;
+            const coinsGained = 1;
+            this.coins += coinsGained;
+            this.logMessage(`You defeated the ${monster.name}! and gained ${expGained} experience.`);
+            this.currentMonsters.splice(index, 1);  // Remove the monster from the array
+          } else {
+            if (monster.attackTimer > monster.attackInterval) {
+              monster.attack(this);  // Monster attacks the character
+              monster.attackTimer -= monster.attackInterval;
+            }
+
+            if (this.currentHealth <= 0) {
+              this.die();
+            }
+          }
+        }
+      });
+      if (this.attackTimer > this.calculateAttackSpeed()) {
+        // this.logMessage(`Attack timer  ${this.attackTimer}! New attacktimer: ${this.attackTimer - rounds * this.calculateAttackSpeed()} Rounds: ${rounds}.`);
+        this.attackTimer = this.attackTimer - rounds * this.calculateAttackSpeed();
+      }
 
       if (this.treasureTimer > treasureInterval) {
         // Simulate finding resources and gaining experience
@@ -254,7 +341,15 @@ export class Character {
       this.hazardTimer += elapsedTime;
       if (this.hazardTimer > hazardInterval) {
         // Check for hazards (enemies or environments)
-        this.encounterHazard();
+        const typeOfHazard = Math.floor(Math.random() * 2);
+        if (typeOfHazard === 0) {
+          this.encounterHazard();
+        } else if (typeOfHazard === 1) {
+          const spawnMonster = Math.random();
+          if(spawnMonster < 0.3) {
+            this.spawnMonster(this.depth);
+          }
+        }
 
         // Check if it's time to level up
         if (this.experience >= this.calculateXpNeededForLevel(this.level)) {
@@ -263,6 +358,17 @@ export class Character {
         this.hazardTimer = this.hazardTimer - hazardInterval;
       }
     }
+  }
+
+  spawnMonster(depth) {
+    const randomHealth = Math.floor(Math.random() * 100) + 50 * depth;  // Example: Random health between 50 and 150
+    const randomDamage = Math.floor(Math.random() * 20) + 5 * depth;  // Example: Random damage between 5 and 25
+    const randomAttackInterval = Math.floor(Math.random() * 3000) + (2000 / depth);  // Attack every 2-5 seconds
+
+    const monster = new Monster('Worm', randomHealth, randomDamage, randomAttackInterval);  // Example monster
+
+    this.logMessage(`A wild ${monster.name} has appeared with ${monster.health} HP!`);
+    this.currentMonsters.push(monster);  // Add the spawned monster to the array
   }
 
   // Method to simulate encountering a hazard
