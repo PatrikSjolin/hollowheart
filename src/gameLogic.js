@@ -1,4 +1,4 @@
-import { apiUrl } from './App';
+import { apiUrl, debug } from './App';
 
 export class Character {
   constructor(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores, initialState = {}) {
@@ -87,7 +87,9 @@ export class Character {
 
       if (this.currentHealth < this.health) {
         this.currentHealth = Math.min(this.currentHealth + (this.lifeRegen) * rounds, this.health);
+        if(debug) {
         this.logMessage(`Regenerated ${this.lifeRegen * rounds} health.`);
+        }
       }
       this.regenTimer = this.regenTimer - (regenInterval * rounds);
     }
@@ -159,7 +161,7 @@ export class Character {
       }
     }
     else {
-      this.logMessage(`You can't decend while being dead.`);
+      this.logMessage(`You can't descend while being dead.`);
     }
   }
 
@@ -445,6 +447,7 @@ export class Character {
       if (stat === 'vitality') {
         this.health = this.calculateMaxHealth();
       }
+
       this.logMessage(`Upgraded ${stat}. Remaining points: ${this.unallocatedPoints}`);
       this.saveToLocalStorage(this);
     } else {
@@ -552,7 +555,9 @@ export class Character {
       });
       const rounds = Math.floor(this.woodTimer / 10000);
       if (generatedWood > 0) {
+        if(debug) {
         this.logMessage(`Generated ${generatedWood * rounds} wood.`);
+        }
         this.wood = Math.min(this.maxWood, this.wood + (generatedWood * rounds));
       }
       this.woodTimer -= 10000 * rounds;
@@ -569,7 +574,9 @@ export class Character {
       const rounds = Math.floor(this.stoneTimer / 15000);
 
       if (generatedStone > 0) {
+        if(debug) {
         this.logMessage(`Generated ${generatedStone * rounds} stone.`);
+        }
         this.stone = Math.min(this.maxStone, this.stone + (generatedStone * rounds));
       }
       this.stoneTimer -= 15000 * rounds;

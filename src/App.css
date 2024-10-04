@@ -818,3 +818,9 @@ button:disabled {
   pointer-events: none;  /* So stars don’t interfere with clicking */
   z-index: -1;  /* Behind game content */
 }
+
+.item-description {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-top: 5px;
+}

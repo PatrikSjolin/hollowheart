@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ShopOverlay from './ShopOverlay';
 import CharacterOverlay from './CharacterOverlay';
 import ResearchOverlay from './ResearchOverlay';  // Add this line
@@ -9,7 +9,7 @@ import translations from './translations'; // Import translations
 import './App.css'; // Use existing styles from your CSS
 
 export const apiUrl = 'https://23ab-2001-9b1-4500-ef00-a4e3-da53-a84b-f3be.ngrok-free.app';
-export const debug = false;
+export const debug = process.env.REACT_APP_DEBUG === 'true';
 
 const gameVersion = '0.0.3';
 
@@ -24,7 +24,7 @@ const App = () => {
     // Load language from localStorage, default to 'en'
     const savedSettings = JSON.parse(localStorage.getItem('siteSettings'));
     return savedSettings?.language || 'en';
-  });
+  });  
 
   const [stars, setStars] = useState([]);  // Store star positions in state
   const [starColors, setStarColors] = useState([]);  // Store colors of the stars
@@ -56,6 +56,13 @@ const App = () => {
   const [generalMessage, setGeneralMessage] = useState(null);
   const [playerName, setPlayerName] = useState(""); // Add player name state
   const [highScores, setHighScores] = useState([]);
+  const logRef = useRef(null);  // Add this line to define logRef
+  useEffect(() => {
+    if (logRef.current) {
+      logRef.current.scrollTop = logRef.current.scrollHeight;
+    }
+  }, [log]);  // This will trigger auto-scrolling whenever the log updates
+
 
   // Logging function
   const logMessage = (message) => {
@@ -240,8 +247,8 @@ const App = () => {
     const newStars = [];
     for (let i = 0; i < numStars; i++) {
       const size = Math.random() * 8 + 1; // Random size for each star
-      const top = Math.random() * 100 + '%'; // Random top position
-      const left = Math.random() * 100 + '%'; // Random left position
+      const top = Math.random() * 98 + 1 + '%'; // Random top position
+      const left = Math.random() * 98 + 1 + '%'; // Random left position
       newStars.push({ top, left, size });
     }
     return newStars;
@@ -382,11 +389,11 @@ const App = () => {
         </section>
       )}
       {/* Log Section */}
-      <section className="log-section">
-        {log.slice(0).reverse().map((message, index) => (
-          <p key={index}>{message}</p>
-        ))}
-      </section>
+      <section className="log-section" ref={logRef}>
+      {log.map((message, index) => (
+        <p key={index}>{message}</p>
+      ))}
+    </section>
 
       {characterOverlayVisible && (
         <CharacterOverlay
