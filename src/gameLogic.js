@@ -102,8 +102,8 @@ export class Character {
 
       if (this.currentHealth < this.health) {
         this.currentHealth = Math.min(this.currentHealth + (this.lifeRegen) * rounds, this.health);
-        if(debug) {
-        this.logMessage(`Regenerated ${this.lifeRegen * rounds} health.`);
+        if (debug) {
+          this.logMessage(`Regenerated ${this.lifeRegen * rounds} health.`);
         }
       }
       this.regenTimer = this.regenTimer - (regenInterval * rounds);
@@ -175,7 +175,6 @@ export class Character {
       this.saveToLocalStorage(this);
     }
   }
-
 
   // Method to start exploring (descend)
   startExploring() {
@@ -332,32 +331,6 @@ export class Character {
     }
   }
 
-  // Method to convert resources to coins
-  convertToCoins(resourceType, amount) {
-    let conversionRate = 1; // Define conversion rates
-    switch (resourceType) {
-      case 'iron':
-        conversionRate = 1;
-        this.coins += amount * conversionRate;
-        this.logMessage(`Converted ${amount} Iron to ${amount * conversionRate} Coins.`);
-        this.iron -= amount; // Subtract the converted amount
-        break;
-      case 'gold':
-        conversionRate = 5;
-        this.coins += amount * conversionRate;
-        this.logMessage(`Converted ${amount} Gold to ${amount * conversionRate} Coins.`);
-        this.gold -= amount; // Subtract the converted amount
-        break;
-      case 'diamonds':
-        conversionRate = 10;
-        this.coins += amount * conversionRate;
-        this.logMessage(`Converted ${amount} Diamonds to ${amount * conversionRate} Coins.`);
-        this.diamonds -= amount; // Subtract the converted amount
-        break;
-    }
-    this.saveToLocalStorage(this); // Save the updated state
-  }
-
   // Method to buy buildings that generate resources
   buyBuilding(building) {
     if (building.canAfford(this)) {
@@ -432,8 +405,8 @@ export class Character {
       });
       const rounds = Math.floor(this.woodTimer / 10000);
       if (generatedWood > 0) {
-        if(debug) {
-        this.logMessage(`Generated ${generatedWood * rounds} wood.`);
+        if (debug) {
+          this.logMessage(`Generated ${generatedWood * rounds} wood.`);
         }
         this.wood = Math.min(this.maxWood, this.wood + (generatedWood * rounds));
       }
@@ -451,8 +424,8 @@ export class Character {
       const rounds = Math.floor(this.stoneTimer / 15000);
 
       if (generatedStone > 0) {
-        if(debug) {
-        this.logMessage(`Generated ${generatedStone * rounds} stone.`);
+        if (debug) {
+          this.logMessage(`Generated ${generatedStone * rounds} stone.`);
         }
         this.stone = Math.min(this.maxStone, this.stone + (generatedStone * rounds));
       }

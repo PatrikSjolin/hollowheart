@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { buildings } from './building';
 import translations from './translations';
+import { ShopService } from './ShopService';
 
 const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language }) => {
   const [activeTab, setActiveTab] = useState('conversion');  // State to manage active tab
@@ -94,7 +95,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
   };
 
   const handleConvert = (resource) => {
-    character.convertToCoins(resource, convertAmount[resource]);
+    ShopService.convertToCoins(character, resource, convertAmount[resource]);
     setCharacter(character);
     setConvertAmount(prevState => ({
       ...prevState,
