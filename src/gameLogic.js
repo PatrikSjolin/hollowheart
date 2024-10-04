@@ -63,11 +63,11 @@ export class Character {
   }
 
   calculateQuantityBoostFromIntelligence() {
-    return (1 + this.intelligence) / this.intelligence;
+    return 1 + (this.intelligence / (this.intelligence + 100));
   }
 
   calculateXpBoostFromIntelligence() {
-    return (1 + this.intelligence) / this.intelligence;
+    return 1 + (this.intelligence / (this.intelligence + 100));
   }
 
   calculateDamageReductionFromArmor() {
@@ -118,8 +118,7 @@ export class Character {
   equipItem(slot, item) {
     if (this.equipment[slot]) {
       this.logMessage(`You unequipped ${this.equipment[slot].name}.`);
-      // Remove the effects of the previously equipped item (if any)
-      // this.removeItemBonus(this.equipment[slot]);
+      this.addItemToInventory(this.equipment[slot]);
     }
     this.equipment[slot] = item; // Assign the item to the equipment slot
     this.inventory = this.inventory.filter(inventoryItem => inventoryItem.name !== item.name); // Remove from inventory

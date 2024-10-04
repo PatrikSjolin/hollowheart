@@ -1,7 +1,8 @@
 export class Item {
 
-  generateArmor(depth, level, intelligence) {
-    const intelligenceFactor = this.calculateQuantityBoostFromIntelligence();
+  static generateArmor(depth, level, intelligence) {
+    console.log('generate armor');
+    const intelligenceFactor = 1 - ((intelligence) / (intelligence + 100));
     const armorBonus = Math.floor(Math.random() * 10 * intelligenceFactor * (depth + 1) / depth);
     let finalSlot = '';
 
@@ -28,7 +29,8 @@ export class Item {
     };
   }
 
-  generateWeapon(depth, level, intelligence) {
+  static generateWeapon(depth, level, intelligence) {
+    console.log('generate weapon');
     return {
       name: 'Destroyed stick of crap',
       type: 'equipable',
@@ -40,10 +42,10 @@ export class Item {
     };
   }
 
-  generateEquipableItem(depth, level, intelligence) {
-
-    const typeOfSlot = Math.floor(Math.random * 2);
-
+  static generateEquipableItem(depth, level, intelligence) {
+    console.log('generate equipable item');
+    const typeOfSlot = Math.floor(Math.random() * 2);
+    console.log('slot ' + typeOfSlot);
     if (typeOfSlot === 0) {
       return this.generateWeapon(depth, level, intelligence);
     }
@@ -52,7 +54,7 @@ export class Item {
     }
   }
 
-  generateSpecial(depth, level, intelligence) {
+  static generateSpecial(depth, level, intelligence) {
     return {
       name: `Rope`,
       type: 'special',
@@ -62,7 +64,7 @@ export class Item {
     };
   }
 
-  generateConsumable(depth, level, intelligence) {
+  static generateConsumable(depth, level, intelligence) {
     return {
       name: 'Health restore',
       type: 'consumable',
@@ -75,7 +77,7 @@ export class Item {
     }
   }
 
-  generateItem(depth, level, intelligence) {
+  static generateItem(depth, level, intelligence) {
 
     const typeOfItem = Math.floor(Math.random() * 3);
 

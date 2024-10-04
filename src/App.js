@@ -7,6 +7,7 @@ import MessageOverlay from './MessageOverlay';
 import translations from './translations'; // Import translations
 import { HighscoreService } from './HighScoreService'; // Import the service
 import { ShopService } from './ShopService';
+import { Item } from './item'
 
 import './App.css'; // Use existing styles from your CSS
 
@@ -284,6 +285,14 @@ const App = () => {
     return newStars;
   };
 
+  const generateRandomItem = () => {
+    const newItem = Item.generateItem(character.depth, character.level, character.intelligence);
+    logMessage(newItem.name);
+    character.addItemToInventory(newItem);
+    setCharacter(character);
+    saveToLocalStorage(character);
+    };
+
   const increaseCharacterLevel = () => {
     character.levelUp();
     setCharacter(character);
@@ -426,6 +435,7 @@ const App = () => {
           Increase Level (Debug)
         </button>
       )}
+      {debug && ( <button onClick={generateRandomItem}>Generate Item (Debug)</button>)}
         </section>
       )}
       {/* Log Section */}
