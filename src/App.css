@@ -807,6 +807,7 @@ button:disabled {
   background-color: #ffffff;
   border-radius: 50%;
   animation: glow 2s infinite ease-in-out;
+  transition: background-color 2s ease;  /* Add transition for smooth color change */
 }
 
 #star-container {
