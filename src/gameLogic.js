@@ -1,4 +1,4 @@
-import { apiUrl, debug } from './App';
+import { debug } from './App';
 import { Item } from './item'
 
 export class Character {
@@ -197,10 +197,6 @@ export class Character {
       else {
         this.logMessage('Not ready to descend');
       }
-      if (this.depth > this.recordDepth) {
-        this.recordDepth = this.depth;
-        this.sendHighscoreToServer(this.playerName, this.recordDepth);  // Send highscore to the server
-      }
     }
     else {
       this.logMessage(`You can't descend while being dead.`);
@@ -284,33 +280,6 @@ export class Character {
         this.die();
       }
     }
-  }
-
-  sendHighscoreToServer(characterName, score) {
-    fetch(apiUrl + '/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        "ngrok-skip-browser-warning": "69420",
-      },
-      body: JSON.stringify({ characterName, score }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('High score submitted:', data.message);
-        // Fetch updated high scores after submission
-        fetch(apiUrl + '/highscores', {
-          headers: new Headers({
-            "ngrok-skip-browser-warning": "69420",
-          }),
-        })
-          .then(response => response.json())
-          .then(updatedData => this.setHighScores(updatedData)) // Update the local high scores state
-          .catch(error => console.error('Error fetching updated high scores:', error));
-      })
-      .catch(error => {
-        console.error('Error submitting high score:', error);
-      });
   }
 
   // Method for the character to die and reset

@@ -5,10 +5,10 @@ import ResearchOverlay from './ResearchOverlay';  // Add this line
 import { Character } from './gameLogic'; // Import character logic
 import MessageOverlay from './MessageOverlay';
 import translations from './translations'; // Import translations
+import { HighscoreService } from './HighScoreService'; // Import the service
 
 import './App.css'; // Use existing styles from your CSS
 
-export const apiUrl = 'https://23ab-2001-9b1-4500-ef00-a4e3-da53-a84b-f3be.ngrok-free.app';
 export const debug = process.env.REACT_APP_DEBUG === 'true';
 
 const gameVersion = '0.0.3';
@@ -75,16 +75,35 @@ const App = () => {
     setLog((prevLog) => [...prevLog, `${timestamp}${message}`]);
   };
 
-  useEffect(() => {
-    fetch(apiUrl + '/highscores', {
-      headers: new Headers({
-        "ngrok-skip-browser-warning": "69420",
-      }),
-    })  // Replace with your server URL
-      .then(response => response.json())
+  // Function to fetch high scores and update the state
+  const fetchHighScores = () => {
+    HighscoreService.fetchHighscores()
       .then(data => setHighScores(data))
       .catch(error => console.error('Error fetching high scores:', error));
-  }, []);  // Empty array to ensure this only runs once on component mount
+  };
+
+  // useEffect to fetch high scores on component mount
+  useEffect(() => {
+    fetchHighScores(); // Fetch high scores when the component is mounted
+  }, []);
+
+  // Function to handle sending the high score and refetching scores
+  const submitHighScore = (characterName, recordDepth) => {
+    HighscoreService.sendHighscore(characterName, recordDepth)
+      .then(() => fetchHighScores()) // Fetch updated high scores after submission
+      .catch(error => console.error('Error updating high scores:', error));
+  };
+
+  // This useEffect can watch for depth changes and submit high score when necessary
+  useEffect(() => {
+    if (character) {
+      if (character.depth > character.recordDepth) {
+        character.recordDepth = character.depth;  // Update the record
+        submitHighScore(character.playerName, character.depth);
+      }
+    }
+  }, [character?.depth]);  // Still track changes in depth
+  
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -103,7 +122,6 @@ const App = () => {
       setStarColors(colors);  // Update the star colors when the depth changes
     }
   }, [character?.depth]);  // Track changes in character
-
 
   // Load character state from localStorage when the app first loads
   useEffect(() => {
@@ -142,7 +160,7 @@ const App = () => {
     if (character && !firstTimeOverlayVisible) {  // Ensure the loop only starts after the player has clicked Start
       let lastTimestamp = Date.now(); // Keep track of the last loop tick
       const gameLoop = setInterval(() => {
-        
+
         const currentTimestamp = Date.now();
         const elapsedTime = currentTimestamp - lastTimestamp;
         lastTimestamp = currentTimestamp;
