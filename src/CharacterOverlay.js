@@ -102,47 +102,79 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible,
 
         <h3>Equipped Items</h3>
         <div className="equipped-items">
-          <p><strong>Weapon:</strong> {character.equipment.weapon ? character.equipment.weapon.name : 'None'}
-            {character.equipment.weapon && (
-              <button onClick={() => {
-                character.unequipItem('weapon');
-                setCharacter(character);
-              }}>
-                Unequip
-              </button>
-            )}
-          </p>
-          <p><strong>Chest Armor:</strong> {character.equipment.chest ? character.equipment.chest.name : 'None'}
-            {character.equipment.chest && (
-              <button onClick={() => {
-                character.unequipItem('chest');
-                setCharacter(character);
-              }}>
-                Unequip
-              </button>
-            )}
-          </p>
-          <p><strong>Boots:</strong> {character.equipment.boots ? character.equipment.boots.name : 'None'}
-            {character.equipment.boots && (
-              <button onClick={() => {
-                character.unequipItem('boots');
-                setCharacter(character);
-              }}>
-                Unequip
-              </button>
-            )}
-          </p>
-          <p><strong>Gloves:</strong> {character.equipment.gloves ? character.equipment.gloves.name : 'None'}
-            {character.equipment.gloves && (
-              <button onClick={() => {
-                character.unequipItem('gloves');
-                setCharacter(character);
-              }}>
-                Unequip
-              </button>
-            )}
-          </p>
-        </div>
+  {/* Weapon */}
+  <div className="equipped-item">
+    <div className="item-info">
+      <p><strong>Weapon:</strong> {character.equipment.weapon ? character.equipment.weapon.name : 'None'}</p>
+      {character.equipment.weapon && (
+        <p className="item-description">{character.equipment.weapon.description}</p>
+      )}
+    </div>
+    {character.equipment.weapon && (
+      <button className="unequip-button" onClick={() => {
+        character.unequipItem('weapon');
+        setCharacter(character);
+      }}>
+        Unequip
+      </button>
+    )}
+  </div>
+
+  {/* Chest Armor */}
+  <div className="equipped-item">
+    <div className="item-info">
+      <p><strong>Chest:</strong> {character.equipment.chest ? character.equipment.chest.name : 'None'}</p>
+      {character.equipment.chest && (
+        <p className="item-description">{character.equipment.chest.description}</p>
+      )}
+    </div>
+    {character.equipment.chest && (
+      <button className="unequip-button" onClick={() => {
+        character.unequipItem('chest');
+        setCharacter(character);
+      }}>
+        Unequip
+      </button>
+    )}
+  </div>
+
+  {/* Boots */}
+  <div className="equipped-item">
+    <div className="item-info">
+      <p><strong>Boots:</strong> {character.equipment.boots ? character.equipment.boots.name : 'None'}</p>
+      {character.equipment.boots && (
+        <p className="item-description">{character.equipment.boots.description}</p>
+      )}
+    </div>
+    {character.equipment.boots && (
+      <button className="unequip-button" onClick={() => {
+        character.unequipItem('boots');
+        setCharacter(character);
+      }}>
+        Unequip
+      </button>
+    )}
+  </div>
+
+  {/* Gloves */}
+  <div className="equipped-item">
+    <div className="item-info">
+      <p><strong>Gloves:</strong> {character.equipment.gloves ? character.equipment.gloves.name : 'None'}</p>
+      {character.equipment.gloves && (
+        <p className="item-description">{character.equipment.gloves.description}</p>
+      )}
+    </div>
+    {character.equipment.gloves && (
+      <button className="unequip-button" onClick={() => {
+        character.unequipItem('gloves');
+        setCharacter(character);
+      }}>
+        Unequip
+      </button>
+    )}
+  </div>
+</div>
+
 
         {/* <h3>Inventory</h3> */}
         <h3>Inventory</h3>

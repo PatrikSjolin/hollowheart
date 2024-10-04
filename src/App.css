@@ -771,14 +771,35 @@ button:disabled {
   flex-grow: 1;
 }
 
-.equip-button {
-  margin-left: 20px;
-  padding: 8px 12px;
-  background-color: #4caf50;
+.equipped-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;  /* Align button to the right */
+  margin-bottom: 15px;
+}
+
+.item-info {
+  flex-grow: 1;  /* Allow item info (name and description) to take up available space */
+}
+
+.item-description {
+  margin-left: 10px;  /* Space between the name and description */
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.unequip-button {
+  background-color: #ff4d4d;
   color: white;
   border: none;
-  border-radius: 8px;
+  padding: 8px 12px;
+  border-radius: 5px;
   cursor: pointer;
+  margin-left: 20px;  /* Add space between description and button */
+}
+
+.unequip-button:hover {
+  background-color: #ff3333;
 }
 
 .item-description {

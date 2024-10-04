@@ -39,13 +39,13 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
         bonus: { attack: 5 },
       },
       {
-        name: 'Chest Armor',
+        name: 'Disgusting vest',
         type: 'equipable',
         stacks: false,
         slot: 'chest',
-        description: 'Provides 5 extra armor points.',
+        description: 'Provides 7 extra armor points.',
         cost: { coins: 80 },
-        bonus: { armor: 5 },
+        bonus: { armor: 7 },
       }
     ];
 
