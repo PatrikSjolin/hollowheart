@@ -268,7 +268,7 @@ export class Character {
 
           // Check if the monster is dead
           if (monster.health <= 0) {
-            const expGained = Math.floor(this.calculateXpBoostFromIntelligence() * this.depth * Math.floor(Math.random() * 4) + 5); // Random exp gained
+            const expGained = Math.floor(this.calculateXpBoostFromIntelligence() * this.depth * Math.floor(Math.random() * 6) + 5); // Random exp gained
             this.experience += expGained;
             const coinsGained = 1;
             this.coins += coinsGained;

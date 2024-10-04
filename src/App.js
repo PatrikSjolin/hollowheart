@@ -26,7 +26,7 @@ const App = () => {
     // Load language from localStorage, default to 'en'
     const savedSettings = JSON.parse(localStorage.getItem('siteSettings'));
     return savedSettings?.language || 'en';
-  });  
+  });
 
   const [stars, setStars] = useState([]);  // Store star positions in state
   const [starColors, setStarColors] = useState([]);  // Store colors of the stars
@@ -107,21 +107,21 @@ const App = () => {
       if (character.depth > character.recordDepth) {
         character.recordDepth = character.depth;  // Update the record
         submitHighScore(character.playerName, character.depth);
-        if(character.depth === 5) {
-            const newItem = {
-              name: 'Dung-induced boots',
-              type: 'equipable',
-              slot: 'boots',
-              description: 'They stink. But increases armor by 40',
-              cost: { coins: 400 },
-              bonus: { armor: 40 },
-            };
-            ShopService.addNewItemToShop(newItem, shopItems, setShopItems);  // Call the function passed from App.js
+        if (character.depth === 5) {
+          const newItem = {
+            name: 'Dung-induced boots',
+            type: 'equipable',
+            slot: 'boots',
+            description: 'They stink. But increases armor by 40',
+            cost: { coins: 400 },
+            bonus: { armor: 40 },
+          };
+          ShopService.addNewItemToShop(newItem, shopItems, setShopItems);  // Call the function passed from App.js
         }
       }
     }
   }, [character?.depth]);  // Still track changes in depth
-  
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -269,11 +269,11 @@ const App = () => {
       return ['#4682B4', '#5F9EA0', '#1E90FF']; // Blue-themed stars
     } else if (depth >= 20 && depth <= 29) {
       return ['#8A2BE2', '#9400D3', '#9932CC']; // Purple-themed stars
-    } 
+    }
     // More intervals can be added here
     return ['#ffffff']; // Default white for other depths
   };
-  
+
   const generateStars = (numStars) => {
     const newStars = [];
     for (let i = 0; i < numStars; i++) {
@@ -291,7 +291,7 @@ const App = () => {
     character.addItemToInventory(newItem);
     setCharacter(character);
     saveToLocalStorage(character);
-    };
+  };
 
   const increaseCharacterLevel = () => {
     character.levelUp();
@@ -300,9 +300,9 @@ const App = () => {
   };
 
   return (
-    
+
     <div className="container">
-          <div id="star-container">
+      <div id="star-container">
         {stars.map((star, index) => (
           <div
             key={index}
@@ -381,19 +381,6 @@ const App = () => {
 
       )}
 
-{character && character.depth > 0 && character.currentMonsters.length > 0 && (
-<div>
-  <h3>Active Monsters:</h3>
-  <ul>
-    {character.currentMonsters.map((monster, index) => (
-      <li key={index}>
-        {monster.name} - {monster.health} HP
-      </li>
-    ))}
-  </ul>
-</div>
-)}
-
       {/* Action Buttons */}
       {character && (
         <section className="actions-section">
@@ -411,7 +398,7 @@ const App = () => {
           </button>
           <button
             onClick={handleClimbUp}
-            disabled={!character.inventory.some(item => (item.name === 'Rope' || item.name === 'Rep') && item.quantity > 0) || character.depth === 0 || character.depth === 1 }
+            disabled={!character.inventory.some(item => (item.name === 'Rope' || item.name === 'Rep') && item.quantity > 0) || character.depth === 0 || character.depth === 1}
           >
             ⬆️
           </button>
@@ -445,19 +432,33 @@ const App = () => {
             Debug: Add Resources
           </button>)}
           {debug && (
-        <button onClick={increaseCharacterLevel}>
-          Increase Level (Debug)
-        </button>
-      )}
-      {debug && ( <button onClick={generateRandomItem}>Generate Item (Debug)</button>)}
+            <button onClick={increaseCharacterLevel}>
+              Increase Level (Debug)
+            </button>
+          )}
+          {debug && (<button onClick={generateRandomItem}>Generate Item (Debug)</button>)}
         </section>
       )}
+
+      {character && character.depth > 0 && character.currentMonsters.length > 0 && (
+        <div>
+          <h3>Active Monsters:</h3>
+          <ul>
+            {character.currentMonsters.map((monster, index) => (
+              <li key={index}>
+                {monster.name} - {monster.health} HP
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Log Section */}
       <section className="log-section" ref={logRef}>
-      {log.map((message, index) => (
-        <p key={index}>{message}</p>
-      ))}
-    </section>
+        {log.map((message, index) => (
+          <p key={index}>{message}</p>
+        ))}
+      </section>
 
       {characterOverlayVisible && (
         <CharacterOverlay
