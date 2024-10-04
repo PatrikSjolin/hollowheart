@@ -1,4 +1,5 @@
 import { apiUrl, debug } from './App';
+import { Item } from './item'
 
 export class Character {
   constructor(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores, initialState = {}) {
@@ -8,7 +9,6 @@ export class Character {
     this.dexterity = initialState.dexterity || 10;
     this.vitality = initialState.vitality || 10;
     this.intelligence = initialState.intelligence || 10;
-    this.health = this.calculateMaxHealth();
     this.currentHealth = initialState.currentHealth || 100;
     this.iron = initialState.iron || 0;
     this.gold = initialState.gold || 0;
@@ -30,29 +30,31 @@ export class Character {
     this.wood = initialState.wood || 0;
     this.completedResearch = initialState.completedResearch || []; // Store completed research
     this.stone = initialState.stone || 0;
+    this.lastDepthVisited = initialState.lastDepthVisited || 0; // Store the last visited depth
+    this.maxWood = initialState.maxWood || 100;  // Initial maximum amount of wood
+    this.maxStone = initialState.maxStone || 100;  // Initial maximum amount of stone
+    this.numberOfDeaths = initialState.numberOfDeaths || 0;
+    this.libraryBuilt = initialState.libraryBuilt || false;
     this.inventory = initialState.inventory || [];  // Add an inventory to store items
     this.equipment = initialState.equipment || {
       weapon: null,
       chest: null,
       boots: null,
       gloves: null,
-    }; // Make sure equipment is stored
-    this.regenTimer = 0; // Initialize regen timer for health regeneration
+    };
+    this.regenTimer = 0;
     this.treasureTimer = 0;
-    this.numberOfDeaths = initialState.numberOfDeaths || 0;
     this.hazardTimer = 0;
     this.woodTimer = 0;
-    this.lastDepthVisited = initialState.lastDepthVisited || 0; // Store the last visited depth
-    this.maxWood = initialState.maxWood || 100;  // Initial maximum amount of wood
-    this.maxStone = initialState.maxStone || 100;  // Initial maximum amount of stone
+    this.health = this.calculateMaxHealth();
     this.stoneTimer = 0;
     this.isLevelingUp = false; // New property to track level-up state
-    this.libraryBuilt = initialState.libraryBuilt || false;
     this.saveToLocalStorage = saveToLocalStorage;
-    saveToLocalStorage(this);
     this.logMessage = logMessage;
     this.showGeneralMessage = showGeneralMessage;
     this.setHighScores = setHighScores;
+
+    saveToLocalStorage(this);
   }
 
   // Calculate max health based on vitality (10 HP per point of vitality)
@@ -60,20 +62,33 @@ export class Character {
     return this.vitality * 10;
   }
 
-  climbUp() {
-    if (this.depth > 0) {
-      this.depth -= 1;
-      const rope = this.inventory.find(item => item.name === 'Rope');
-      if (rope) {
-        rope.quantity -= 1; // Decrease rope count by 1
-        if (rope.quantity === 0) {
-          // Remove the item if quantity is 0
-          this.inventory = this.inventory.filter(item => item.name !== 'Rope');
-        }
-      }
-      this.logMessage('You used a rope to climb up one depth.');
-      this.saveToLocalStorage(this);
+  calculateQuantityBoostFromIntelligence() {
+    return (1 + this.intelligence) / this.intelligence;
+  }
+
+  calculateXpBoostFromIntelligence() {
+    return (1 + this.intelligence) / this.intelligence;
+  }
+
+  calculateDamageReductionFromArmor() {
+    const armor = this.calculateArmor();
+    return (armor / (armor + 120));
+  }
+
+  calculateArmor() {
+    let armor = this.strength * 4;  // Base armor from strength
+    if (this.equipment.chest) {
+      armor += this.equipment.chest.bonus.armor;  // Add armor from equipped chest item
     }
+    // Add bonuses from other equipped items as needed
+    return armor;
+  }
+
+  calculateXpNeededForLevel(level) {
+    if (level === 0)
+      return 0;
+
+    return Math.floor(200 * Math.pow(1.5, level - 1));
   }
 
   // Regenerate health based on lifeRegen stat
@@ -134,6 +149,33 @@ export class Character {
     this.saveToLocalStorage(this);
   }
 
+  // Method to ascend (stop exploring)
+  ascend() {
+    if (this.isExploring) {
+      this.isExploring = false;
+      this.lastDepthVisited = this.depth; // Store the current depth before ascending
+      this.logMessage(`You ascend back to the surface.`);
+      this.depth = 0;
+      this.saveToLocalStorage(this); // Trigger React state update
+    }
+  }
+
+  climbUp() {
+    if (this.depth > 0) {
+      this.depth -= 1;
+      const rope = this.inventory.find(item => item.name === 'Rope');
+      if (rope) {
+        rope.quantity -= 1; // Decrease rope count by 1
+        if (rope.quantity === 0) {
+          // Remove the item if quantity is 0
+          this.inventory = this.inventory.filter(item => item.name !== 'Rope');
+        }
+      }
+      this.logMessage('You used a rope to climb up one depth.');
+      this.saveToLocalStorage(this);
+    }
+  }
+
 
   // Method to start exploring (descend)
   startExploring() {
@@ -165,17 +207,6 @@ export class Character {
     }
   }
 
-  // Method to ascend (stop exploring)
-  ascend() {
-    if (this.isExploring) {
-      this.isExploring = false;
-      this.lastDepthVisited = this.depth; // Store the current depth before ascending
-      this.logMessage(`You ascend back to the surface.`);
-      this.depth = 0;
-      this.saveToLocalStorage(this); // Trigger React state update
-    }
-  }
-
   // Exploration mechanism - gathering resources, finding items, gaining experience, and encountering hazards
   explore(elapsedTime) {
     if (this.isExploring) {
@@ -202,7 +233,7 @@ export class Character {
         const randomChance = Math.random();
 
         if (randomChance < itemFindChance) {
-          const foundItem = this.generateItem(this.depth, this.level, this.intelligence);
+          const foundItem = Item.generateItem(this.depth, this.level, this.intelligence);
           if (foundItem !== undefined) {
             if (foundItem.type === 'consumable') {
               this.useHealingPotion();
@@ -228,106 +259,6 @@ export class Character {
         this.hazardTimer = this.hazardTimer - hazardInterval;
       }
     }
-  }
-
-
-  generateArmor(depth, level, intelligence) {
-    const intelligenceFactor = this.calculateQuantityBoostFromIntelligence();
-    const armorBonus = Math.floor(Math.random() * 10 * intelligenceFactor * (depth + 1) / depth);
-    let finalSlot = '';
-
-    const slotRoll = Math.floor(Math.random() * 3);
-
-    if (slotRoll === 0) {
-      finalSlot = 'chest';
-    } else if (slotRoll === 1) {
-      finalSlot = 'gloves';
-    } else if (slotRoll === 2) {
-      finalSlot = 'boots';
-    }
-
-    const name = `Rotten ${finalSlot} of trash`;
-
-    return {
-      name: name,
-      type: 'equipable',
-      stacks: false,
-      slot: finalSlot,
-      description: `Provides ${armorBonus} extra armor points.`,
-      cost: { coins: 80 },
-      bonus: { armor: armorBonus },
-    };
-  }
-
-  generateWeapon(depth, level, intelligence) {
-    return {
-      name: 'Destroyed stick of crap',
-      type: 'equipable',
-      stacks: false,
-      slot: 'weapon',
-      description: `Provides 0 extra damage.`,
-      cost: { coins: 80 },
-      bonus: { attack: 0 },
-    };
-  }
-
-
-  generateEquipableItem(depth, level, intelligence) {
-
-    const typeOfSlot = Math.floor(Math.random * 2);
-
-    if (typeOfSlot === 0) {
-      return this.generateWeapon(depth, level, intelligence);
-    }
-    else if (typeOfSlot === 1) {
-      return this.generateArmor(depth, level, intelligence);
-    }
-  }
-
-  generateSpecial(depth, level, intelligence) {
-    return {
-      name: `Rope`,
-      type: 'special',
-      stacks: true,
-      description: 'Used to climb up one depth.',
-      cost: { coins: 10 },
-    };
-  }
-
-  generateConsumable(depth, level, intelligence) {
-    return {
-      name: 'Health restore',
-      type: 'consumable',
-      stacks: false,
-      description: 'Restores 100 health points.',
-      cost: { coins: 10 },
-      effect: (character) => {
-        character.useHealingPotion(); // Apply the healing effect
-      }
-    }
-  }
-
-  generateItem(depth, level, intelligence) {
-
-    const typeOfItem = Math.floor(Math.random() * 3);
-
-    if (typeOfItem === 0) {
-
-      return this.generateEquipableItem(depth, level, intelligence);
-    }
-    else if (typeOfItem === 1) {
-      return this.generateSpecial(depth, level, intelligence);
-    }
-    else if (typeOfItem === 2) {
-      return this.generateConsumable(depth, level, intelligence);
-    }
-  }
-
-  calculateXpNeededForLevel(level) {
-    if (level === 0)
-      return 0;
-
-    return Math.floor(200 * Math.pow(1.5, level - 1));
   }
 
   // Method to simulate encountering a hazard
@@ -380,29 +311,6 @@ export class Character {
       .catch(error => {
         console.error('Error submitting high score:', error);
       });
-  }
-
-
-  calculateQuantityBoostFromIntelligence() {
-    return (1 + this.intelligence) / this.intelligence;
-  }
-
-  calculateXpBoostFromIntelligence() {
-    return (1 + this.intelligence) / this.intelligence;
-  }
-
-  calculateDamageReductionFromArmor() {
-    const armor = this.calculateArmor();
-    return (armor / (armor + 120));
-  }
-
-  calculateArmor() {
-    let armor = this.strength * 4;  // Base armor from strength
-    if (this.equipment.chest) {
-      armor += this.equipment.chest.bonus.armor;  // Add armor from equipped chest item
-    }
-    // Add bonuses from other equipped items as needed
-    return armor;
   }
 
   // Method for the character to die and reset
