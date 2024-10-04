@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/hollowheart/static/css/main.67a5f296.css",
-    "main.js": "/hollowheart/static/js/main.9d9b0b27.js",
+    "main.js": "/hollowheart/static/js/main.ec6397ef.js",
     "static/js/453.8ff6c1f3.chunk.js": "/hollowheart/static/js/453.8ff6c1f3.chunk.js",
     "index.html": "/hollowheart/index.html",
     "main.67a5f296.css.map": "/hollowheart/static/css/main.67a5f296.css.map",
-    "main.9d9b0b27.js.map": "/hollowheart/static/js/main.9d9b0b27.js.map",
+    "main.ec6397ef.js.map": "/hollowheart/static/js/main.ec6397ef.js.map",
     "453.8ff6c1f3.chunk.js.map": "/hollowheart/static/js/453.8ff6c1f3.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.67a5f296.css",
-    "static/js/main.9d9b0b27.js"
+    "static/js/main.ec6397ef.js"
   ]
 }
