@@ -64,6 +64,14 @@ export const buildings = [
     function (character) { return character.buildings.some(building => building.name === 'Lumber Mill'); }
   ),
   new Building(
+    'Stone Warehouse',
+    { wood: 100, stone: 50, coins: 300 },
+    'storage',
+    { stone: 200 },  // Increases max wood/stone storage
+    'Increases the maximum storage of stone with 200.',
+    function (character) { return character.buildings.some(building => building.name === 'Stone Quarry'); }
+  ),
+  new Building(
     'Library',
     { wood: 300, coins: 300, iron: 50 },
     'feature',

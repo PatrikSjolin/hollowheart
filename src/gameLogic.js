@@ -62,8 +62,12 @@ export class Character {
     return this.vitality * 10;
   }
 
-  calculateQuantityBoostFromIntelligence() {
+  calculateQualityBoostFromIntelligence(){
     return 1 + (this.intelligence / (this.intelligence + 100));
+  }
+
+  calculateQuantityBoostFromIntelligence() {
+    return 1 + (this.dexterity / (this.dexterity + 100));
   }
 
   calculateXpBoostFromIntelligence() {

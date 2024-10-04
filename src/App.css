@@ -846,3 +846,10 @@ button:disabled {
   color: #ccc;
   margin-top: 5px;
 }
+
+.section-divider {
+  border: 0;
+  height: 1px;
+  background-color: #ccc;  /* Light gray line */
+  margin: 20px 0;  /* Add space around the divider */
+}

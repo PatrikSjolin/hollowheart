@@ -112,8 +112,8 @@ const App = () => {
               name: 'Dung-induced boots',
               type: 'equipable',
               slot: 'boots',
-              description: 'They stink.',
-              cost: { coins: 200 },
+              description: 'They stink. But increases armor by 40',
+              cost: { coins: 400 },
               bonus: { armor: 40 },
             };
             ShopService.addNewItemToShop(newItem, shopItems, setShopItems);  // Call the function passed from App.js
