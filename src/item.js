@@ -40,7 +40,6 @@ export class Item {
     };
   }
 
-
   generateEquipableItem(depth, level, intelligence) {
 
     const typeOfSlot = Math.floor(Math.random * 2);
@@ -81,7 +80,6 @@ export class Item {
     const typeOfItem = Math.floor(Math.random() * 3);
 
     if (typeOfItem === 0) {
-
       return this.generateEquipableItem(depth, level, intelligence);
     }
     else if (typeOfItem === 1) {

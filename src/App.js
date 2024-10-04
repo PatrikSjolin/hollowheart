@@ -142,23 +142,18 @@ const App = () => {
     if (character && !firstTimeOverlayVisible) {  // Ensure the loop only starts after the player has clicked Start
       let lastTimestamp = Date.now(); // Keep track of the last loop tick
       const gameLoop = setInterval(() => {
+        
         const currentTimestamp = Date.now();
         const elapsedTime = currentTimestamp - lastTimestamp;
         lastTimestamp = currentTimestamp;
 
-        // Life regeneration
         character.regenerateHealth(elapsedTime);
-
-        // Resource gathering (e.g., from buildings)
         character.generateResources(elapsedTime);
-
-        // Exploration and hazard checks
         character.explore(elapsedTime);
 
-        // Update character and save to localStorage
         setCharacter(character);
         saveToLocalStorage(character);
-      }, 500); // Game loop runs every 1 second
+      }, 500); // Game loop runs every 500 ms
 
       return () => clearInterval(gameLoop); // Cleanup on component unmount
     }
