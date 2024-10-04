@@ -80,6 +80,12 @@ export class Character {
     if (this.equipment.chest) {
       armor += this.equipment.chest.bonus.armor;  // Add armor from equipped chest item
     }
+    if(this.equipment.boots) {
+      armor += this.equipment.boots.bonus.armor;
+    }
+    if(this.equipment.gloves) {
+      armor += this.equipment.gloves.bonus.armor;
+    }
     // Add bonuses from other equipped items as needed
     return armor;
   }

@@ -6,6 +6,7 @@ import { Character } from './gameLogic'; // Import character logic
 import MessageOverlay from './MessageOverlay';
 import translations from './translations'; // Import translations
 import { HighscoreService } from './HighScoreService'; // Import the service
+import { ShopService } from './ShopService';
 
 import './App.css'; // Use existing styles from your CSS
 
@@ -56,12 +57,17 @@ const App = () => {
   const [generalMessage, setGeneralMessage] = useState(null);
   const [playerName, setPlayerName] = useState(""); // Add player name state
   const [highScores, setHighScores] = useState([]);
+  const [shopItems, setShopItems] = useState(ShopService.initializeShopStock());  // Move the shop items to App.js
   const logRef = useRef(null);  // Add this line to define logRef
   useEffect(() => {
     if (logRef.current) {
       logRef.current.scrollTop = logRef.current.scrollHeight;
     }
   }, [log]);  // This will trigger auto-scrolling whenever the log updates
+
+  const handleAddNewItemToShop = (newItem) => {
+    ShopService.addNewItemToShop(newItem, setShopItems);
+  };
 
 
   // Logging function
@@ -100,6 +106,17 @@ const App = () => {
       if (character.depth > character.recordDepth) {
         character.recordDepth = character.depth;  // Update the record
         submitHighScore(character.playerName, character.depth);
+        if(character.depth === 5) {
+            const newItem = {
+              name: 'Dung-induced boots',
+              type: 'equipable',
+              slot: 'boots',
+              description: 'They stink.',
+              cost: { coins: 200 },
+              bonus: { armor: 40 },
+            };
+            ShopService.addNewItemToShop(newItem, shopItems, setShopItems);  // Call the function passed from App.js
+        }
       }
     }
   }, [character?.depth]);  // Still track changes in depth
@@ -267,6 +284,11 @@ const App = () => {
     return newStars;
   };
 
+  const increaseCharacterLevel = () => {
+    character.levelUp();
+    setCharacter(character);
+    saveToLocalStorage(character);
+  };
 
   return (
     
@@ -399,6 +421,11 @@ const App = () => {
           }}>
             Debug: Add Resources
           </button>)}
+          {debug && (
+        <button onClick={increaseCharacterLevel}>
+          Increase Level (Debug)
+        </button>
+      )}
         </section>
       )}
       {/* Log Section */}
@@ -423,6 +450,8 @@ const App = () => {
           setCharacter={setCharacter}
           setShopOverlayVisible={setShopOverlayVisible}
           language={language}
+          shopItems={shopItems}
+          setShopItems={setShopItems}
         />
       )}
 

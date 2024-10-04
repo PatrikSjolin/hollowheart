@@ -3,68 +3,10 @@ import { buildings } from './building';
 import translations from './translations';
 import { ShopService } from './ShopService';
 
-const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language }) => {
+const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language, shopItems, setShopItems }) => {
   const [activeTab, setActiveTab] = useState('conversion');  // State to manage active tab
-  const [convertAmount, setConvertAmount] = useState({
-    iron: 0,
-    gold: 0,
-    diamonds: 0,
-  });
-
-  const initializeShopStock = () => {
-    const defaultItems = [
-      {
-        name: 'Health restore',
-        type: 'consumable',
-        stacks: false,
-        description: 'Restores 100 health points.',
-        cost: { coins: 10 },
-        effect: (character) => {
-          character.useHealingPotion(); // Apply the healing effect
-        }
-      },
-      {
-        name: `${translations[language].rope}`,
-        type: 'special',
-        stacks: true,
-        description: 'Used to climb up one depth.',
-        cost: { coins: 10 },
-      },
-      {
-        name: 'Broken sword',
-        type: 'equipable',
-        stacks: false,
-        slot: 'weapon',
-        description: 'A "sword" that "increases" your attack power by 1.',
-        cost: { coins: 50 },
-        bonus: { attack: 5 },
-      },
-      {
-        name: 'Disgusting vest',
-        type: 'equipable',
-        stacks: false,
-        slot: 'chest',
-        description: 'Provides 7 extra armor points.',
-        cost: { coins: 80 },
-        bonus: { armor: 7 },
-      }
-    ];
-
-    const savedShopStock = JSON.parse(localStorage.getItem('shopStock'));
-    if (!savedShopStock) {
-      localStorage.setItem('shopStock', JSON.stringify(defaultItems));
-      return defaultItems;
-    }
-    return savedShopStock;
-  };
-
-  const [shopItems, setShopItems] = useState(initializeShopStock());  // Initialize with the shop stock
-
-  const conversionRates = {
-    iron: 1,
-    gold: 5,
-    diamonds: 10,
-  };
+  const [convertAmount, setConvertAmount] = useState({iron: 0, gold: 0, diamonds: 0, });
+  // const [shopItems, setShopItems] = useState(initializeShopStock());  // Initialize with the shop stock
 
   const handleSliderChange = (resource, value) => {
     setConvertAmount(prevState => ({
@@ -79,12 +21,6 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
       setShopItems(savedShopStock);  // Restore the shop items from localStorage
     }
   }, []);
-
-  const addNewItemToShop = (newItem) => {
-    const updatedShopStock = [...shopItems, newItem];
-    setShopItems(updatedShopStock);
-    localStorage.setItem('shopStock', JSON.stringify(updatedShopStock));
-  };
 
   // Handle max button click to set the slider to the maximum value
   const handleMaxClick = (resource) => {
@@ -116,6 +52,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
       setShopOverlayVisible(false);
     }
   };
+
   const handleBuyItem = (item, index) => {
     if (character.coins >= item.cost.coins) {
       if (item.type === 'consumable') {
@@ -184,7 +121,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language 
               {['iron', 'gold', 'diamonds'].map(resource => (
                 <div key={resource} className="conversion-row">
                   <p>{resource.charAt(0).toUpperCase() + resource.slice(1)}: {character[resource]}</p>
-                  <p>{translations[language].convertTo} {convertAmount[resource] * conversionRates[resource]} {translations[language].coins}</p>
+                  <p>{translations[language].convertTo} {convertAmount[resource] * ShopService.conversionRates[resource]} {translations[language].coins}</p>
                   <input
                     type="range"
                     min="0"
