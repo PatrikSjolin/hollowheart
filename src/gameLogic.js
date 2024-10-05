@@ -62,7 +62,13 @@ export class Character {
   }
 
   calculateDamate() {
-    return Math.floor(this.strength * 0.5 * (Math.random() + 1));
+
+    let baseDamage = this.strength * 0.5;
+    if (this.equipment.weapon) {
+      baseDamage += this.equipment.weapon.bonus.attack; 
+    }
+
+    return Math.floor(baseDamage * (Math.random() + 1));
   }
 
   calculateAttackSpeed() {

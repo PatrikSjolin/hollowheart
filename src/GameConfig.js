@@ -1,9 +1,9 @@
-// gameConfig.js
+const gameSpeed = 1;
 
 export const TIMERS = {
   healthRegenInterval: 20000,  // Health regenerates every 20 seconds
-  treasureInterval: 5000,      // Treasure found every 5 seconds
-  hazardInterval: 1000,        // Hazards occur every second
+  treasureInterval: 5000 * gameSpeed,      // Treasure found every 5 seconds
+  hazardInterval: 1000 * gameSpeed,        // Hazards occur every second
   woodGenerationInterval: 10000,  // Wood generated every 10 seconds
   stoneGenerationInterval: 15000,  // Stone generated every 15 seconds
   timeNeededToCompleteLevel: 6000,

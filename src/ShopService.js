@@ -54,7 +54,7 @@ export class ShopService {
         type: 'equipable',
         stacks: false,
         slot: 'weapon',
-        description: 'A "sword" that "increases" your attack power by 1.',
+        description: 'A "sword" that "increases" your attack power by 5.',
         cost: { coins: 50 },
         bonus: { attack: 5 },
       },
