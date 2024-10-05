@@ -1,6 +1,7 @@
 import { debug } from './App';
 import { Item } from './item'
 import { Monster } from './Monster'
+import { TIMERS, MONSTER_CONFIG } from './GameConfig';
 
 export class Character {
   constructor(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores, initialState = {}) {
@@ -221,7 +222,7 @@ export class Character {
         this.depth = 1; // Otherwise, go down by 1 depth
         this.logMessage(`You descend to depth ${this.depth}`);
       }
-      else if (this.timeSurvivedAtLevel > 6000) {
+      else if (this.timeSurvivedAtLevel > TIMERS.timeNeededToCompleteLevel) {
         this.depth += 1; // Otherwise, go down by 1 depth
         this.timeSurvivedAtLevel = 0;
         this.logMessage(`You descend to depth ${this.depth}`);
@@ -238,7 +239,7 @@ export class Character {
   // Exploration mechanism - gathering resources, finding items, gaining experience, and encountering hazards
   explore(elapsedTime) {
     if (this.isExploring) {
-      const treasureInterval = 5000;
+      const treasureInterval = TIMERS.treasureInterval;
       this.treasureTimer += elapsedTime;
       this.timeSurvivedAtLevel += elapsedTime;
 
@@ -337,7 +338,7 @@ export class Character {
         }
       }
 
-      const hazardInterval = 1000;
+      const hazardInterval = TIMERS.hazardInterval;
       this.hazardTimer += elapsedTime;
       if (this.hazardTimer > hazardInterval) {
         // Check for hazards (enemies or environments)
@@ -361,9 +362,9 @@ export class Character {
   }
 
   spawnMonster(depth) {
-    const randomHealth = Math.floor(Math.random() * 100) + 50 * depth;  // Example: Random health between 50 and 150
-    const randomDamage = Math.floor(Math.random() * 20) + 5 * depth;  // Example: Random damage between 5 and 25
-    const randomAttackInterval = Math.floor(Math.random() * 3000) + (2000 / depth);  // Attack every 2-5 seconds
+    const randomHealth = Math.floor(Math.random() * 100) + MONSTER_CONFIG.baseHealth * depth;  // Example: Random health between 50 and 150
+    const randomDamage = Math.floor(Math.random() * 20) + MONSTER_CONFIG.baseDamage * depth;  // Example: Random damage between 5 and 25
+    const randomAttackInterval = Math.floor(Math.random() * (MONSTER_CONFIG.monsterAttackIntervalRange[1] - MONSTER_CONFIG.monsterAttackIntervalRange[0])) + (MONSTER_CONFIG.monsterAttackIntervalRange[0] / depth);  // Attack every 2-5 seconds
 
     const monster = new Monster('Worm', randomHealth, randomDamage, randomAttackInterval);  // Example monster
 
@@ -511,32 +512,32 @@ export class Character {
 
   generateResources(elapsedTime) {
     this.woodTimer += elapsedTime;
-    if (this.woodTimer > 10000) {
+    if (this.woodTimer > TIMERS.woodGenerationInterval) {
       // Find all wood-generating buildings
       const woodGenerators = this.buildings.filter(building => building.name === 'Lumber Mill');
       let generatedWood = 0;
       woodGenerators.forEach(building => {
         generatedWood++;
       });
-      const rounds = Math.floor(this.woodTimer / 10000);
+      const rounds = Math.floor(this.woodTimer / TIMERS.woodGenerationInterval);
       if (generatedWood > 0) {
         if (debug) {
           this.logMessage(`Generated ${generatedWood * rounds} wood.`);
         }
         this.wood = Math.min(this.maxWood, this.wood + (generatedWood * rounds));
       }
-      this.woodTimer -= 10000 * rounds;
+      this.woodTimer -= TIMERS.woodGenerationInterval * rounds;
     }
 
     this.stoneTimer += elapsedTime;
-    if (this.stoneTimer > 15000) {
+    if (this.stoneTimer > TIMERS.stoneGenerationInterval) {
       const stoneGenerators = this.buildings.filter(building => building.name === 'Stone Quarry');
       let generatedStone = 0;
       stoneGenerators.forEach(building => {
         generatedStone++;
       });
 
-      const rounds = Math.floor(this.stoneTimer / 15000);
+      const rounds = Math.floor(this.stoneTimer / TIMERS.stoneGenerationInterval);
 
       if (generatedStone > 0) {
         if (debug) {
@@ -544,7 +545,7 @@ export class Character {
         }
         this.stone = Math.min(this.maxStone, this.stone + (generatedStone * rounds));
       }
-      this.stoneTimer -= 15000 * rounds;
+      this.stoneTimer -= TIMERS.stoneGenerationInterval * rounds;
     }
   }
 
