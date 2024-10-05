@@ -1,3 +1,5 @@
+import { generateUniqueId } from './Utilities'
+
 export class ShopService {
   static convertToCoins(character, resourceType, amount) {
     let conversionRate = 1;
@@ -43,6 +45,7 @@ export class ShopService {
         }
       },
       {
+        id: generateUniqueId(),  // Unique identifier for each item
         name: `Rope`,
         type: 'special',
         stacks: true,
@@ -50,6 +53,7 @@ export class ShopService {
         cost: { coins: 10 },
       },
       {
+        id: generateUniqueId(),  // Unique identifier for each item
         name: 'Broken sword',
         type: 'equipable',
         stacks: false,
@@ -59,6 +63,7 @@ export class ShopService {
         bonus: { attack: 5 },
       },
       {
+        id: generateUniqueId(),  // Unique identifier for each item
         name: 'Disgusting vest',
         type: 'equipable',
         stacks: false,

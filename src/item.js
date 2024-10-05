@@ -1,3 +1,5 @@
+import { generateUniqueId } from './Utilities'
+
 export class Item {
 
   static generateArmor(depth, level, intelligence) {
@@ -19,6 +21,7 @@ export class Item {
     const name = `Rotten ${finalSlot} of trash`;
 
     return {
+      id: generateUniqueId(),  // Unique identifier for each item
       name: name,
       type: 'equipable',
       stacks: false,
@@ -32,6 +35,7 @@ export class Item {
   static generateWeapon(depth, level, intelligence) {
     console.log('generate weapon');
     return {
+      id: generateUniqueId(),  // Unique identifier for each item
       name: 'Destroyed stick of crap',
       type: 'equipable',
       stacks: false,
@@ -56,6 +60,7 @@ export class Item {
 
   static generateSpecial(depth, level, intelligence) {
     return {
+      id: generateUniqueId(),  // Unique identifier for each item
       name: `Rope`,
       type: 'special',
       stacks: true,
@@ -66,6 +71,7 @@ export class Item {
 
   static generateConsumable(depth, level, intelligence) {
     return {
+      id: generateUniqueId(),  // Unique identifier for each item
       name: 'Health restore',
       type: 'consumable',
       stacks: false,

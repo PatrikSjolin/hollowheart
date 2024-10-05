@@ -154,7 +154,7 @@ export class Character {
       this.addItemToInventory(this.equipment[slot]);
     }
     this.equipment[slot] = item; // Assign the item to the equipment slot
-    this.inventory = this.inventory.filter(inventoryItem => inventoryItem.name !== item.name); // Remove from inventory
+    this.inventory = this.inventory.filter(inventoryItem => inventoryItem.id !== item.id); // Remove from inventory
     this.logMessage(`You equipped ${item.name}.`);
     this.saveToLocalStorage(this); // Save changes
   }
@@ -293,7 +293,7 @@ export class Character {
           if (monster.health <= 0) {
             const expGained = Math.floor(this.calculateXpBoostFromIntelligence() * this.depth * Math.floor(Math.random() * 4) + 5); // Random exp gained
             this.experience += expGained;
-            const coinsGained = 1;
+            const coinsGained = 1 + Math.floor(this.depth / 10);
             this.coins += coinsGained;
             this.logMessage(`You defeated the ${monster.name}! and gained ${expGained} experience.`);
             this.currentMonsters.splice(index, 1);  // Remove the monster from the array
