@@ -2,6 +2,29 @@ import { generateUniqueId } from './Utilities'
 
 export class Item {
 
+  static prefixes = [
+    "Dung-Induced", "Shitty", "Rusty", "Crusty", "Broken", "Dirty", "Grease-Soaked", 
+    "Moldy", "Unfortunate", "Cursed", "Grimy", "Vomit-Stained", "Half-Eaten", 
+    "Filthy", "Soggy", "Inferior", "Pathetic", "Misguided", "Muck-Infused", 
+    "Foul-Smelling", "Disastrous", "Unwashed", "Shameful", "Disgusting", "Stinky", 
+    "Muddy", "Rotten", "Junky", "Crappy", "Badly-Made", "Cheap"
+  ];
+  
+  static suffixes = [
+    "of Crap", "of Garbage", "of Misfortune", "of Despair", "of Worthlessness", 
+    "of Regret", "of Uselessness", "of the Dumpster", "of Failure", "of Disgust", 
+    "of the Sewer", "of Embarrassment", "of Defeat", "of the Trash Heap", "of Waste", 
+    "of the Pit", "of Ruin", "of Humiliation", "of the Underworld", "of Neglect", 
+    "of Confusion", "of the Forgotten", "of the Abyss", "of Banishment", "of the Unlucky", 
+    "of Doom", "of the Lost Cause", "of Desperation", "of Disrepair"
+  ];
+  
+  static generateRandomItemName(baseName) {
+    const prefix = this.prefixes[Math.floor(Math.random() * this.prefixes.length)];
+    const suffix = this.suffixes[Math.floor(Math.random() * this.suffixes.length)];
+    return `${prefix} ${baseName} ${suffix}`;
+  }
+
   static generateArmor(depth, level, intelligence) {
     console.log('generate armor');
     const intelligenceFactor = 1 - ((intelligence) / (intelligence + 100));
@@ -18,7 +41,7 @@ export class Item {
       finalSlot = 'boots';
     }
 
-    const name = `Rotten ${finalSlot} of trash`;
+    const name = this.generateRandomItemName(finalSlot);
 
     return {
       id: generateUniqueId(),  // Unique identifier for each item
@@ -33,10 +56,12 @@ export class Item {
   }
 
   static generateWeapon(depth, level, intelligence) {
+    
+    const name = this.generateRandomItemName('sword');
     console.log('generate weapon');
     return {
       id: generateUniqueId(),  // Unique identifier for each item
-      name: 'Destroyed stick of crap',
+      name: name,
       type: 'equipable',
       stacks: false,
       slot: 'weapon',
