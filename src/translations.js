@@ -38,6 +38,7 @@ const translations = {
     convertTo: 'Trade to',
     buy: 'Buy',
     trade: 'Trade',
+    sellItems: 'Sell items',
   },
   sv: {
     title: 'Hollowheart',
@@ -77,6 +78,7 @@ const translations = {
     convertTo: 'Byt till',
     buy: 'Köp',
     trade: 'Byt',
+    sellItems: 'Sälj föremål',
   },
 };
 

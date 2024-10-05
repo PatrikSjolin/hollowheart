@@ -74,6 +74,17 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
     }
   };
 
+  const handleSellItem = (item) => {
+    const sellPrice = item.cost.coins * 0.5;  // Example: Sell price is twice the attack bonus
+    character.coins += sellPrice;
+    character.inventory = character.inventory.filter(inventoryItem => inventoryItem.id !== item.id);
+    setCharacter(character);
+    character.saveToLocalStorage(character);
+    setShopItems([...shopItems]);  // Force re-render
+    character.logMessage(`Sold ${item.name} for ${sellPrice} coins.`);
+  };
+
+
   useEffect(() => {
     // Add event listener for click outside
     document.addEventListener('click', handleClickOutside);
@@ -111,6 +122,12 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
             className={activeTab === 'items' ? 'active' : ''}
           >
             {translations[language].buyItems}
+          </button>
+          <button
+            onClick={() => setActiveTab('sell')}
+            className={activeTab === 'sell' ? 'active' : ''}
+          >
+            {translations[language].sellItems}
           </button>
         </div>
 
@@ -240,7 +257,21 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
               ))}
             </div>
           )}
-
+          {activeTab === 'sell' && (
+            <div className="sell-items">
+              <h3>Inventory</h3>
+              {character.inventory.length > 0 ? (
+                character.inventory.filter(item => item.type === 'equipable').map((item, index) => (
+                  <div key={index} className="sell-item-block">
+            <p>{item.name} - Sells for {Math.floor(item.cost.coins * 0.5)} coins</p>
+            <button onClick={() => handleSellItem(item)}>Sell</button>
+          </div>
+                ))
+              ) : (
+                <p>Your inventory is empty.</p>
+              )}
+            </div>
+          )}
 
           {/* Resource Display at the top */}
           <div className="resources-display">

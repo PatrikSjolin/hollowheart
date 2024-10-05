@@ -853,3 +853,22 @@ button:disabled {
   background-color: #ccc;  /* Light gray line */
   margin: 20px 0;  /* Add space around the divider */
 }
+
+.sell-item-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;  /* Align items vertically in the center */
+  margin-bottom: 10px;
+}
+
+.sell-item-block p {
+  margin: 0;
+  flex: 1;  /* Allow the item description to take up the majority of space */
+}
+
+.sell-item-block button {
+  margin-left: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+  flex-shrink: 0;  /* Prevent the button from shrinking */
+}

@@ -286,7 +286,7 @@ const App = () => {
   };
 
   const generateRandomItem = () => {
-    const newItem = Item.generateItem(character.depth, character.level, character.intelligence);
+    const newItem = Item.generateItem(character.lastDepthVisited, character.level, character.intelligence);
     logMessage(newItem.name);
     character.addItemToInventory(newItem);
     setCharacter(character);
