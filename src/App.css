@@ -735,15 +735,12 @@ button:disabled {
   padding: 10px;
   background-color: #444;
   border-radius: 8px;
-  margin-top: 20px;
+  margin-top: 480px;
   color: white;
   font-weight: bold;
   position: sticky;
-  bottom: 0;  /* Align it to the bottom of the overlay */
-  /* Full width of the overlay */
-
-/* padding: 10px; */
-z-index: 10;  /* Make sure it stays on top of content */
+  bottom: 1px;  /* Align it to the bottom of the overlay */
+  z-index: 10;  /* Make sure it stays on top of content */
 }
 
 
