@@ -26,7 +26,6 @@ export class Item {
   }
 
   static generateArmor(depth, level, intelligence) {
-    console.log('generate armor');
     const intelligenceFactor = 1 - ((intelligence) / (intelligence + 100));
     const armorBonus = Math.floor(Math.random() * 10 * intelligenceFactor * (depth + 1) / depth);
     let finalSlot = '';
@@ -58,16 +57,17 @@ export class Item {
   static generateWeapon(depth, level, intelligence) {
     
     const name = this.generateRandomItemName('sword');
-    console.log('generate weapon');
+    const intelligenceFactor = 1 - ((intelligence) / (intelligence + 100));
+    const dmgBonus = Math.floor(Math.random() * 10 * intelligenceFactor * (depth + 1) / depth);
     return {
       id: generateUniqueId(),  // Unique identifier for each item
       name: name,
       type: 'equipable',
       stacks: false,
       slot: 'weapon',
-      description: `Provides 0 extra damage.`,
+      description: `Provides ${dmgBonus} extra damage.`,
       cost: { coins: 80 },
-      bonus: { attack: 0 },
+      bonus: { attack: dmgBonus },
     };
   }
 

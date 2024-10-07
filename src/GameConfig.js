@@ -1,4 +1,4 @@
-const gameSpeed = 1;
+const gameSpeed = 3;
 
 export const TIMERS = {
   healthRegenInterval: 20000,  // Health regenerates every 20 seconds

@@ -6,7 +6,6 @@ import { ShopService } from './ShopService';
 const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language, shopItems, setShopItems }) => {
   const [activeTab, setActiveTab] = useState('conversion');  // State to manage active tab
   const [convertAmount, setConvertAmount] = useState({ iron: 0, gold: 0, diamonds: 0, });
-  // const [shopItems, setShopItems] = useState(initializeShopStock());  // Initialize with the shop stock
 
   const handleSliderChange = (resource, value) => {
     setConvertAmount(prevState => ({
