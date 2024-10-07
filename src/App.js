@@ -151,9 +151,13 @@ const App = () => {
       newCharacter.currentMonsters = newGame.rehydrateMonsters(newCharacter.currentMonsters);
       setGame(newGame);
       setCharacter(newCharacter); // Load character from storage
-      logMessage('UseEffect savedCharacter is set');
+      if(debug) {
+        logMessage('DEBUG: UseEffect savedCharacter is set');
+      }
     } else {
-      logMessage('UseEffect savedCharacter is not set');
+      if(debug) {
+      logMessage('DEBUG: UseEffect savedCharacter is not set');
+      }
       const newCharacter = new Character(saveToLocalStorage, logMessage, setGeneralMessage, setHighScores); // Create new character if none exists
       setGame(new Game(newCharacter, logMessage, saveToLocalStorage));
       setCharacter(newCharacter);
@@ -190,7 +194,7 @@ const App = () => {
 
         character.regenerateHealth(elapsedTime);
         character.generateResources(elapsedTime);
-        character.explore(elapsedTime);
+        game.explore(elapsedTime);
 
         setCharacter(character);
         saveToLocalStorage(character);
@@ -207,17 +211,20 @@ const App = () => {
   }
 
   const startGame = (name) => {
-    console.log("starting game");
     if (character === null) {
       // Create a new character and set playerName to the entered name
       const newCharacter = new Character(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores, { playerName: name });
-      logMessage('StartGame character == null');
+      if(debug) {
+        logMessage('DEBUG: StartGame character == null');
+      }
       setCharacter(newCharacter);
       let newGame = new Game(newCharacter, logMessage, saveToLocalStorage);
       setGame(newGame);
     } else {
       // Update the name if the character already exists
-      logMessage('StartGame character != null');
+      if(debug) {
+        logMessage('DEBUG: StartGame character != null');
+      }
       character.playerName = name;
       setCharacter(character);
       setGame(new Game(character, logMessage, saveToLocalStorage));

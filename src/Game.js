@@ -74,7 +74,7 @@ export class Game {
       this.character.timeSurvivedAtLevel += elapsedTime;
 
       const intelligenceFactor = this.character.calculateXpBoostFromIntelligence();
-      this.attackTimer += elapsedTime;
+      this.character.attackTimer += elapsedTime;
       const rounds = Math.round(this.character.attackTimer / this.character.calculateAttackSpeed());
       this.character.currentMonsters.forEach((monster, index) => {
         monster.attackTimer += elapsedTime;
@@ -83,14 +83,14 @@ export class Game {
         if (firstStrike < 0.5) {
 
           if (monster.attackTimer > monster.attackInterval) {
-            monster.attack(this);  // Monster attacks the character
+            monster.attack(this.character);  // Monster attacks the character
             monster.attackTimer -= monster.attackInterval;
           }
 
           if (this.character.currentHealth <= 0) {
-            this.character.die();
+            this.manageDeath();
           }
-
+          this.logMessage(this.character.attackTimer);
           if (this.character.attackTimer > this.character.calculateAttackSpeed()) {
             const damageDealt = this.character.calculateDamate();
             monster.health -= (damageDealt * rounds);
@@ -115,7 +115,7 @@ export class Game {
 
           // Check if the monster is dead
           if (monster.health <= 0) {
-            const expGained = Math.floor(this.calculateXpBoostFromIntelligence() * this.character.depth * Math.floor(Math.random() * 6) + 5); // Random exp gained
+            const expGained = Math.floor(this.character.calculateXpBoostFromIntelligence() * this.character.depth * Math.floor(Math.random() * 6) + 5); // Random exp gained
             this.character.experience += expGained;
             const coinsGained = 1 + Math.floor(this.character.depth / 10);
             this.character.coins += coinsGained;
@@ -123,12 +123,12 @@ export class Game {
             this.character.currentMonsters.splice(index, 1);  // Remove the monster from the array
           } else {
             if (monster.attackTimer > monster.attackInterval) {
-              monster.attack(this);  // Monster attacks the character
+              monster.attack(this.character);  // Monster attacks the character
               monster.attackTimer -= monster.attackInterval;
             }
 
             if (this.character.currentHealth <= 0) {
-              this.character.die();
+              this.manageDeath();
             }
           }
         }
@@ -191,6 +191,11 @@ export class Game {
     }
   }
 
+  manageDeath() {
+    this.character.die();
+    this.ascend(); // Ascend back to the surface upon death
+  }
+
   spawnMonster(depth) {
     const randomHealth = Math.floor(Math.random() * 100) + MONSTER_CONFIG.baseHealth * depth;  // Example: Random health between 50 and 150
     const randomDamage = Math.floor(Math.random() * 20) + MONSTER_CONFIG.baseDamage * depth;  // Example: Random damage between 5 and 25
@@ -222,7 +227,7 @@ export class Game {
 
       // If health drops to zero or below, the character dies and returns to the surface
       if (this.character.currentHealth <= 0) {
-        this.character.die();
+        this.manageDeath();
       }
     }
   }
