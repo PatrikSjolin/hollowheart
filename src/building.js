@@ -79,4 +79,28 @@ export const buildings = [
     'Unlocks the ability to research.',
     function (character) { return character.buildings.some(building => building.name === 'Stone Quarry') && character.intelligence >= 20; }
   ),
+  new Building(
+    'Alchemy center',
+    { wood: 300, coins: 300, iron: 50 },
+    'feature',
+    { unlocks: 'alchemy' },  // Unlocks research for upgrades
+    'Unlocks more consumables.',
+    function (character) { return character.buildings.some(building => building.name === 'Library') && character.intelligence >= 20; }
+  ),
+  new Building(
+    'Blacksmith',
+    { wood: 500, coins: 300, iron: 50 },
+    'feature',
+    { unlocks: 'alchemy' },  // Unlocks research for upgrades
+    'Unlocks more consumables.',
+    function (character) { return character.buildings.some(building => building.name === 'Library') && character.intelligence >= 20; }
+  ),
+  new Building(
+    'Mineral extractor',
+    { wood: 500, coins: 300, iron: 50 },
+    'feature',
+    { unlocks: 'extract' },  // Unlocks research for upgrades
+    'Place at a certain depth and it will harvest resources.',
+    function (character) { return character.buildings.some(building => building.name === 'Library') && character.intelligence >= 20; }
+  ),
 ];

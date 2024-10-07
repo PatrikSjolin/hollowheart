@@ -195,6 +195,7 @@ const App = () => {
         character.regenerateHealth(elapsedTime);
         character.generateResources(elapsedTime);
         game.explore(elapsedTime);
+        game.handleGlobalHazards(elapsedTime);
 
         setCharacter(character);
         saveToLocalStorage(character);
@@ -460,6 +461,20 @@ const App = () => {
         </section>
       )}
 
+    {game && game.hazardActive && (
+      <div className="hazard-progress-container">
+        <p>A village hazard is ongoing!</p>
+        <div className="hazard-progress">
+          <div
+            className="hazard-progress-bar"
+            style={{
+              width: `${((game.hazardEndTime - Date.now()) / (game.hazardEndTime - (game.hazardEndTime - 60000))) * 100}%`
+            }}
+          ></div>
+        </div>
+      </div>
+    )}
+
       {character && character.depth > 0 && character.currentMonsters.length > 0 && (
         <div>
           <h3>Active Monsters:</h3>
@@ -552,7 +567,7 @@ const App = () => {
       </div>
       <div className="highscore-display">
         <h3>{translations[language].highScores}</h3>
-        {highScores.map((score, index) => (
+        {highScores.slice(0, 10).map((score, index) => (
           <p key={`score-${index}`}>{index + 1}. {score.characterName}: {score.score}</p>
         ))}
       </div>

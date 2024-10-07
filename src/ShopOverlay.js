@@ -271,8 +271,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
               )}
             </div>
           )}
-
-          {/* Resource Display at the top */}
+          
           <div className="resources-display">
             <p><strong>{translations[language].coins}:</strong> {character.coins}</p>
             <p><strong>{translations[language].wood}:</strong> {character.wood}</p>

@@ -6,7 +6,8 @@ export const TIMERS = {
   hazardInterval: 1000 * gameSpeed,        // Hazards occur every second
   woodGenerationInterval: 10000,  // Wood generated every 10 seconds
   stoneGenerationInterval: 15000,  // Stone generated every 15 seconds
-  timeNeededToCompleteLevel: 6000,
+  timeNeededToCompleteLevel: 6000 * gameSpeed,
+  villageHazardMinCooldown: 120000,
 };
 
 export const MONSTER_CONFIG = {
@@ -23,6 +24,6 @@ export const RESEARCH_CONFIG = {
 };
 
 export const CHARACTER_CONFIG = {
-baseXp: 200,
-xpNeededPerLevelIncrease: 1.4,
+  baseXp: 200,
+  xpNeededPerLevelIncrease: 1.4,
 };
