@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import ShopOverlay from './ShopOverlay';
 import CharacterOverlay from './CharacterOverlay';
 import ResearchOverlay from './ResearchOverlay';  // Add this line
-import { Character } from './gameLogic'; // Import character logic
+import { Character } from './Character'; // Import character logic
 import MessageOverlay from './MessageOverlay';
 import translations from './translations'; // Import translations
 import { HighscoreService } from './HighScoreService'; // Import the service
 import { ShopService } from './ShopService';
-import { Item } from './item'
+import { Item } from './item';
+import { Game } from './Game';  // Import the new Game class
 
 import './App.css'; // Use existing styles from your CSS
 
@@ -15,19 +16,13 @@ export const debug = process.env.REACT_APP_DEBUG === 'true';
 
 const gameVersion = '0.0.3';
 
-// Define saveToLocalStorage function to be used across the app
-const saveToLocalStorage = (character) => {
-  console.log("Saving character to localStorage:", character);
-  localStorage.setItem('characterState', JSON.stringify(character));
-};
-
 const App = () => {
+
   const [language, setLanguage] = useState(() => {
     // Load language from localStorage, default to 'en'
     const savedSettings = JSON.parse(localStorage.getItem('siteSettings'));
     return savedSettings?.language || 'en';
   });
-
   const [stars, setStars] = useState([]);  // Store star positions in state
   const [starColors, setStarColors] = useState([]);  // Store colors of the stars
 
@@ -36,6 +31,11 @@ const App = () => {
     setStars(generateStars(100));
   }, []);  // Empty dependency array ensures this runs only once
 
+  // Define saveToLocalStorage function to be used across the app
+  const saveToLocalStorage = (character) => {
+    console.log("Saving character to localStorage:", character);
+    localStorage.setItem('characterState', JSON.stringify(character));
+  };
 
   // Handle language change
   const handleLanguageChange = (event) => {
@@ -50,6 +50,7 @@ const App = () => {
 
 
   const [character, setCharacter] = useState(null); // Initialize as null to avoid premature access
+  const [game, setGame] = useState(null);  // Initialize game state
   const [log, setLog] = useState([]);
   const [firstTimeOverlayVisible, setFirstTimeOverlayVisible] = useState(true);
   const [shopOverlayVisible, setShopOverlayVisible] = useState(false); // Shop visibility state
@@ -60,16 +61,12 @@ const App = () => {
   const [highScores, setHighScores] = useState([]);
   const [shopItems, setShopItems] = useState(ShopService.initializeShopStock());  // Move the shop items to App.js
   const logRef = useRef(null);  // Add this line to define logRef
+
   useEffect(() => {
     if (logRef.current) {
       logRef.current.scrollTop = logRef.current.scrollHeight;
     }
   }, [log]);  // This will trigger auto-scrolling whenever the log updates
-
-  const handleAddNewItemToShop = (newItem) => {
-    ShopService.addNewItemToShop(newItem, setShopItems);
-  };
-
 
   // Logging function
   const logMessage = (message) => {
@@ -112,9 +109,9 @@ const App = () => {
             name: 'Dung-induced boots',
             type: 'equipable',
             slot: 'boots',
-            description: 'They stink. But increases armor by 40',
+            description: 'They stink. But increases armor by 20',
             cost: { coins: 400 },
-            bonus: { armor: 40 },
+            bonus: { armor: 20 },
           };
           ShopService.addNewItemToShop(newItem, shopItems, setShopItems);  // Call the function passed from App.js
         }
@@ -148,9 +145,17 @@ const App = () => {
     if (savedCharacter) {
       const parsedCharacter = JSON.parse(savedCharacter);
       setFirstTimeOverlayVisible(false); // Hide intro if character exists
-      setCharacter(new Character(saveToLocalStorage, logMessage, setGeneralMessage, setHighScores, parsedCharacter)); // Load character from storage
+      
+      const newCharacter = new Character(saveToLocalStorage, logMessage, setGeneralMessage, setHighScores, parsedCharacter);
+      const newGame = new Game(newCharacter, logMessage, saveToLocalStorage);
+      newCharacter.currentMonsters = newGame.rehydrateMonsters(newCharacter.currentMonsters);
+      setGame(newGame);
+      setCharacter(newCharacter); // Load character from storage
+      logMessage('UseEffect savedCharacter is set');
     } else {
+      logMessage('UseEffect savedCharacter is not set');
       const newCharacter = new Character(saveToLocalStorage, logMessage, setGeneralMessage, setHighScores); // Create new character if none exists
+      setGame(new Game(newCharacter, logMessage, saveToLocalStorage));
       setCharacter(newCharacter);
     }
   }, []);
@@ -206,11 +211,16 @@ const App = () => {
     if (character === null) {
       // Create a new character and set playerName to the entered name
       const newCharacter = new Character(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores, { playerName: name });
+      logMessage('StartGame character == null');
       setCharacter(newCharacter);
+      let newGame = new Game(newCharacter, logMessage, saveToLocalStorage);
+      setGame(newGame);
     } else {
       // Update the name if the character already exists
+      logMessage('StartGame character != null');
       character.playerName = name;
       setCharacter(character);
+      setGame(new Game(character, logMessage, saveToLocalStorage));
     }
 
     setFirstTimeOverlayVisible(false);  // Hide the overlay
@@ -256,7 +266,7 @@ const App = () => {
   };
 
   const handleClimbUp = () => {
-    character.climbUp();
+    game.climbUp();
     setCharacter(character);
   };
 
@@ -384,13 +394,16 @@ const App = () => {
       {/* Action Buttons */}
       {character && (
         <section className="actions-section">
-          <button className="explore-btn" onClick={() => character.startExploring()}>
+          <button className="explore-btn" onClick={() => game.startExploring()}>
             {translations[language].descend}
           </button>
           <button
             className={`explore-btn ${!character.isExploring ? 'disabled' : ''}`}
             onClick={() => {
-              if (character.isExploring) character.ascend();
+              if (character.isExploring) {
+                game.ascend();
+                setCharacter(character);
+              }
             }}
             disabled={!character.isExploring}
           >

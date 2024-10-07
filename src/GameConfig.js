@@ -21,3 +21,8 @@ export const RESEARCH_CONFIG = {
   baseResearchDuration: 1800000,  // Research takes 30 minutes
   researchBoostFactor: 1.5,       // Boost to research duration based on intelligence
 };
+
+export const CHARACTER_CONFIG = {
+baseXp: 200,
+xpNeededPerLevelIncrease: 1.4,
+};
