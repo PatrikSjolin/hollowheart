@@ -1,29 +1,26 @@
 import { generateUniqueId } from './Utilities'
+import translations from './translations'; // Import translations
 
 export class ShopService {
-  static convertToCoins(character, resourceType, amount) {
-    let conversionRate = 1;
-    switch (resourceType) {
-      case 'iron':
-        conversionRate = 1;
-        character.coins += amount * conversionRate;
-        character.iron -= amount;
-        break;
-      case 'gold':
-        conversionRate = 5;
-        character.coins += amount * conversionRate;
-        character.gold -= amount;
-        break;
-      case 'diamonds':
-        conversionRate = 10;
-        character.coins += amount * conversionRate;
-        character.diamonds -= amount;
-        break;
-      default:
-        return;
+  static convertToCoins(character, resourceType, amount, language) {
+    const conversionRate = this.conversionRates[resourceType];
+    
+    // Ensure the resource is available and that the character has enough to convert
+    if (!character.resources[resourceType] || character.resources[resourceType] < amount) {
+      character.logMessage(`Not enough ${resourceType} to convert.`);
+      return;
     }
-    character.logMessage(`Converted ${amount} ${resourceType} to ${amount * conversionRate} Coins.`);
-    character.saveToLocalStorage(character);  // Save updated state
+
+    // Convert the resource into coins
+    const coinsEarned = amount * conversionRate;
+    character.resources[resourceType] -= amount;
+    character.resources['coins'] = (character.resources['coins'] || 0) + coinsEarned;
+
+    // Log the transaction with the translated resource name
+    character.logMessage(`Converted ${amount} ${resourceType} to ${coinsEarned} coins.`);
+    
+    // Save the updated state
+    character.saveToLocalStorage();
   }
 
   static conversionRates = {

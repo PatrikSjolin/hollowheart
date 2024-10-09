@@ -10,10 +10,8 @@ export class Character {
     this.vitality = initialState.vitality || 10;
     this.intelligence = initialState.intelligence || 10;
     this.currentHealth = initialState.currentHealth || 100;
-    this.iron = initialState.iron || 0;
-    this.gold = initialState.gold || 0;
+    this.resources = initialState.resources || { coins: 0 };
     this.recordDepth = initialState.recordDepth || 0;
-    this.diamonds = initialState.diamonds || 0;
     this.coins = initialState.coins || 0;
     this.unallocatedPoints = initialState.unallocatedPoints || 0;
     this.researchBoost = initialState.researchBoost || 1;
@@ -28,14 +26,13 @@ export class Character {
     this.timeSurvivedAtLevel = initialState.timeSurvivedAtLevel || 0;
     this.expBoost = initialState.expBoost || 1;
     this.attackTimer = initialState.attackTimer || 0;
-    this.wood = initialState.wood || 0;
     this.completedResearch = initialState.completedResearch || []; // Store completed research
-    this.stone = initialState.stone || 0;
     this.lastDepthVisited = initialState.lastDepthVisited || 0; // Store the last visited depth
     this.maxWood = initialState.maxWood || 100;  // Initial maximum amount of wood
     this.maxStone = initialState.maxStone || 100;  // Initial maximum amount of stone
     this.numberOfDeaths = initialState.numberOfDeaths || 0;
     this.libraryBuilt = initialState.libraryBuilt || false;
+    this.depthConfigs = initialState.depthConfigs || {};  // Store depth configurations for consistency
     this.currentMonsters = initialState.currentMonsters || [];  // Initialize as an empty array to hold multiple monsters
     this.inventory = initialState.inventory || [];  // Add an inventory to store items
     this.equipment = initialState.equipment || {
@@ -70,7 +67,7 @@ export class Character {
   }
 
   calculateAttackSpeed() {
-    return (1 - (this.dexterity / (this.dexterity + 15))) * 1000;
+    return (1 - (this.dexterity / (this.dexterity + 15))) * CHARACTER_CONFIG.baseAttackSpeed;
   }
 
   // Calculate max health based on vitality (10 HP per point of vitality)
@@ -117,6 +114,15 @@ export class Character {
     return Math.floor(CHARACTER_CONFIG.baseXp * Math.pow(CHARACTER_CONFIG.xpNeededPerLevelIncrease, level - 1));
   }
 
+  modifyResource(resourceName, quantity) {
+    if (!this.resources[resourceName]) {
+      this.resources[resourceName] = 0;  // Initialize the resource if not already present
+    }
+    this.resources[resourceName] += quantity;  // Add or subtract resources
+    this.resources[resourceName] = Math.max(0, this.resources[resourceName]);  // Ensure it doesn't go below 0
+    this.saveToLocalStorage();
+  }
+
   // Regenerate health based on lifeRegen stat
   regenerateHealth(elapsedTime) {
     this.regenTimer += elapsedTime;
@@ -135,6 +141,7 @@ export class Character {
       this.regenTimer = this.regenTimer - (regenInterval * rounds);
     }
   }
+
   equipItem(slot, item) {
     if (this.equipment[slot]) {
       this.logMessage(`You unequipped ${this.equipment[slot].name}.`);
@@ -177,12 +184,11 @@ export class Character {
   // Method for the character to die and reset
   die() {
     this.logMessage("You have died and lost all resources gathered during the journey. Now you need to rest.");
-    this.iron = 0;
-    this.gold = 0;
-    this.diamonds = 0;
-    this.coins = 0;
-    this.wood = Math.floor(this.wood * 0.1);
-    this.stone = Math.floor(this.wood * 0.1);
+    
+    Object.keys(this.resources).forEach(resourceKey => {
+      this.resources[resourceKey] = 0;
+    });
+
     this.currentHealth = 0;
     this.numberOfDeaths++;
     this.treasureTimer = 0;
@@ -224,21 +230,25 @@ export class Character {
 
   // Method to buy buildings that generate resources
   buyBuilding(building) {
-    if (building.canAfford(this)) {
-      // Deduct the resources
+    // Check if the character can afford the building
+    if (building.canAfford(this.resources)) {
+      // Deduct the required resources
       for (const [resource, amount] of Object.entries(building.cost)) {
-        this[resource] -= amount;
+        this.resources[resource] = Math.max(0, (this.resources[resource] || 0) - amount);
       }
-
-      // Add the building and apply its effect
+  
+      // Add the building to the character's list of buildings
       this.buildings.push(building);
+  
+      // Apply the building's effect
       building.applyEffect(this);
-
-      this.logMessage(`Bought a ${building.name}`);
+  
+      // Log the purchase and save the updated character state
+      this.logMessage(`You have built a ${building.name}!`);
+      this.saveToLocalStorage();
     } else {
-      this.logMessage('Not enough resources.');
+      this.logMessage(`Not enough resources to build a ${building.name}.`);
     }
-    this.saveToLocalStorage(this);
   }
 
   unlockFeature(feature) {
@@ -287,6 +297,7 @@ export class Character {
 
   generateResources(elapsedTime) {
     this.woodTimer += elapsedTime;
+  
     if (this.woodTimer > TIMERS.woodGenerationInterval) {
       // Find all wood-generating buildings
       const woodGenerators = this.buildings.filter(building => building.name === 'Lumber Mill');
@@ -296,41 +307,54 @@ export class Character {
       });
       const rounds = Math.floor(this.woodTimer / TIMERS.woodGenerationInterval);
       if (generatedWood > 0) {
+        this.resources['wood'] = Math.min(this.maxWood, (this.resources['wood'] || 0) + (generatedWood * rounds));
         if (debug) {
           this.logMessage(`Generated ${generatedWood * rounds} wood.`);
         }
-        this.wood = Math.min(this.maxWood, this.wood + (generatedWood * rounds));
       }
       this.woodTimer -= TIMERS.woodGenerationInterval * rounds;
     }
-
+  
     this.stoneTimer += elapsedTime;
+  
     if (this.stoneTimer > TIMERS.stoneGenerationInterval) {
       const stoneGenerators = this.buildings.filter(building => building.name === 'Stone Quarry');
       let generatedStone = 0;
       stoneGenerators.forEach(building => {
         generatedStone++;
       });
-
+  
       const rounds = Math.floor(this.stoneTimer / TIMERS.stoneGenerationInterval);
-
+  
       if (generatedStone > 0) {
+        this.resources['stone'] = Math.min(this.maxStone, (this.resources['stone'] || 0) + (generatedStone * rounds));
         if (debug) {
           this.logMessage(`Generated ${generatedStone * rounds} stone.`);
         }
-        this.stone = Math.min(this.maxStone, this.stone + (generatedStone * rounds));
       }
       this.stoneTimer -= TIMERS.stoneGenerationInterval * rounds;
     }
+
+      this.saveToLocalStorage(this);
   }
 
   addDebugResources() {
-    this.coins += 1000;
-    this.wood += 1000;
-    this.stone += 1000;
-    this.iron += 1000;
-    this.intelligence += 100;
-    this.logMessage('Added 1000 coins, 100 wood, 100 stone, and 100 iron for debugging.');
-    this.saveToLocalStorage(this); // Save to local storage to persist the resources
+    const debugResources = {
+      wood: 100,
+      stone: 100,
+      iron: 50,
+      gold: 25,
+      emerald: 10,
+      diamonds: 5,
+      coins: 1000
+    };
+  
+    // Add each resource to the character's resources object
+    Object.keys(debugResources).forEach(resource => {
+      this.resources[resource] = (this.resources[resource] || 0) + debugResources[resource];
+      this.logMessage(`Added ${debugResources[resource]} ${resource}.`);
+    });
+  
+    this.saveToLocalStorage();
   }
 }

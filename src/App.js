@@ -14,7 +14,7 @@ import './App.css'; // Use existing styles from your CSS
 
 export const debug = process.env.REACT_APP_DEBUG === 'true';
 
-const gameVersion = '0.0.3';
+const gameVersion = '0.0.4';
 
 const App = () => {
 
@@ -192,9 +192,7 @@ const App = () => {
         const elapsedTime = currentTimestamp - lastTimestamp;
         lastTimestamp = currentTimestamp;
 
-        character.regenerateHealth(elapsedTime);
-        character.generateResources(elapsedTime);
-        game.explore(elapsedTime);
+        game.update(elapsedTime);
         game.handleGlobalHazards(elapsedTime);
 
         setCharacter(character);
@@ -365,12 +363,9 @@ const App = () => {
       {/* Resources Section */}
       {character && (
         <section className="resources-section">
-          <p>{translations[language].iron}: {character.iron}</p>
-          <p>{translations[language].gold}: {character.gold}</p>
-          <p>{translations[language].diamonds}: {character.diamonds}</p>
-          <p>{translations[language].coins}: {character.coins}</p>
-          <p>{translations[language].wood}: {character.wood} / {character.maxWood}</p>
-          <p>{translations[language].stone}: {character.stone} / {character.maxStone}</p>
+          {Object.keys(character.resources).map(resourceName => (
+      <p key={resourceName}>{resourceName}: {character.resources[resourceName]}</p>
+    ))}
         </section>
       )}
 
@@ -402,7 +397,7 @@ const App = () => {
       {/* Action Buttons */}
       {character && (
         <section className="actions-section">
-          <button className="explore-btn" onClick={() => game.startExploring()}>
+          <button className="explore-btn" onClick={() => game.descend()}>
             {translations[language].descend}
           </button>
           <button
@@ -460,6 +455,8 @@ const App = () => {
           {debug && (<button onClick={generateRandomItem}>Generate Item (Debug)</button>)}
         </section>
       )}
+
+    {debug && game && game.depthConfigs && character && game.depthConfigs[character.depth] && (<p>Depth: {character.depth}. SpawnMonsters: {game.depthConfigs[character.depth].spawnMonsters}. Chance to spawn monsters: {game.depthConfigs[character.depth].spawnMonsterChance} NumberOfMonsterTypes: ${game.depthConfigs[character.depth].numberOfMonsterTypes}. CanTriggerHazards: {game.depthConfigs[character.depth].canTriggerHazards}. HazardSeverity: {game.depthConfigs[character.depth].hazardSeverity}. IsPoisonous: {game.depthConfigs[character.depth].isPoisonous}</p>)}
 
     {game && game.hazardActive && (
       <div className="hazard-progress-container">

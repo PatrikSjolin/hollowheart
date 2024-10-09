@@ -11,11 +11,11 @@ export const TIMERS = {
 };
 
 export const MONSTER_CONFIG = {
-  baseHealth: 50,
-  healthMultiplier: 50,  // Increase health with depth
-  baseDamage: 5,
-  damageMultiplier: 5,  // Increase damage with depth
-  monsterAttackIntervalRange: [2000, 5000],  // Monsters attack between 2 and 5 seconds
+  baseHealth: 40,
+  healthMultiplier: 40,  // Increase health with depth
+  baseDamage: 4,
+  damageMultiplier: 4,  // Increase damage with depth
+  monsterAttackIntervalRange: [2000 * gameSpeed, 5000 * gameSpeed],  // Monsters attack between 2 and 5 seconds
 };
 
 export const RESEARCH_CONFIG = {
@@ -26,4 +26,5 @@ export const RESEARCH_CONFIG = {
 export const CHARACTER_CONFIG = {
   baseXp: 200,
   xpNeededPerLevelIncrease: 1.4,
+  baseAttackSpeed: 3000 * gameSpeed,
 };

@@ -25,7 +25,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
   const handleMaxClick = (resource) => {
     setConvertAmount(prevState => ({
       ...prevState,
-      [resource]: character[resource],
+      [resource]: character.resources[resource],
     }));
   };
 
@@ -53,7 +53,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
   };
 
   const handleBuyItem = (item, index) => {
-    if (character.coins >= item.cost.coins) {
+    if (character.resources['coins'] >= item.cost.coins) {
       if (item.type === 'consumable') {
         item.effect(character);  // Consumable is used immediately
         character.logMessage(`${item.name} used.`);
@@ -61,7 +61,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
         // Add equipable or stackable items to inventory
         character.addItemToInventory(item);
       }
-      character.coins -= item.cost.coins;
+      character.resources['coins'] -= item.cost.coins;
       setCharacter(character);  // Update character state
 
       // If the item is not consumable or special, remove it from the shop stock
@@ -75,7 +75,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
 
   const handleSellItem = (item) => {
     const sellPrice = item.cost.coins * 0.5;  // Example: Sell price is twice the attack bonus
-    character.coins += sellPrice;
+    character.resources['coins'] += sellPrice;
     character.inventory = character.inventory.filter(inventoryItem => inventoryItem.id !== item.id);
     setCharacter(character);
     character.saveToLocalStorage(character);
@@ -136,12 +136,12 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
             <div className="conversion-section">
               {['iron', 'gold', 'diamonds'].map(resource => (
                 <div key={resource} className="conversion-row">
-                  <p>{resource.charAt(0).toUpperCase() + resource.slice(1)}: {character[resource]}</p>
+                  <p>{resource.charAt(0).toUpperCase() + resource.slice(1)}: {character.resources[resource]}</p>
                   <p>{translations[language].convertTo} {convertAmount[resource] * ShopService.conversionRates[resource]} {translations[language].coins}</p>
                   <input
                     type="range"
                     min="0"
-                    max={character[resource]}
+                    max={character.resources[resource]}
                     value={convertAmount[resource]}
                     onChange={(e) => handleSliderChange(resource, e.target.value)}
                   />
@@ -173,15 +173,15 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
                   </div>
                   <button
                     onClick={() => {
-                      if (character.coins >= item.cost.coins) {
+                      if (character.resources['coins'] >= item.cost.coins) {
                         // item.effect(character); // Consumable is used immediately
                         character.useHealingPotion();
                         character.logMessage(`${item.name} used.`);
-                        character.coins -= item.cost.coins;
+                        character.resources['coins'] -= item.cost.coins;
                         setCharacter(character);
                       }
                     }}
-                    disabled={character.coins < item.cost.coins}
+                    disabled={character.resources['coins'] < item.cost.coins || character.depth > 0}
                     className="shop-button"
                   >
                     {translations[language].buy}
@@ -211,17 +211,12 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
                         iron: character.iron,
                         coins: character.coins,
                       };
-                      if (building.canAfford(resources)) {
+                      if (building.canAfford(character.resources)) {
                         character.buyBuilding(building);
                         setCharacter(character);
                       }
                     }}
-                    disabled={!building.canAfford({
-                      wood: character.wood,
-                      stone: character.stone,
-                      iron: character.iron,
-                      coins: character.coins,
-                    })}
+                    disabled={!building.canAfford(character.resources)}
                     className="shop-button"
                   >
                     {translations[language].buy}
@@ -247,7 +242,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
                   <button
 
                     onClick={() => handleBuyItem(item, index)}  // Call handleBuyItem when the item is purchased
-                    disabled={character.coins < item.cost.coins}
+                    disabled={character.resources['coins'] < item.cost.coins}
                     className="shop-button"
                   >
                     {translations[language].buy}
@@ -273,12 +268,11 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
           )}
           
           <div className="resources-display">
-            <p><strong>{translations[language].coins}:</strong> {character.coins}</p>
-            <p><strong>{translations[language].wood}:</strong> {character.wood}</p>
-            <p><strong>{translations[language].stone}:</strong> {character.stone}</p>
-            <p><strong>{translations[language].iron}:</strong> {character.iron}</p>
-            <p><strong>{translations[language].gold}:</strong> {character.gold}</p>
-            <p><strong>{translations[language].diamonds}:</strong> {character.diamonds}</p>
+          {Object.keys(character.resources).map(resourceKey => (
+    <p key={resourceKey}>
+      <strong>{translations[language][resourceKey]}:</strong> {character.resources[resourceKey]}
+    </p>
+  ))}
           </div>
         </div>
       </div>
