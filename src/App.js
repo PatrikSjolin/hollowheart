@@ -456,7 +456,7 @@ const App = () => {
         </section>
       )}
 
-    {debug && game && game.depthConfigs && character && game.depthConfigs[character.depth] && (<p>Depth: {character.depth}. SpawnMonsters: {game.depthConfigs[character.depth].spawnMonsters}. Chance to spawn monsters: {game.depthConfigs[character.depth].spawnMonsterChance} NumberOfMonsterTypes: ${game.depthConfigs[character.depth].numberOfMonsterTypes}. CanTriggerHazards: {game.depthConfigs[character.depth].canTriggerHazards}. HazardSeverity: {game.depthConfigs[character.depth].hazardSeverity}. IsPoisonous: {game.depthConfigs[character.depth].isPoisonous}</p>)}
+    {debug && game && character && character.depthConfigs[character.lastDepthVisited] && (<p>Depth: {character.lastDepthVisited}. SpawnMonsters: {character.depthConfigs[character.lastDepthVisited].spawnMonsters}. Chance to spawn monsters: {character.depthConfigs[character.lastDepthVisited].spawnMonsterChance} NumberOfMonsterTypes: ${character.depthConfigs[character.lastDepthVisited].numberOfMonsterTypes}. CanTriggerHazards: {character.depthConfigs[character.lastDepthVisited].canTriggerHazards}. HazardSeverity: {character.depthConfigs[character.lastDepthVisited].hazardSeverity}. IsPoisonous: {character.depthConfigs[character.lastDepthVisited].isPoisonous}</p>)}
 
     {game && game.hazardActive && (
       <div className="hazard-progress-container">

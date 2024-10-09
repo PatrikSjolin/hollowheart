@@ -11,10 +11,8 @@ export const TIMERS = {
 };
 
 export const MONSTER_CONFIG = {
-  baseHealth: 40,
-  healthMultiplier: 40,  // Increase health with depth
+  baseHealth: 30,
   baseDamage: 4,
-  damageMultiplier: 4,  // Increase damage with depth
   monsterAttackIntervalRange: [2000 * gameSpeed, 5000 * gameSpeed],  // Monsters attack between 2 and 5 seconds
 };
 

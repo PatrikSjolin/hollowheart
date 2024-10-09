@@ -83,6 +83,10 @@ export class Character {
     return 1 + (this.dexterity / (this.dexterity + 100));
   }
 
+  calculateQuantityBoostFromDexterity() {
+    return 1 + (this.dexterity / (this.dexterity + 100));
+  }
+
   calculateXpBoostFromIntelligence() {
     return 1 + (this.intelligence / (this.intelligence + 100));
   }

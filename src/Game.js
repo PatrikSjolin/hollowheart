@@ -19,7 +19,7 @@ export class Game {
 
     // Randomize whether this depth spawns monsters, hazards, etc.
     const spawnMonsters = Math.random() < dangerLevel;  // Higher chance of monsters deeper
-    const spawnMonsterChance = Math.random() * dangerLevel * 0.3;
+    const spawnMonsterChance = 0.02 + Math.random() * dangerLevel * 0.1;
     const numberOfMonsterTypes = spawnMonsters ? Math.floor(Math.random() * 3 + 1) : 0;
     const monsterStrength = depth;  // Monsters get stronger as you go deeper
 
@@ -97,6 +97,7 @@ export class Game {
   climbUp() {
     if (this.character.depth > 0) {
       this.character.depth -= 1;
+      this.character.lastDepthVisited = this.character.depth;  // Store the current depth before ascending
       this.character.currentMonsters = [];
       const rope = this.character.inventory.find(item => item.name === 'Rope');
       if (rope) {
@@ -205,8 +206,7 @@ export class Game {
   }
 
 
-  generateTreasures(depthConfig, intelligenceFactor) {
-    //const config = this.depthConfigs[this.character.depth];
+  generateTreasures(depthConfig) {
 
     const treasuresFound = [];
   
@@ -224,7 +224,7 @@ export class Game {
     }
 
     //Find items
-    const itemFindChance = 0.05 * intelligenceFactor;  // 1% chance to find an item
+    const itemFindChance = 0.05 + this.character.calculateQuantityBoostFromDexterity() * this.character.depth * 0.05;
     const randomChance = Math.random();
 
     if (randomChance < itemFindChance) {
@@ -251,7 +251,6 @@ export class Game {
       
       const depthConfig = this.character.depthConfigs[this.character.depth];
       this.character.timeSurvivedAtLevel += elapsedTime;
-      const intelligenceFactor = this.character.calculateXpBoostFromIntelligence();
 
       //Manage monsters
       const randomMonsterSpawn = Math.random();
@@ -272,7 +271,7 @@ export class Game {
       //Manage treasures
       this.character.treasureTimer += elapsedTime;
       if (this.character.treasureTimer > TIMERS.treasureInterval) {
-        this.generateTreasures(depthConfig, intelligenceFactor);
+        this.generateTreasures(depthConfig);
         this.character.treasureTimer = this.character.treasureTimer - TIMERS.treasureInterval;
       }
 
@@ -309,8 +308,8 @@ export class Game {
   }
 
   spawnMonster(depth) {
-    const randomHealth = Math.floor(Math.random() * 100) + MONSTER_CONFIG.baseHealth * depth;  // Example: Random health between 50 and 150
-    const randomDamage = Math.floor(Math.random() * 20) + MONSTER_CONFIG.baseDamage * depth;  // Example: Random damage between 5 and 25
+    const randomHealth = Math.floor(Math.random() * 80) + MONSTER_CONFIG.baseHealth * depth;  // Example: Random health between 50 and 150
+    const randomDamage = Math.floor(Math.random() * 10) + MONSTER_CONFIG.baseDamage * depth;  // Example: Random damage between 5 and 25
     const randomAttackInterval = Math.floor(Math.random() * (MONSTER_CONFIG.monsterAttackIntervalRange[1] - MONSTER_CONFIG.monsterAttackIntervalRange[0])) + (MONSTER_CONFIG.monsterAttackIntervalRange[0] / depth);  // Attack every 2-5 seconds
 
     const randomNumber = Math.floor(Math.random() * 100);
