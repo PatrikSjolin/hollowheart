@@ -11,7 +11,7 @@ export const TIMERS = {
 };
 
 export const MONSTER_CONFIG = {
-  baseHealth: 30,
+  baseHealth: 20,
   baseDamage: 4,
   monsterAttackIntervalRange: [2000 * gameSpeed, 5000 * gameSpeed],  // Monsters attack between 2 and 5 seconds
 };

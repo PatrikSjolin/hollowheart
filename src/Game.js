@@ -308,8 +308,8 @@ export class Game {
   }
 
   spawnMonster(depth) {
-    const randomHealth = Math.floor(Math.random() * 80) + MONSTER_CONFIG.baseHealth * depth;  // Example: Random health between 50 and 150
-    const randomDamage = Math.floor(Math.random() * 10) + MONSTER_CONFIG.baseDamage * depth;  // Example: Random damage between 5 and 25
+    const randomHealth = Math.floor(Math.random() * 60) + MONSTER_CONFIG.baseHealth * depth;  // Example: Random health between 50 and 150
+    const randomDamage = Math.floor(Math.random() * 8) + MONSTER_CONFIG.baseDamage * depth;  // Example: Random damage between 5 and 25
     const randomAttackInterval = Math.floor(Math.random() * (MONSTER_CONFIG.monsterAttackIntervalRange[1] - MONSTER_CONFIG.monsterAttackIntervalRange[0])) + (MONSTER_CONFIG.monsterAttackIntervalRange[0] / depth);  // Attack every 2-5 seconds
 
     const randomNumber = Math.floor(Math.random() * 100);
@@ -397,16 +397,16 @@ export class Game {
       if (randomEffect < 0.5) {
         // Randomly reduce wood if it exists in the resources
         const lostWood = Math.floor(Math.random() * 10 + 5);
-        if (this.character.resources['Wood']) {
-          this.character.resources['Wood'] = Math.max(0, this.character.resources['Wood'] - lostWood);
+        if (this.character.resources['wood']) {
+          this.character.resources['wood'] = Math.max(0, this.character.resources['wood'] - lostWood);
           this.logMessage(`The disaster destroyed ${lostWood} wood!`);
           lostResources = true;  // Mark that we lost resources
         }
       } else {
         // Randomly reduce stone if it exists in the resources
         const lostStone = Math.floor(Math.random() * 10 + 5);
-        if (this.character.resources['Stone']) {
-          this.character.resources['Stone'] = Math.max(0, this.character.resources['Stone'] - lostStone);
+        if (this.character.resources['stone']) {
+          this.character.resources['stone'] = Math.max(0, this.character.resources['stone'] - lostStone);
           this.logMessage(`The disaster destroyed ${lostStone} stone!`);
           lostResources = true;  // Mark that we lost resources
         }
