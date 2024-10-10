@@ -499,6 +499,7 @@ const App = () => {
           setCharacter={setCharacter}
           setCharacterOverlayVisible={setCharacterOverlayVisible}
           language={language}
+          game={game}
         />
       )}
 

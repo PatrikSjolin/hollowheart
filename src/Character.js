@@ -114,6 +114,8 @@ export class Character {
   calculateXpNeededForLevel(level) {
     if (level === 0)
       return 0;
+    if (level === 1)
+      return CHARACTER_CONFIG.baseXp;
 
     return Math.floor(CHARACTER_CONFIG.baseXp + CHARACTER_CONFIG.baseXp * Math.pow(CHARACTER_CONFIG.xpNeededPerLevelIncrease, level - 1));
   }

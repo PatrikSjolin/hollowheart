@@ -381,26 +381,52 @@ export class Game {
     this.saveToLocalStorage(this.character);
   }
 
+  calculateHazardProtection() {
+ // Calculate damage reduction based on the number of guard towers, owned buildings, and last visited depth
+ const numGuardTowers = this.character.buildings.filter(building => building.name === 'Village Guard Tower').length;
+ const numOwnedBuildings = this.character.buildings.length;
+ const lastDepthVisited = this.character.lastDepthVisited;
+
+ // Base hazard reduction from guard towers (each tower reduces damage by 50%)
+ let hazardReduction = numGuardTowers * 0.5;
+
+ // More owned buildings reduce this % by 2% for each building
+ const buildingReduction = numOwnedBuildings * 0.02;
+
+ // Deeper last visited depths increase hazard intensity (reduce hazard reduction by 1% per depth level)
+ const depthReduction = lastDepthVisited * 0.01;
+
+ return hazardReduction - buildingReduction - depthReduction;
+  }
+
   // Apply effects while the hazard is active
   applyHazardEffects() {
     const causeAnIssue = Math.random();
     const randomEffect = Math.random();
 
+
+ // Final hazard reduction is based on all these factors
+ let totalHazardReduction = this.calculateHazardProtection();
+ totalHazardReduction = Math.max(0, Math.min(totalHazardReduction, 1));  // Clamp the reduction between 0% and 100%
+
+
     if (causeAnIssue < 0.1) {  // 10% chance to cause an issue
       if (randomEffect < 0.5) {
         // Randomly reduce wood if it exists in the resources
         if (this.character.resources['wood'] >= 0) {
-          const lostWood = Math.floor(Math.random() * 10 + 7);
-          this.character.modifyResource('wood', -lostWood);
-          this.logMessage(`The disaster destroyed ${lostWood} wood!`);
+          const lostWood = Math.floor(Math.random() * 2 * this.character.lastDepthVisited + 7);
+          const reducedLostWood = Math.floor(lostWood * (1 - totalHazardReduction));
+          this.character.modifyResource('wood', -reducedLostWood);
+          this.logMessage(`The disaster destroyed ${reducedLostWood} wood!`);
         }
 
       } else {
         // Randomly reduce stone if it exists in the resources
         if (this.character.resources['stone'] >= 0) {
-          const lostStone = Math.floor(Math.random() * 5 + 5);
-          this.character.modifyResource('stone', -lostStone);
-          this.logMessage(`The disaster destroyed ${lostStone} stone!`);
+          const lostStone = Math.floor(Math.random() * 1 * this.character.lastDepthVisited + 5);
+        const reducedLostStone = Math.floor(lostStone * (1 - totalHazardReduction));  // Apply hazard reduction
+          this.character.modifyResource('stone', -reducedLostStone);
+          this.logMessage(`The disaster destroyed ${reducedLostStone} stone!`);
         }
       }
       this.saveToLocalStorage(this.character);

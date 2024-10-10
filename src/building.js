@@ -103,4 +103,12 @@ export const buildings = [
     'Place at a certain depth and it will harvest resources.',
     function (character) { return character.buildings.some(building => building.name === 'Library') && character.intelligence >= 20; }
   ),
+  new Building(
+    'Village Guard Tower',
+    { wood: 50, iron: 200, coins: 100 },
+    'feature',
+    { reducesHazardImpact: true },  // This flag indicates hazard reduction
+    'Reduces the impact of village hazards, protecting your resources and buildings.',
+    function (character) { return true; }  // Always available
+  ),  
 ];

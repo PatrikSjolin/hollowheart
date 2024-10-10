@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { debug } from './App';
 import translations from './translations';
 
-const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible, language }) => {
+const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible, language, game }) => {
 
   // Close the overlay when clicking outside the overlay content
   const handleClickOutside = (e) => {
@@ -209,6 +209,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible,
         {debug && (<p>Xp gain: {character.calculateXpBoostFromIntelligence()} </p>)}
         {debug && (<p>Attack: {character.calculateAttackSpeed()} </p>)}
         {debug && (<p>Damage: {character.calculateDamate()} </p>)}
+        {debug && (<p>Village hazard protection: {game.calculateHazardProtection()} </p>)}
       </div>
     </div>
   )
