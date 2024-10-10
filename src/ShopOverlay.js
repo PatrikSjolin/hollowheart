@@ -134,29 +134,29 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
         <div className="tab-content">
           {activeTab === 'conversion' && (
             <div className="conversion-section">
-              {['iron', 'gold', 'diamonds'].map(resource => (
-                <div key={resource} className="conversion-row">
-                  <p>{resource.charAt(0).toUpperCase() + resource.slice(1)}: {character.resources[resource]}</p>
-                  <p>{translations[language].convertTo} {convertAmount[resource] * ShopService.conversionRates[resource]} {translations[language].coins}</p>
-                  <input
-                    type="range"
-                    min="0"
-                    max={character.resources[resource]}
-                    value={convertAmount[resource]}
-                    onChange={(e) => handleSliderChange(resource, e.target.value)}
-                  />
-                  <span>{convertAmount[resource]}</span>
+                {['iron', 'gold', 'emerald', 'diamonds'].filter(resource => character.resources[resource] >= 0).map(resource => (
+    <div key={resource} className="conversion-row">
+      <p>{translations[language][resource]}: {character.resources[resource]}</p>
+      <p>{translations[language].convertTo} {convertAmount[resource] * ShopService.conversionRates[resource]} {translations[language].coins}</p>
+      <input
+        type="range"
+        min="0"
+        max={character.resources[resource]}
+        value={convertAmount[resource]}
+        onChange={(e) => handleSliderChange(resource, e.target.value)}
+      />
+      <span>{convertAmount[resource]}</span>
 
-                  {/* Max Button */}
-                  <button onClick={() => handleMaxClick(resource)} className="max-button">
-                    Max
-                  </button>
+      {/* Max Button */}
+      <button onClick={() => handleMaxClick(resource)} className="max-button">
+        Max
+      </button>
 
-                  <button onClick={() => handleConvert(resource)} disabled={convertAmount[resource] <= 0 || character.isExploring} className="shop-button">
-                    {translations[language].trade}
-                  </button>
-                </div>
-              ))}
+      <button onClick={() => handleConvert(resource)} disabled={convertAmount[resource] <= 0 || character.isExploring} className="shop-button">
+        {translations[language].trade}
+      </button>
+    </div>
+  ))}
               <hr className="section-divider" />
               {/* Add Consumables here */}
               <h2>{translations[language].buyConsumables}</h2>

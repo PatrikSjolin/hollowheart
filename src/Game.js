@@ -172,8 +172,8 @@ export class Game {
       if (monster.health <= 0) {
         const expGained = Math.floor(this.character.calculateXpBoostFromIntelligence() * this.character.depth * Math.floor(Math.random() * 6) + 5); // Random exp gained
         this.character.experience += expGained;
-        const coinsGained = 1;
-        this.character.coins += coinsGained;
+        const coinsGained = 1 + Math.floor(this.character.depth / 10);
+        this.character.resources['coins'] += coinsGained;
         this.logMessage(`You defeated the ${monster.name}! and gained ${expGained} experience.`);
         this.character.currentMonsters.splice(index, 1);  // Remove the monster from the array
       }
@@ -189,7 +189,7 @@ export class Game {
         const expGained = Math.floor(this.character.calculateXpBoostFromIntelligence() * this.character.depth * Math.floor(Math.random() * 6) + 5); // Random exp gained
         this.character.experience += expGained;
         const coinsGained = 1 + Math.floor(this.character.depth / 10);
-        this.character.coins += coinsGained;
+        this.character.resources['coins'] += coinsGained;
         this.logMessage(`You defeated the ${monster.name}! and gained ${expGained} experience.`);
         this.character.currentMonsters.splice(index, 1);  // Remove the monster from the array
       } else {
@@ -354,7 +354,7 @@ export class Game {
 
       if (remainingTime > 0) {
         // Apply random hazard effects while the hazard is active
-        this.applyHazardEffects(elapsedTime);
+        this.applyHazardEffects();
       } else {
         this.endHazard();
       }
@@ -387,35 +387,27 @@ export class Game {
   }
 
   // Apply effects while the hazard is active
-  applyHazardEffects(elapsedTime) {
+  applyHazardEffects() {
     const causeAnIssue = Math.random();
     const randomEffect = Math.random();
-  
-    let lostResources = false;  // Track whether any resource was lost
   
     if (causeAnIssue < 0.1) {  // 10% chance to cause an issue
       if (randomEffect < 0.5) {
         // Randomly reduce wood if it exists in the resources
-        const lostWood = Math.floor(Math.random() * 10 + 5);
-        if (this.character.resources['wood']) {
-          this.character.resources['wood'] = Math.max(0, this.character.resources['wood'] - lostWood);
+        const lostWood = Math.floor(Math.random() * 10 + 7);
+        this.character.modifyResource('wood', lostWood);
           this.logMessage(`The disaster destroyed ${lostWood} wood!`);
-          lostResources = true;  // Mark that we lost resources
-        }
+        
       } else {
         // Randomly reduce stone if it exists in the resources
-        const lostStone = Math.floor(Math.random() * 10 + 5);
-        if (this.character.resources['stone']) {
-          this.character.resources['stone'] = Math.max(0, this.character.resources['stone'] - lostStone);
+        const lostStone = Math.floor(Math.random() * 5 + 5);
+        this.character.modifyResource('stone', lostStone);
           this.logMessage(`The disaster destroyed ${lostStone} stone!`);
-          lostResources = true;  // Mark that we lost resources
-        }
+          
       }
   
-      // Only log if resources were actually lost
-      if (lostResources) {
         this.saveToLocalStorage(this.character);
-      }
+      
     }
   }
 
