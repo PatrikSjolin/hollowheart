@@ -10,6 +10,8 @@ export class Character {
     this.vitality = initialState.vitality || 10;
     this.intelligence = initialState.intelligence || 10;
     this.currentHealth = initialState.currentHealth || 100;
+this.buffs = initialState.buffs || [];
+this.debuffs = initialState.debuffs || [];
     this.resources = initialState.resources || { coins: 0 };
     this.recordDepth = initialState.recordDepth || 0;
     this.coins = initialState.coins || 0;
@@ -343,6 +345,104 @@ export class Character {
 
       this.saveToLocalStorage(this);
   }
+
+  // Method to apply a buff or debuff
+  applyEffect(effect) {
+    const existingEffect = this.buffs.find(buff => buff.name === effect.name) || this.debuffs.find(debuff => debuff.name === effect.name);
+  
+    if (!existingEffect) {
+      if (effect.type === 'buff') {
+        this.buffs.push(effect);
+        this.logMessage(`${effect.name} applied!`);
+        if (!effect.overTime) {
+        this.applyImmediateBuffEffect(effect);
+        }
+      } else if (effect.type === 'debuff') {
+        this.debuffs.push(effect);
+        this.logMessage(`You've been hit with ${effect.name}!`);
+        if (!effect.overTime) {
+          this.applyImmediateEffect(effect);  // Apply the debuff's effect immediately if applicable
+        }
+      }
+      this.saveToLocalStorage(this);
+    }
+  }
+
+  applyImmediateEffect(effect) {
+    if (effect.statAffected && !effect.overTime) {
+      // Apply static effect immediately (e.g., reducing armor, increasing strength)
+      this[effect.statAffected] += effect.amount;  // Increase or decrease stat immediately
+      if (effect.amount > 0) {
+        this.logMessage(`${effect.statAffected} increased by ${effect.amount}.`);
+      } else {
+        this.logMessage(`${effect.statAffected} reduced by ${-effect.amount}.`);
+      }
+    }
+  }
+  
+
+// Remove expired effects
+removeEffect(effectName) {
+  const buff = this.buffs.find(b => b.name === effectName);
+  const debuff = this.debuffs.find(d => d.name === effectName);
+
+  if (buff && buff.statAffected && !buff.overTime) {
+    // Revert the buff's stat change
+    this[buff.statAffected] -= buff.amount;
+    this.logMessage(`${buff.name} has expired, reducing ${buff.statAffected}.`);
+  }
+
+  if (debuff && debuff.statAffected && !debuff.overTime) {
+    // Revert the debuff's stat change
+    this[debuff.statAffected] -= debuff.amount;
+    this.logMessage(`${debuff.name} has expired, restoring ${debuff.statAffected}.`);
+  }
+
+  // Remove the effect from the list
+  this.buffs = this.buffs.filter(buff => buff.name !== effectName);
+  this.debuffs = this.debuffs.filter(debuff => debuff.name !== effectName);
+  this.saveToLocalStorage(this);
+}
+
+// Process buffs and debuffs to modify character stats
+processEffects(elapsedTime) {
+  const effectsToRemove = [];
+
+  // Process buffs
+  this.buffs.forEach(buff => {
+    buff.duration -= elapsedTime;
+    if (buff.duration <= 0) {
+      effectsToRemove.push(buff);
+    }
+  });
+
+  // Process debuffs
+  this.debuffs.forEach(debuff => {
+    debuff.duration -= elapsedTime;
+    if (debuff.overTime && debuff.interval) {
+      debuff.interval -= elapsedTime;
+      if (debuff.interval <= 0) {
+        this.applyOverTimeEffect(debuff);
+        debuff.interval = 5000; // Reset the interval
+      }
+    }
+    if (debuff.duration <= 0) {
+      effectsToRemove.push(debuff);
+    }
+  });
+
+  // Remove expired effects
+  effectsToRemove.forEach(effect => this.removeEffect(effect.name));
+}
+
+// Apply an over-time effect like poison
+applyOverTimeEffect(effect) {
+  if (effect.statAffected === 'health') {
+    this.currentHealth = Math.max(0, this.currentHealth + effect.amount); // Reduces health over time
+    this.logMessage(`${effect.name} deals ${-effect.amount} damage.`);
+    this.saveToLocalStorage();
+  }
+}
 
   addDebugResources() {
     const debugResources = {

@@ -360,6 +360,42 @@ const App = () => {
           </div>
         </section>
       )}
+
+<div className="buffs-debuffs-display">
+  {/* Display Buffs */}
+  {character && (
+  <div className="buffs-section">
+    <h3>{translations[language].activeBuffs}</h3>
+    {character.buffs.length > 0 ? (
+      character.buffs.map((buff, index) => (
+        <p key={index}>
+          {buff.name} ({Math.ceil(buff.duration / 1000)}s)
+        </p>
+      ))
+    ) : (
+      <p>{translations[language].noBuffs}</p>
+    )}
+  </div>)}
+
+  {/* Display Debuffs */}
+  {character && (
+  <div className="debuffs-section">
+    <h3>{translations[language].activeDebuffs}</h3>
+    {character.debuffs.length > 0 ? (
+      character.debuffs.map((debuff, index) => (
+        <p key={index}>
+          {debuff.name} ({Math.ceil(debuff.duration / 1000)}s)
+        </p>
+      ))
+    ) : (
+      <p>{translations[language].noDebuffs}</p>
+    )}
+  </div>
+  )}
+</div>
+
+
+
       {/* Resources Section */}
       {character && (
         <section className="resources-section">

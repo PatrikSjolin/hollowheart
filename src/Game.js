@@ -145,7 +145,7 @@ export class Game {
     }
   }
 
-  monsterDeath(monster, index){
+  monsterDeath(monster, index) {
     const expGained = Math.floor(this.character.calculateXpBoostFromIntelligence() * this.character.depth * Math.floor(Math.random() * 6) + 10); // Random exp gained
     this.character.experience += expGained;
     const coinsGained = 1 + Math.floor(this.character.depth / 10);
@@ -239,6 +239,7 @@ export class Game {
 
     this.character.regenerateHealth(elapsedTime);
     this.character.generateResources(elapsedTime);
+    this.character.processEffects(elapsedTime);
 
     if (this.character.isExploring) {
 
@@ -289,11 +290,11 @@ export class Game {
         this.character.hazardTimer = this.character.hazardTimer - TIMERS.hazardInterval;
       }
 
-      
-        // Check if it's time to level up
-        if (this.character.experience >= this.character.calculateXpNeededForLevel(this.character.level)) {
-          this.character.levelUp();
-        }
+
+      // Check if it's time to level up
+      if (this.character.experience >= this.character.calculateXpNeededForLevel(this.character.level)) {
+        this.character.levelUp();
+      }
     }
   }
 
@@ -382,21 +383,21 @@ export class Game {
   }
 
   calculateHazardProtection() {
- // Calculate damage reduction based on the number of guard towers, owned buildings, and last visited depth
- const numGuardTowers = this.character.buildings.filter(building => building.name === 'Village Guard Tower').length;
- const numOwnedBuildings = this.character.buildings.length;
- const lastDepthVisited = this.character.lastDepthVisited;
+    // Calculate damage reduction based on the number of guard towers, owned buildings, and last visited depth
+    const numGuardTowers = this.character.buildings.filter(building => building.name === 'Village Guard Tower').length;
+    const numOwnedBuildings = this.character.buildings.length;
+    const lastDepthVisited = this.character.lastDepthVisited;
 
- // Base hazard reduction from guard towers (each tower reduces damage by 50%)
- let hazardReduction = numGuardTowers * 0.5;
+    // Base hazard reduction from guard towers (each tower reduces damage by 50%)
+    let hazardReduction = numGuardTowers * 0.4;
 
- // More owned buildings reduce this % by 2% for each building
- const buildingReduction = numOwnedBuildings * 0.02;
+    // More owned buildings reduce this % by 2% for each building
+    const buildingReduction = numOwnedBuildings * 0.04;
 
- // Deeper last visited depths increase hazard intensity (reduce hazard reduction by 1% per depth level)
- const depthReduction = lastDepthVisited * 0.01;
+    // Deeper last visited depths increase hazard intensity (reduce hazard reduction by 1% per depth level)
+    const depthReduction = lastDepthVisited * 0.02;
 
- return hazardReduction - buildingReduction - depthReduction;
+    return hazardReduction - buildingReduction - depthReduction;
   }
 
   // Apply effects while the hazard is active
@@ -405,9 +406,9 @@ export class Game {
     const randomEffect = Math.random();
 
 
- // Final hazard reduction is based on all these factors
- let totalHazardReduction = this.calculateHazardProtection();
- totalHazardReduction = Math.max(0, Math.min(totalHazardReduction, 1));  // Clamp the reduction between 0% and 100%
+    // Final hazard reduction is based on all these factors
+    let totalHazardReduction = this.calculateHazardProtection();
+    totalHazardReduction = Math.min(0.99, Math.max(0, Math.min(totalHazardReduction, 1)));  // Clamp the reduction between 0% and 100%
 
 
     if (causeAnIssue < 0.1) {  // 10% chance to cause an issue
@@ -424,13 +425,32 @@ export class Game {
         // Randomly reduce stone if it exists in the resources
         if (this.character.resources['stone'] >= 0) {
           const lostStone = Math.floor(Math.random() * 1 * this.character.lastDepthVisited + 5);
-        const reducedLostStone = Math.floor(lostStone * (1 - totalHazardReduction));  // Apply hazard reduction
+          const reducedLostStone = Math.floor(lostStone * (1 - totalHazardReduction));  // Apply hazard reduction
           this.character.modifyResource('stone', -reducedLostStone);
           this.logMessage(`The disaster destroyed ${reducedLostStone} stone!`);
         }
       }
       this.saveToLocalStorage(this.character);
     }
+
+    const debuffChance = Math.random();
+    if (debuffChance < 0.04 * (1 - totalHazardReduction)) {
+      const debuff = this.generateDebuffForHazard((1 - totalHazardReduction) * this.character.lastDepthVisited);
+      this.character.applyEffect(debuff);
+      this.logMessage('You have been poisoned!');
+    }
+  }
+
+  generateDebuffForHazard(effectMultiple) {
+    const debuffs = [
+      { name: 'Poison', statAffected: 'health', amount: Math.floor(-1 * effectMultiple), duration: 30000, interval: 5000, type: 'debuff', overTime: true },
+      { name: 'Weakened', statAffected: 'strength', amount: Math.floor(-5 * effectMultiple), duration: 20000, type: 'debuff', overTime: false },
+      { name: 'Slowed', statAffected: 'dexterity', amount: Math.floor(-3 * effectMultiple), duration: 20000, type: 'debuff', overTime: false }
+    ];
+
+    // Randomly select one of the debuffs
+    const randomIndex = Math.floor(Math.random() * debuffs.length);
+    return debuffs[randomIndex];
   }
 
   rehydrateMonsters(monsterDataArray) {

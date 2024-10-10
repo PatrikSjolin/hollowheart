@@ -880,3 +880,19 @@ button:disabled {
   height: 100%;
   transition: width 0.5s ease;
 }
+
+.buffs-debuffs-display {
+  margin-top: 20px;
+}
+
+.buffs-section, .debuffs-section {
+  margin-bottom: 10px;
+}
+
+.buffs-section p, .debuffs-section p {
+  color: green;  /* Buffs in green */
+}
+
+.debuffs-section p {
+  color: red;  /* Debuffs in red */
+}
