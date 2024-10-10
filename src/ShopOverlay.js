@@ -242,7 +242,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
                   <button
 
                     onClick={() => handleBuyItem(item, index)}  // Call handleBuyItem when the item is purchased
-                    disabled={character.resources['coins'] < item.cost.coins}
+                    disabled={character.resources['coins'] < item.cost.coins || character.depth > 0}
                     className="shop-button"
                   >
                     {translations[language].buy}
@@ -258,7 +258,8 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
                 character.inventory.filter(item => item.type === 'equipable').map((item, index) => (
                   <div key={index} className="sell-item-block">
             <p>{item.name} - Sells for {Math.floor(item.cost.coins * 0.5)} coins</p>
-            <button onClick={() => handleSellItem(item)}>Sell</button>
+            <p>{item.description}</p>
+            <button onClick={() => handleSellItem(item)} disabled={character.depth > 0}>Sell</button>
           </div>
                 ))
               ) : (

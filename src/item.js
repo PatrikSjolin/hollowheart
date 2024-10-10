@@ -49,7 +49,7 @@ export class Item {
       stacks: false,
       slot: finalSlot,
       description: `Provides ${armorBonus} extra armor points.`,
-      cost: { coins: 80 },
+      cost: { coins: armorBonus * 2 },
       bonus: { armor: armorBonus },
     };
   }
@@ -66,7 +66,7 @@ export class Item {
       stacks: false,
       slot: 'weapon',
       description: `Provides ${dmgBonus} extra damage.`,
-      cost: { coins: 80 },
+      cost: { coins: dmgBonus * 2 },
       bonus: { attack: dmgBonus },
     };
   }
