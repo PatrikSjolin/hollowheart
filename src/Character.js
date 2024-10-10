@@ -115,7 +115,7 @@ export class Character {
     if (level === 0)
       return 0;
 
-    return Math.floor(CHARACTER_CONFIG.baseXp * Math.pow(CHARACTER_CONFIG.xpNeededPerLevelIncrease, level - 1));
+    return Math.floor(CHARACTER_CONFIG.baseXp + CHARACTER_CONFIG.baseXp * Math.pow(CHARACTER_CONFIG.xpNeededPerLevelIncrease, level - 1));
   }
 
   modifyResource(resourceName, quantity) {

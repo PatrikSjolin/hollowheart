@@ -202,7 +202,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible,
         </div>
 
         {debug && <hr className="section-divider" />}
-        {debug && (<p>Experience: {character.experience} / {Math.floor(200 * Math.pow(1.5, character.level - 1))} </p>)}
+        {debug && (<p>Experience: {character.experience} / {character.calculateXpNeededForLevel(character.level)} </p>)}
         {debug && (<p>Amor: {character.calculateArmor()}</p>)}
         {debug && (<p>Damage Reduction: {character.calculateDamageReductionFromArmor()} </p>)}
         {debug && (<p>Quantity gain: {character.calculateQuantityBoostFromIntelligence()}</p>)}

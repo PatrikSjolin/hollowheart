@@ -30,12 +30,6 @@ export class Game {
 
     const resourceConfig = this.generateResourceConfig(depth);
 
-    if(debug) {
-      this.logMessage(`Depth: ${depth}. SpawnMonsters: ${spawnMonsters}. Chance to spawn monsters: ${spawnMonsterChance} NumberOfMonsterTypes: ${numberOfMonsterTypes}. CanTriggerHazards: ${canTriggerHazards}. HazardSeverity: ${hazardSeverity}. IsPoisonous: ${isPoisonous}`);
-      this.logMessage(`Resource Config for Depth ${depth}: ${JSON.stringify(resourceConfig)}`);
-
-    }
-
     return {
       spawnMonsters,
       spawnMonsterChance,
@@ -56,9 +50,9 @@ export class Game {
       { type: 'emeralds', depthStart: 10, probabilityRange: [0.2, 0.5] },
       { type: 'diamonds', depthStart: 15, probabilityRange: [0.1, 0.4] }
     ];
-  
+
     const resourcePool = [];
-  
+
     // Add resources based on depth
     availableResources.forEach(resource => {
       if (depth >= resource.depthStart) {
@@ -66,7 +60,7 @@ export class Game {
         resourcePool.push({ type: resource.type, probability });
       }
     });
-  
+
     // Randomly select up to 2 distinct resources
     const selectedResources = [];
     while (selectedResources.length < 2 && resourcePool.length > 0) {
@@ -74,10 +68,10 @@ export class Game {
       const selectedResource = resourcePool.splice(randomIndex, 1)[0];  // Remove to avoid duplicates
       selectedResources.push(selectedResource);
     }
-  
+
     return selectedResources;  // Return selected resources with their probabilities
   }
-  
+
   // Helper function to generate random number within a range
   randomInRange(min, max) {
     return Math.random() * (max - min) + min;
@@ -151,6 +145,15 @@ export class Game {
     }
   }
 
+  monsterDeath(monster, index){
+    const expGained = Math.floor(this.character.calculateXpBoostFromIntelligence() * this.character.depth * Math.floor(Math.random() * 6) + 10); // Random exp gained
+    this.character.experience += expGained;
+    const coinsGained = 1 + Math.floor(this.character.depth / 10);
+    this.character.resources['coins'] += coinsGained;
+    this.logMessage(`You defeated the ${monster.name}! and gained ${expGained} experience.`);
+    this.character.currentMonsters.splice(index, 1);  // Remove the monster from the array
+  }
+
   fightMonster(monster, index, elapsedTime, rounds) {
     monster.attackTimer += elapsedTime;
     const firstStrike = Math.random();
@@ -170,12 +173,7 @@ export class Game {
 
       // Check if the monster is dead
       if (monster.health <= 0) {
-        const expGained = Math.floor(this.character.calculateXpBoostFromIntelligence() * this.character.depth * Math.floor(Math.random() * 6) + 5); // Random exp gained
-        this.character.experience += expGained;
-        const coinsGained = 1 + Math.floor(this.character.depth / 10);
-        this.character.resources['coins'] += coinsGained;
-        this.logMessage(`You defeated the ${monster.name}! and gained ${expGained} experience.`);
-        this.character.currentMonsters.splice(index, 1);  // Remove the monster from the array
+        this.monsterDeath(monster, index);
       }
     } else {
       if (this.character.attackTimer > this.character.calculateAttackSpeed()) {
@@ -186,12 +184,7 @@ export class Game {
 
       // Check if the monster is dead
       if (monster.health <= 0) {
-        const expGained = Math.floor(this.character.calculateXpBoostFromIntelligence() * this.character.depth * Math.floor(Math.random() * 6) + 5); // Random exp gained
-        this.character.experience += expGained;
-        const coinsGained = 1 + Math.floor(this.character.depth / 10);
-        this.character.resources['coins'] += coinsGained;
-        this.logMessage(`You defeated the ${monster.name}! and gained ${expGained} experience.`);
-        this.character.currentMonsters.splice(index, 1);  // Remove the monster from the array
+        this.monsterDeath(monster, index);
       } else {
         if (monster.attackTimer > monster.attackInterval) {
           monster.attack(this.character);  // Monster attacks the character
@@ -209,7 +202,7 @@ export class Game {
   generateTreasures(depthConfig) {
 
     const treasuresFound = [];
-  
+
     depthConfig.resourceConfig.forEach(resourceConfig => {
       const roll = Math.random();
       if (roll <= resourceConfig.probability) {
@@ -218,7 +211,7 @@ export class Game {
         treasuresFound.push(`${quantity} ${resourceConfig.type}`);
       }
     });
-  
+
     if (treasuresFound.length > 0) {
       this.logMessage(`You found: ${treasuresFound.join(', ')}.`);
     }
@@ -248,14 +241,14 @@ export class Game {
     this.character.generateResources(elapsedTime);
 
     if (this.character.isExploring) {
-      
+
       const depthConfig = this.character.depthConfigs[this.character.depth];
       this.character.timeSurvivedAtLevel += elapsedTime;
 
       //Manage monsters
       const randomMonsterSpawn = Math.random();
 
-      if(depthConfig.spawnMonsters && randomMonsterSpawn < depthConfig.spawnMonsterChance) {
+      if (depthConfig.spawnMonsters && randomMonsterSpawn < depthConfig.spawnMonsterChance) {
         this.spawnMonster(this.character.depth);
       }
 
@@ -292,13 +285,15 @@ export class Game {
         const hazardChange = Math.random();
         if (hazardChange < 0.5) {
           this.encounterHazard();
-        } 
+        }
+        this.character.hazardTimer = this.character.hazardTimer - TIMERS.hazardInterval;
+      }
+
+      
         // Check if it's time to level up
         if (this.character.experience >= this.character.calculateXpNeededForLevel(this.character.level)) {
           this.character.levelUp();
         }
-        this.character.hazardTimer = this.character.hazardTimer - TIMERS.hazardInterval;
-      }
     }
   }
 
@@ -390,24 +385,25 @@ export class Game {
   applyHazardEffects() {
     const causeAnIssue = Math.random();
     const randomEffect = Math.random();
-  
+
     if (causeAnIssue < 0.1) {  // 10% chance to cause an issue
       if (randomEffect < 0.5) {
         // Randomly reduce wood if it exists in the resources
-        const lostWood = Math.floor(Math.random() * 10 + 7);
-        this.character.modifyResource('wood', lostWood);
+        if (this.character.resources['wood'] >= 0) {
+          const lostWood = Math.floor(Math.random() * 10 + 7);
+          this.character.modifyResource('wood', -lostWood);
           this.logMessage(`The disaster destroyed ${lostWood} wood!`);
-        
+        }
+
       } else {
         // Randomly reduce stone if it exists in the resources
-        const lostStone = Math.floor(Math.random() * 5 + 5);
-        this.character.modifyResource('stone', lostStone);
+        if (this.character.resources['stone'] >= 0) {
+          const lostStone = Math.floor(Math.random() * 5 + 5);
+          this.character.modifyResource('stone', -lostStone);
           this.logMessage(`The disaster destroyed ${lostStone} stone!`);
-          
+        }
       }
-  
-        this.saveToLocalStorage(this.character);
-      
+      this.saveToLocalStorage(this.character);
     }
   }
 

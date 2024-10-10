@@ -457,6 +457,7 @@ const App = () => {
       )}
 
     {debug && game && character && character.depthConfigs[character.lastDepthVisited] && (<p>Depth: {character.lastDepthVisited}. SpawnMonsters: {character.depthConfigs[character.lastDepthVisited].spawnMonsters}. Chance to spawn monsters: {character.depthConfigs[character.lastDepthVisited].spawnMonsterChance} NumberOfMonsterTypes: ${character.depthConfigs[character.lastDepthVisited].numberOfMonsterTypes}. CanTriggerHazards: {character.depthConfigs[character.lastDepthVisited].canTriggerHazards}. HazardSeverity: {character.depthConfigs[character.lastDepthVisited].hazardSeverity}. IsPoisonous: {character.depthConfigs[character.lastDepthVisited].isPoisonous}</p>)}
+    {debug && game && character && character.depthConfigs[character.lastDepthVisited] && (<p>Resource Config for Depth {character.depth}: {JSON.stringify(character.depthConfigs[character.lastDepthVisited].resourceConfig)}</p>)}
 
     {game && game.hazardActive && (
       <div className="hazard-progress-container">
