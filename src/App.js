@@ -524,9 +524,9 @@ const App = () => {
 
       {/* Log Section */}
       <section className="log-section" ref={logRef}>
-        {log.map((message, index) => (
-          <p key={index}>{message}</p>
-        ))}
+      {log.map((message, index) => (
+    <p key={index} dangerouslySetInnerHTML={{ __html: message }}></p>
+  ))}
       </section>
 
       {characterOverlayVisible && (

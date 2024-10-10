@@ -228,8 +228,7 @@ export class Game {
         } else {
           this.character.addItemToInventory(foundItem);
         }
-
-        this.logMessage(`You found a ${foundItem.name}!`);
+        this.logMessage(`<span class="item-found">You found a ${foundItem.name}!</span>`);
       }
     }
   }
@@ -434,10 +433,16 @@ export class Game {
     }
 
     const debuffChance = Math.random();
-    if (debuffChance < 0.04 * (1 - totalHazardReduction)) {
+    if (debuffChance < 0.02 * (1 - totalHazardReduction)) {
+
       const debuff = this.generateDebuffForHazard((1 - totalHazardReduction) * this.character.lastDepthVisited);
+      if (debug) {
+        this.logMessage(debuffChance);
+        this.logMessage(0.02 * (1 - totalHazardReduction));
+
+        this.logMessage(debuff.name);
+      }
       this.character.applyEffect(debuff);
-      this.logMessage('You have been poisoned!');
     }
   }
 

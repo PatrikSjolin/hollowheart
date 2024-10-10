@@ -896,3 +896,8 @@ button:disabled {
 .debuffs-section p {
   color: red;  /* Debuffs in red */
 }
+
+.item-found {
+  color: green;  /* Or any color you prefer for items found */
+  font-weight: bold;  /* Optional: make the text bold */
+}
