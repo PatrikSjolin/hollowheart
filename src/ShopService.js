@@ -26,7 +26,8 @@ export class ShopService {
   static conversionRates = {
     iron: 1,
     gold: 5,
-    diamonds: 10,
+    emerald: 10,
+    diamonds: 50,
   };
   
   static initializeShopStock = () => {
@@ -68,7 +69,36 @@ export class ShopService {
         description: 'Provides 7 extra armor points.',
         cost: { coins: 80 },
         bonus: { armor: 7 },
+      },
+      {
+        id: generateUniqueId(),
+        name: 'Stat Booster',
+        type: 'consumable',
+        stacks: false,
+        description: 'Randomly increases one of your stats by 10 for 5 minutes.',
+        cost: { coins: 100, iron: 20 },
+        effect: (character) => {
+          const stats = ['strength', 'dexterity', 'vitality', 'intelligence'];
+          const randomStat = stats[Math.floor(Math.random() * stats.length)];
+          // Check if there's already a "Stat Boost" buff and remove it
+          character.logMessage(character.hasBuff('Stat Boost'));
+          if (character.hasBuff('Stat Boost')) {
+              character.removeEffect('Stat Boost');  // Properly remove the existing buff
+              character.logMessage('Previous Stat Boost expired.');
+          }
+      
+          // Apply the new "Stat Boost" buff
+          character.applyEffect({
+              name: 'Stat Boost',
+              type: 'buff',
+              statAffected: randomStat,
+              amount: 10,
+              duration: 5 * 60 * 1000, // 5 minutes
+              overtime: false,
+          });
+          character.logMessage(`Your ${randomStat} increased by 10 for 5 minutes.`);
       }
+      },
     ];
 
     const savedShopStock = JSON.parse(localStorage.getItem('shopStock'));
@@ -78,6 +108,45 @@ export class ShopService {
     }
     return savedShopStock;
   };
+
+  static rehydrateShopItems(shopItems) {
+    return shopItems.map(item => {
+      // Check for consumables and reassign their effects
+      if (item.type === 'consumable') {
+        switch (item.name) {
+          case 'Health restore':
+            item.effect = (character) => character.useHealingPotion();
+            break;
+          case 'Stat Booster':
+            item.effect = (character) => {
+              const stats = ['strength', 'dexterity', 'vitality', 'intelligence'];
+              const randomStat = stats[Math.floor(Math.random() * stats.length)];
+              // Check if there's already a "Stat Boost" buff and remove it
+              character.logMessage(character.hasBuff('Stat Boost'));
+              if (character.hasBuff('Stat Boost')) {
+                  character.removeEffect('Stat Boost');  // Properly remove the existing buff
+                  character.logMessage('Previous Stat Boost expired.');
+              }
+          
+              // Apply the new "Stat Boost" buff
+              character.applyEffect({
+                  name: 'Stat Boost',
+                  type: 'buff',
+                  statAffected: randomStat,
+                  amount: 10,
+                  duration: 5 * 60 * 1000, // 5 minutes
+                  overtime: false,
+              });
+              character.logMessage(`Your ${randomStat} increased by 10 for 5 minutes.`);
+          }
+            break;
+          // Add other consumables as needed
+        }
+      }
+      return item;
+    });
+  }
+
 
   static addNewItemToShop(newItem, shopItems, setShopItems) {
     const updatedShopStock = [...shopItems, newItem];

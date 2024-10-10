@@ -346,27 +346,31 @@ this.debuffs = initialState.debuffs || [];
       this.saveToLocalStorage(this);
   }
 
+  hasBuff(buffName) {
+    return this.buffs.find(buff => buff.name === buffName);
+}
+
   // Method to apply a buff or debuff
   applyEffect(effect) {
     const existingEffect = this.buffs.find(buff => buff.name === effect.name) || this.debuffs.find(debuff => debuff.name === effect.name);
-  
+    
     if (!existingEffect) {
-      if (effect.type === 'buff') {
-        this.buffs.push(effect);
-        this.logMessage(`${effect.name} applied!`);
-        if (!effect.overTime) {
-        this.applyImmediateBuffEffect(effect);
+        if (effect.type === 'buff') {
+            this.buffs.push(effect);
+            this.logMessage(`${effect.name} applied!`);
+            if (!effect.overTime) {
+                this.applyImmediateEffect(effect);  // Apply immediate stat boost/reduction
+            }
+        } else if (effect.type === 'debuff') {
+            this.debuffs.push(effect);
+            this.logMessage(`You've been hit with ${effect.name}!`);
+            if (!effect.overTime) {
+                this.applyImmediateEffect(effect);  // Apply the debuff's effect immediately if applicable
+            }
         }
-      } else if (effect.type === 'debuff') {
-        this.debuffs.push(effect);
-        this.logMessage(`You've been hit with ${effect.name}!`);
-        if (!effect.overTime) {
-          this.applyImmediateEffect(effect);  // Apply the debuff's effect immediately if applicable
-        }
-      }
-      this.saveToLocalStorage(this);
+        this.saveToLocalStorage(this);  // Always save after applying an effect
     }
-  }
+}
 
   applyImmediateEffect(effect) {
     if (effect.statAffected && !effect.overTime) {
@@ -387,21 +391,19 @@ removeEffect(effectName) {
   const debuff = this.debuffs.find(d => d.name === effectName);
 
   if (buff && buff.statAffected && !buff.overTime) {
-    // Revert the buff's stat change
-    this[buff.statAffected] -= buff.amount;
-    this.logMessage(`${buff.name} has expired, reducing ${buff.statAffected}.`);
+      this[buff.statAffected] -= buff.amount;  // Revert the buff's stat change
+      this.logMessage(`${buff.name} has expired, reducing ${buff.statAffected}.`);
   }
 
   if (debuff && debuff.statAffected && !debuff.overTime) {
-    // Revert the debuff's stat change
-    this[debuff.statAffected] -= debuff.amount;
-    this.logMessage(`${debuff.name} has expired, restoring ${debuff.statAffected}.`);
+      this[debuff.statAffected] -= debuff.amount;  // Revert the debuff's stat change
+      this.logMessage(`${debuff.name} has expired, restoring ${debuff.statAffected}.`);
   }
 
   // Remove the effect from the list
   this.buffs = this.buffs.filter(buff => buff.name !== effectName);
   this.debuffs = this.debuffs.filter(debuff => debuff.name !== effectName);
-  this.saveToLocalStorage(this);
+  this.saveToLocalStorage(this);  // Save state after removal
 }
 
 // Process buffs and debuffs to modify character stats

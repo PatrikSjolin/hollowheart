@@ -5,7 +5,7 @@ import { ShopService } from './ShopService';
 
 const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language, shopItems, setShopItems }) => {
   const [activeTab, setActiveTab] = useState('conversion');  // State to manage active tab
-  const [convertAmount, setConvertAmount] = useState({ iron: 0, gold: 0, diamonds: 0, });
+  const [convertAmount, setConvertAmount] = useState({ iron: 0, gold: 0, emerald: 0, diamonds: 0, });
 
   const handleSliderChange = (resource, value) => {
     setConvertAmount(prevState => ({
@@ -17,7 +17,8 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
   useEffect(() => {
     const savedShopStock = JSON.parse(localStorage.getItem('shopStock'));
     if (savedShopStock) {
-      setShopItems(savedShopStock);  // Restore the shop items from localStorage
+      const rehydratedItems = ShopService.rehydrateShopItems(savedShopStock);
+      setShopItems(rehydratedItems);  // Restore the shop items from localStorage
     }
   }, []);
 
@@ -62,6 +63,11 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
         character.addItemToInventory(item);
       }
       character.resources['coins'] -= item.cost.coins;
+
+      if (item.cost.iron) {
+        character.resources['iron'] -= item.cost.iron;
+      }
+
       setCharacter(character);  // Update character state
 
       // If the item is not consumable or special, remove it from the shop stock
@@ -173,15 +179,9 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
                   </div>
                   <button
                     onClick={() => {
-                      if (character.resources['coins'] >= item.cost.coins) {
-                        // item.effect(character); // Consumable is used immediately
-                        character.useHealingPotion();
-                        character.logMessage(`${item.name} used.`);
-                        character.resources['coins'] -= item.cost.coins;
-                        setCharacter(character);
-                      }
+                      handleBuyItem(item, index)  // Use the dynamic handler
                     }}
-                    disabled={character.resources['coins'] < item.cost.coins || character.depth > 0}
+                    disabled={character.resources['coins'] < item.cost.coins || (character.resources['iron'] < item.cost.iron) || character.depth > 0}
                     className="shop-button"
                   >
                     {translations[language].buy}
@@ -205,12 +205,6 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
                   </div>
                   <button
                     onClick={() => {
-                      const resources = {
-                        wood: character.wood,
-                        stone: character.stone,
-                        iron: character.iron,
-                        coins: character.coins,
-                      };
                       if (building.canAfford(character.resources)) {
                         character.buyBuilding(building);
                         setCharacter(character);
