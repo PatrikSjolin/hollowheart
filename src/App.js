@@ -119,7 +119,6 @@ const App = () => {
     }
   }, [character?.depth]);  // Still track changes in depth
 
-
   useEffect(() => {
     const interval = setInterval(() => {
       if (character && character.ongoingResearch && character.getResearchProgress() > 0) {
@@ -146,7 +145,7 @@ const App = () => {
       const parsedCharacter = JSON.parse(savedCharacter);
       setFirstTimeOverlayVisible(false); // Hide intro if character exists
       
-      const newCharacter = new Character(saveToLocalStorage, logMessage, setGeneralMessage, setHighScores, parsedCharacter);
+      const newCharacter = new Character(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores, parsedCharacter);
       const newGame = new Game(newCharacter, logMessage, saveToLocalStorage);
       newCharacter.currentMonsters = newGame.rehydrateMonsters(newCharacter.currentMonsters);
       setGame(newGame);
@@ -158,7 +157,7 @@ const App = () => {
       if(debug) {
       logMessage('DEBUG: UseEffect savedCharacter is not set');
       }
-      const newCharacter = new Character(saveToLocalStorage, logMessage, setGeneralMessage, setHighScores); // Create new character if none exists
+      const newCharacter = new Character(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores); // Create new character if none exists
       setGame(new Game(newCharacter, logMessage, saveToLocalStorage));
       setCharacter(newCharacter);
     }
@@ -172,7 +171,7 @@ const App = () => {
         setResearchTimers(character.getResearchProgress()); // Update the research timers
         setCharacter(character); // Update character state
       } else if (character && character.ongoingResearch && character.getResearchProgress() === 0) {
-        character.completeResearch(); // Complete the research
+        character.completeResearch(shopItems, setShopItems); // Complete the research
         setCharacter(character);
         setResearchTimers(null); // Clear the timers after completion
       }
@@ -308,6 +307,21 @@ const App = () => {
     setCharacter(character);
     saveToLocalStorage(character);
   };
+
+  const generateDepthConfigs = () => {
+    let depthConfigs = [];
+    for (let depth = 1; depth <= 50; depth++) {
+      const depthConfig = game.generateDepthConfig(depth);  // Your existing method for depth generation
+      depthConfigs.push({ depth, config: depthConfig });
+    }
+
+    // Convert the depthConfigs array into a readable format
+    const depthConfigString = depthConfigs.map(config => `Depth ${config.depth}: ${JSON.stringify(config.config)}`).join('\n');
+
+    // Set the message to be displayed in the overlay
+    showGeneralMessage('Depth configs', depthConfigString);
+  };
+
 
   const increaseCharacterLevel = () => {
     character.levelUp();
@@ -471,6 +485,8 @@ const App = () => {
               setResearchOverlayVisible={setResearchOverlayVisible}
               researchTimers={researchTimers}
               language={language}
+              shopItems={shopItems}
+              setShopItems={setShopItems}
             />
           )}
 
@@ -489,6 +505,7 @@ const App = () => {
             </button>
           )}
           {debug && (<button onClick={generateRandomItem}>Generate Item (Debug)</button>)}
+          {debug && (<button onClick={generateDepthConfigs}>Generate Depth Configs (1-50)</button>)}
         </section>
       )}
 

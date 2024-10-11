@@ -206,7 +206,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible,
         {debug && (<p>Amor: {character.calculateArmor()}</p>)}
         {debug && (<p>Damage Reduction: {character.calculateDamageReductionFromArmor()} </p>)}
         {debug && (<p>Quantity gain: {character.calculateQuantityBoostFromIntelligence()}</p>)}
-        {debug && (<p>Xp gain: {character.calculateXpBoostFromIntelligence()} </p>)}
+        {debug && (<p>Xp gain: {character.calculateXpBoost()} </p>)}
         {debug && (<p>Attack: {character.calculateAttackSpeed()} </p>)}
         {debug && (<p>Damage: {character.calculateDamate()} </p>)}
         {debug && (<p>Village hazard protection: {game.calculateHazardProtection()} </p>)}

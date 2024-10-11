@@ -1,5 +1,6 @@
 import { debug } from './App';
 import { TIMERS, CHARACTER_CONFIG } from './GameConfig';
+import { Item } from './item';
 
 export class Character {
   constructor(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores, initialState = {}) {
@@ -81,16 +82,16 @@ this.debuffs = initialState.debuffs || [];
     return 1 + (this.intelligence / (this.intelligence + 100));
   }
 
-  calculateQuantityBoostFromIntelligence() {
-    return 1 + (this.dexterity / (this.dexterity + 100));
-  }
-
   calculateQuantityBoostFromDexterity() {
-    return 1 + (this.dexterity / (this.dexterity + 100));
+    return 1 + (this.dexterity / (this.dexterity + 50));
   }
 
   calculateXpBoostFromIntelligence() {
-    return 1 + (this.intelligence / (this.intelligence + 100));
+    return 1 + (this.intelligence / (this.intelligence + 50));
+  }
+
+  calculateXpBoost() {
+    return this.calculateXpBoostFromIntelligence() * this.expBoost;
   }
 
   calculateDamageReductionFromArmor() {
@@ -202,10 +203,7 @@ this.debuffs = initialState.debuffs || [];
     this.treasureTimer = 0;
     this.timeSurvivedAtLevel = 0;
     this.experience = this.calculateXpNeededForLevel(this.level - 1);
-
-    if (this.numberOfDeaths === 1) {
-      this.showGeneralMessage('You died', 'Or not really. You will slowly regen back, but all resources are lost. Giving up might be a good choice.');  // Show the death overlay only on the first death
-    }
+    this.showGeneralMessage('You died...', '...or not really. You will slowly regen back, but all resources are lost.\n Giving up might be a good choice.');
   }
 
   // Method for leveling up
@@ -264,8 +262,8 @@ this.debuffs = initialState.debuffs || [];
     this.logMessage(`Unlocked feature: ${feature}`);
   }
 
-  useHealingPotion() {
-    this.currentHealth = Math.min(this.health, this.currentHealth + 100);
+  useHealingPotion(healing) {
+    this.currentHealth = Math.min(this.calculateMaxHealth(), this.currentHealth + healing);
     this.logMessage('You used a health potion.');
     this.saveToLocalStorage(this);
   }
@@ -287,11 +285,13 @@ this.debuffs = initialState.debuffs || [];
     return null;
   }
 
-  completeResearch() {
+  completeResearch(shopItems, setShopItems) {
     if (this.ongoingResearch) {
       this.logMessage(`Research "${this.ongoingResearch.name}" completed!`);
       // Apply the effects of the completed research (increase life regen, exp boost, etc.)
-      this.ongoingResearch.effect();
+
+      const completedResearch = Item.getResearches(this, shopItems, setShopItems).find(research => research.name === this.ongoingResearch.name);
+      completedResearch.effect();
       this.completedResearch.push(this.ongoingResearch.name);
       this.ongoingResearch = null;
       this.researchEndTime = null;

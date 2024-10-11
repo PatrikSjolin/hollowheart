@@ -15,18 +15,19 @@ export class Game {
 
   // Randomly generate depth configuration
   generateDepthConfig(depth) {
-    const dangerLevel = Math.min(depth / 5, 1);  // Danger increases with depth
+    const dangerLevel = Math.min(0.2 + (depth / 20), 1);  // Danger increases with depth
 
     // Randomize whether this depth spawns monsters, hazards, etc.
-    const spawnMonsters = Math.random() < dangerLevel;  // Higher chance of monsters deeper
+    const spawnMonsters = Math.random() < dangerLevel * 0.9;  // Higher chance of monsters deeper
     const spawnMonsterChance = 0.02 + Math.random() * dangerLevel * 0.1;
     const numberOfMonsterTypes = spawnMonsters ? Math.floor(Math.random() * 3 + 1) : 0;
-    const monsterStrength = depth;  // Monsters get stronger as you go deeper
+    const monsterStrength = depth * Math.random();  // Monsters get stronger as you go deeper
 
-    const canTriggerHazards = Math.random() < dangerLevel * 0.5;  // Hazards more likely deeper
+    const canTriggerHazards = Math.random() < dangerLevel * 0.6;  // Hazards more likely deeper
     const hazardSeverity = depth * 0.2;  // Hazard impact increases with depth
 
     const isPoisonous = Math.random() < dangerLevel * 0.3;  // Poisonous depths more likely deeper
+    const hazardDamage = this.character.depth * 8; // Increased danger scaling
 
     const resourceConfig = this.generateResourceConfig(depth);
 
@@ -39,7 +40,21 @@ export class Game {
       hazardSeverity,
       isPoisonous,
       resourceConfig,
+      hazardDamage,
     };
+  }
+
+  spawnMonster(depth, depthConfig) {
+    const randomHealth = Math.floor(Math.random() * 60) + MONSTER_CONFIG.baseHealth * depthConfig.monsterStrength;  // Example: Random health between 50 and 150
+    const randomDamage = Math.floor(Math.random() * 8) + MONSTER_CONFIG.baseDamage * depthConfig.monsterStrength;  // Example: Random damage between 5 and 25
+    const randomAttackInterval = Math.floor(Math.random() * (MONSTER_CONFIG.monsterAttackIntervalRange[1] - MONSTER_CONFIG.monsterAttackIntervalRange[0])) + (MONSTER_CONFIG.monsterAttackIntervalRange[0] / depth);  // Attack every 2-5 seconds
+
+    const randomNumber = Math.floor(Math.random() * 100);
+
+    const monster = new Monster('Worm ' + randomNumber, randomHealth, randomDamage, randomAttackInterval);  // Example monster
+
+    this.logMessage(`A wild ${monster.name} has appeared with ${monster.health} HP!`);
+    this.character.currentMonsters.push(monster);  // Add the spawned monster to the array
   }
 
   // Generate random treasures based on depth
@@ -146,7 +161,7 @@ export class Game {
   }
 
   monsterDeath(monster, index) {
-    const expGained = Math.floor(this.character.calculateXpBoostFromIntelligence() * this.character.depth * Math.floor(Math.random() * 6) + 10); // Random exp gained
+    const expGained = Math.floor(this.character.calculateXpBoost() * this.character.depth * Math.floor(Math.random() * 6) + 10); // Random exp gained
     this.character.experience += expGained;
     const coinsGained = 1 + Math.floor(this.character.depth / 10);
     this.character.resources['coins'] += coinsGained;
@@ -224,7 +239,7 @@ export class Game {
       const foundItem = Item.generateItem(this.character.depth, this.character.level, this.character.intelligence);
       if (foundItem !== undefined) {
         if (foundItem.type === 'consumable') {
-          this.character.useHealingPotion();
+          this.character.useHealingPotion(100);
         } else {
           this.character.addItemToInventory(foundItem);
         }
@@ -249,7 +264,7 @@ export class Game {
       const randomMonsterSpawn = Math.random();
 
       if (depthConfig.spawnMonsters && randomMonsterSpawn < depthConfig.spawnMonsterChance) {
-        this.spawnMonster(this.character.depth);
+        this.spawnMonster(this.character.depth, depthConfig);
       }
 
       this.character.attackTimer += elapsedTime;
@@ -284,17 +299,16 @@ export class Game {
         // Check for hazards (enemies or environments)
         const hazardChange = Math.random();
         if (hazardChange < 0.5) {
-          this.encounterHazard();
+          this.encounterHazard(depthConfig);
         }
         this.character.hazardTimer = this.character.hazardTimer - TIMERS.hazardInterval;
       }
-
+    }
 
       // Check if it's time to level up
       if (this.character.experience >= this.character.calculateXpNeededForLevel(this.character.level)) {
         this.character.levelUp();
       }
-    }
   }
 
   manageDeath() {
@@ -302,26 +316,12 @@ export class Game {
     this.ascend(); // Ascend back to the surface upon death
   }
 
-  spawnMonster(depth) {
-    const randomHealth = Math.floor(Math.random() * 60) + MONSTER_CONFIG.baseHealth * depth;  // Example: Random health between 50 and 150
-    const randomDamage = Math.floor(Math.random() * 8) + MONSTER_CONFIG.baseDamage * depth;  // Example: Random damage between 5 and 25
-    const randomAttackInterval = Math.floor(Math.random() * (MONSTER_CONFIG.monsterAttackIntervalRange[1] - MONSTER_CONFIG.monsterAttackIntervalRange[0])) + (MONSTER_CONFIG.monsterAttackIntervalRange[0] / depth);  // Attack every 2-5 seconds
-
-    const randomNumber = Math.floor(Math.random() * 100);
-
-    const monster = new Monster('Worm ' + randomNumber, randomHealth, randomDamage, randomAttackInterval);  // Example monster
-
-    this.logMessage(`A wild ${monster.name} has appeared with ${monster.health} HP!`);
-    this.character.currentMonsters.push(monster);  // Add the spawned monster to the array
-  }
-
   // Method to simulate encountering a hazard
-  encounterHazard() {
+  encounterHazard(depthConfig) {
     const hazardChance = Math.random(); // Random chance to encounter a hazard
-    const dangerLevel = this.character.depth * 15; // Increased danger scaling
 
     if (hazardChance < 0.7) {
-      const damage = Math.floor(Math.random() * dangerLevel) + 6;
+      const damage = (Math.floor(Math.random() * depthConfig.hazardDamage) + 6) * depthConfig.hazardSeverity;
 
       const damageReduction = this.character.calculateDamageReductionFromArmor();
       const damageTaken = Math.floor(damage * (1 - damageReduction));
@@ -329,7 +329,7 @@ export class Game {
       this.character.currentHealth -= damageTaken;
       this.logMessage(`You encountered a hazard and took ${damageTaken} damage.`);
 
-      const expGained = Math.floor(this.character.calculateXpBoostFromIntelligence() * this.character.depth * Math.floor(Math.random() * 20) + 5); // Random exp gained
+      const expGained = Math.floor(this.character.calculateXpBoost() * this.character.depth * Math.floor(Math.random() * 20) + 5); // Random exp gained
       this.character.experience += expGained;
       this.logMessage(`You survived and gained ${expGained} experience.`);
 
@@ -439,7 +439,6 @@ export class Game {
       if (debug) {
         this.logMessage(debuffChance);
         this.logMessage(0.02 * (1 - totalHazardReduction));
-
         this.logMessage(debuff.name);
       }
       this.character.applyEffect(debuff);

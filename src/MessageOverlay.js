@@ -6,7 +6,7 @@ const MessageOverlay = ({ title, message, onClose, language }) => {
     <div className="overlay">
       <div className="overlay-content">
         <h2>{title}</h2>
-        <p>{message}</p>
+        <pre className="overlay-message">{message}</pre>
         <button onClick={onClose}>{translations[language].close}</button>
       </div>
     </div>

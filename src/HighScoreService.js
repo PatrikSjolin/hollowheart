@@ -1,7 +1,8 @@
+const url = 'https://hungry-cows-hunt.loca.lt';
+
 export const HighscoreService = {
-  
-  sendHighscore: (characterName, score) => {
-    const apiUrl = 'https://eleven-pugs-pay.loca.lt';
+    sendHighscore: (characterName, score) => {
+    const apiUrl = url;
     return fetch(apiUrl + '/submit', {
       method: 'POST',
       headers: {
@@ -14,7 +15,7 @@ export const HighscoreService = {
   },
   
   fetchHighscores: () => {
-    const apiUrl = 'https://eleven-pugs-pay.loca.lt';
+    const apiUrl = url;
     return fetch(apiUrl + '/highscores', {
       headers: {
         "bypass-tunnel-reminder": "69420",

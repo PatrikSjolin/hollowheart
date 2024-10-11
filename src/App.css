@@ -901,3 +901,11 @@ button:disabled {
   color: green;  /* Or any color you prefer for items found */
   font-weight: bold;  /* Optional: make the text bold */
 }
+
+.overlay-message {
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 1.0rem;
+  white-space: pre-wrap;  /* Ensure text wraps within the pre block */
+  word-wrap: break-word;  /* Handle long words */
+}

@@ -1,6 +1,172 @@
 import { generateUniqueId } from './Utilities'
+import { ShopService } from './ShopService';
+import { debug } from './App';
 
 export class Item {
+
+
+  static getResearches(character, shopItems, setShopItems) {
+    return [
+      {
+          name: 'Increased Life Regen',
+          description: 'Increase life regeneration rate from 1 every 20 seconds to 1 every 10 seconds.',
+          timeRequired: 30 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 30 minutes in milliseconds
+          unlockCondition: character.intelligence >= 20, // Example condition based on intelligence
+          effect: () => {
+              character.lifeRegenRate = 10; // Apply effect to character
+          },
+      },
+      {
+          name: 'Improved stat booster restore',
+          description: 'Random stat increased by 20 instead of 10 but costs gold instead of iron.',
+          timeRequired: 30 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 30 minutes in milliseconds
+          unlockCondition: character.intelligence >= 20, // Example condition based on intelligence
+          effect: () => {
+              // Add the upgraded stat booster to the shop
+              const improvedBooster = Item.dynamicItemTemplates.find(item => item.name === 'Improved Stat Booster');
+              ShopService.addNewItemToShop(improvedBooster, shopItems, setShopItems);
+          },
+      },
+      {
+          name: 'Improved library',
+          description: 'Research 20% faster',
+          timeRequired: 60 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 1 hour in milliseconds
+          unlockCondition: character.intelligence >= 100, // Example condition based on owning buildings
+          effect: () => {
+              character.researchBoost = 1.2; // Apply effect to character
+          },
+      },
+      {
+          name: 'Increased Experience Boost',
+          description: 'Increase experience gained by 50%.',
+          timeRequired: 120 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 1 hour in milliseconds
+          unlockCondition: character.intelligence >= 25, // Example condition based on owning buildings
+          effect: () => {
+              character.expBoost = 1.5; // Apply 15% boost to experience gained
+          },
+      },
+      {
+          name: 'Golden Life Regen',
+          description: 'Increase life regeneration rate from 1 every 20 seconds to 1 every 5 seconds.',
+          timeRequired: 60 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 1 hour in milliseconds
+          unlockCondition: character.intelligence >= 25 && character.isResearchCompleted('Increased Life Regen'), // Example condition based on owning buildings
+          effect: () => {
+              character.lifeRegenRate = 5; // Apply effect to character
+          },
+      },
+      {
+          name: 'Heavy Life Regen',
+          description: 'Increase life regeneration rate from 1 hitpoints per tick to 3.',
+          timeRequired: 60 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 1 hour in milliseconds
+          unlockCondition: character.intelligence >= 30 && character.isResearchCompleted('Increased Life Regen'), // Example condition based on owning buildings
+          effect: () => {
+              character.lifeRegen = 3; // Apply effect to character
+          },
+      },
+  ];
+  }
+  
+
+  static defaultItems = [
+    {
+      name: 'Health restore',
+      type: 'consumable',
+      stacks: false,
+      description: 'Restores 100 health points.',
+      cost: { coins: 10 },
+      effect: (character) => {
+        character.useHealingPotion(100); // Apply the healing effect
+      }
+    },
+    {
+      id: generateUniqueId(),  // Unique identifier for each item
+      name: `Rope`,
+      type: 'special',
+      stacks: true,
+      description: 'Used to climb up one depth.',
+      cost: { coins: 10 },
+    },
+    {
+      id: generateUniqueId(),  // Unique identifier for each item
+      name: 'Broken sword',
+      type: 'equipable',
+      stacks: false,
+      slot: 'weapon',
+      description: 'A "sword" that "increases" your attack power by 5.',
+      cost: { coins: 50 },
+      bonus: { attack: 5 },
+    },
+    {
+      id: generateUniqueId(),  // Unique identifier for each item
+      name: 'Disgusting vest',
+      type: 'equipable',
+      stacks: false,
+      slot: 'chest',
+      description: 'Provides 7 extra armor points.',
+      cost: { coins: 80 },
+      bonus: { armor: 7 },
+    },
+    {
+      id: generateUniqueId(),
+      name: 'Stat Booster',
+      type: 'consumable',
+      stacks: false,
+      description: 'Randomly increases one of your stats by 10 for 10 minutes.',
+      cost: { coins: 100, iron: 20 },
+      effect: (character) => {
+        const stats = ['strength', 'dexterity', 'vitality', 'intelligence'];
+        const randomStat = stats[Math.floor(Math.random() * stats.length)];
+        // Check if there's already a "Stat Boost" buff and remove it
+        character.logMessage(character.hasBuff('Stat Boost'));
+        if (character.hasBuff('Stat Boost')) {
+            character.removeEffect('Stat Boost');  // Properly remove the existing buff
+            character.logMessage('Previous Stat Boost expired.');
+        }
+    
+        // Apply the new "Stat Boost" buff
+        character.applyEffect({
+            name: 'Stat Boost',
+            type: 'buff',
+            statAffected: randomStat,
+            amount: 10,
+            duration: 10 * 60 * 1000, // 5 minutes
+            overtime: false,
+        });
+        character.logMessage(`Your ${randomStat} increased by 10 for 10 minutes.`);
+    }
+    },
+  ];
+
+  static dynamicItemTemplates = [
+    {
+      name: 'Improved Stat Booster',
+      type: 'consumable',
+      stacks: false,
+      cost: { coins: 300, gold: 20 },
+      description: 'Random stat increased by 20 for 10 minutes.',
+      effect: (character) => {
+        const stats = ['strength', 'dexterity', 'vitality', 'intelligence'];
+        const randomStat = stats[Math.floor(Math.random() * stats.length)];
+  
+        if (character.hasBuff('Imp Stat Boost')) {
+          character.removeEffect('Imp Stat Boost');
+          character.logMessage('Previous Stat Boost expired.');
+        }
+  
+        character.applyEffect({
+          name: 'Imp Stat Boost',
+          type: 'buff',
+          statAffected: randomStat,
+          amount: 20,
+          duration: 10 * 60 * 1000,
+          overTime: false,
+        });
+        character.logMessage(`Your ${randomStat} increased by 20 for 10 minutes.`);
+      }
+    },
+    // Add other dynamic items here
+  ];
+
 
   static prefixes = [
     "Dung-Induced", "Shitty", "Rusty", "Crusty", "Broken", "Dirty", "Grease-Soaked", 
