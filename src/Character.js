@@ -5,14 +5,15 @@ import { Item } from './item';
 export class Character {
   constructor(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores, initialState = {}) {
     this.playerName = initialState.playerName || 'Soldier';  // Fix here
+    this.created = initialState.created || Date.now();
     this.level = initialState.level || 1;
     this.strength = initialState.strength || 10;
     this.dexterity = initialState.dexterity || 10;
     this.vitality = initialState.vitality || 10;
     this.intelligence = initialState.intelligence || 10;
     this.currentHealth = initialState.currentHealth || 100;
-this.buffs = initialState.buffs || [];
-this.debuffs = initialState.debuffs || [];
+    this.buffs = initialState.buffs || [];
+    this.debuffs = initialState.debuffs || [];
     this.resources = initialState.resources || { coins: 0 };
     this.recordDepth = initialState.recordDepth || 0;
     this.coins = initialState.coins || 0;
@@ -63,7 +64,7 @@ this.debuffs = initialState.debuffs || [];
 
     let baseDamage = this.strength * 0.5;
     if (this.equipment.weapon) {
-      baseDamage += this.equipment.weapon.bonus.attack; 
+      baseDamage += this.equipment.weapon.bonus.attack;
     }
 
     return Math.floor(baseDamage * (Math.random() + 1));
@@ -193,7 +194,7 @@ this.debuffs = initialState.debuffs || [];
   // Method for the character to die and reset
   die() {
     this.logMessage("You have died and lost all resources gathered during the journey. Now you need to rest.");
-    
+
     Object.keys(this.resources).forEach(resourceKey => {
       this.resources[resourceKey] = 0;
     });
@@ -242,13 +243,13 @@ this.debuffs = initialState.debuffs || [];
       for (const [resource, amount] of Object.entries(building.cost)) {
         this.resources[resource] = Math.max(0, (this.resources[resource] || 0) - amount);
       }
-  
+
       // Add the building to the character's list of buildings
       this.buildings.push(building);
-  
+
       // Apply the building's effect
       building.applyEffect(this);
-  
+
       // Log the purchase and save the updated character state
       this.logMessage(`You have built a ${building.name}!`);
       this.saveToLocalStorage();
@@ -305,7 +306,7 @@ this.debuffs = initialState.debuffs || [];
 
   generateResources(elapsedTime) {
     this.woodTimer += elapsedTime;
-  
+
     if (this.woodTimer > TIMERS.woodGenerationInterval) {
       // Find all wood-generating buildings
       const woodGenerators = this.buildings.filter(building => building.name === 'Lumber Mill');
@@ -322,18 +323,18 @@ this.debuffs = initialState.debuffs || [];
       }
       this.woodTimer -= TIMERS.woodGenerationInterval * rounds;
     }
-  
+
     this.stoneTimer += elapsedTime;
-  
+
     if (this.stoneTimer > TIMERS.stoneGenerationInterval) {
       const stoneGenerators = this.buildings.filter(building => building.name === 'Stone Quarry');
       let generatedStone = 0;
       stoneGenerators.forEach(building => {
         generatedStone++;
       });
-  
+
       const rounds = Math.floor(this.stoneTimer / TIMERS.stoneGenerationInterval);
-  
+
       if (generatedStone > 0) {
         this.resources['stone'] = Math.min(this.maxStone, (this.resources['stone'] || 0) + (generatedStone * rounds));
         if (debug) {
@@ -343,39 +344,39 @@ this.debuffs = initialState.debuffs || [];
       this.stoneTimer -= TIMERS.stoneGenerationInterval * rounds;
     }
 
-      this.saveToLocalStorage(this);
+    this.saveToLocalStorage(this);
   }
 
   hasBuff(buffName) {
     return this.buffs.find(buff => buff.name === buffName);
-}
+  }
 
   // Method to apply a buff or debuff
   applyEffect(effect) {
     const existingEffect = this.buffs.find(buff => buff.name === effect.name) || this.debuffs.find(debuff => debuff.name === effect.name);
-    
+
     if (!existingEffect) {
-        if (effect.type === 'buff') {
-            this.buffs.push(effect);
-            this.logMessage(`${effect.name} applied!`);
-            if (!effect.overTime) {
-                this.applyImmediateEffect(effect);  // Apply immediate stat boost/reduction
-            }
-        } else if (effect.type === 'debuff') {
-            this.debuffs.push(effect);
-            this.logMessage(`You've been hit with ${effect.name}!`);
-            if (!effect.overTime) {
-                this.applyImmediateEffect(effect);  // Apply the debuff's effect immediately if applicable
-            }
+      if (effect.type === 'buff') {
+        this.buffs.push(effect);
+        this.logMessage(`${effect.name} applied!`);
+        if (!effect.overTime) {
+          this.applyImmediateEffect(effect);  // Apply immediate stat boost/reduction
         }
-        this.saveToLocalStorage(this);  // Always save after applying an effect
+      } else if (effect.type === 'debuff') {
+        this.debuffs.push(effect);
+        this.logMessage(`You've been hit with ${effect.name}!`);
+        if (!effect.overTime) {
+          this.applyImmediateEffect(effect);  // Apply the debuff's effect immediately if applicable
+        }
+      }
+      this.saveToLocalStorage(this);  // Always save after applying an effect
     }
-}
+  }
 
   applyImmediateEffect(effect) {
     if (effect.statAffected && !effect.overTime) {
       // Apply static effect immediately (e.g., reducing armor, increasing strength)
-      this[effect.statAffected] += effect.amount;  // Increase or decrease stat immediately
+      this[effect.statAffected] = Math.max(0, this[effect.statAffected] + effect.amount);  // Increase or decrease stat immediately
       if (effect.amount > 0) {
         this.logMessage(`${effect.statAffected} increased by ${effect.amount}.`);
       } else {
@@ -383,68 +384,68 @@ this.debuffs = initialState.debuffs || [];
       }
     }
   }
-  
 
-// Remove expired effects
-removeEffect(effectName) {
-  const buff = this.buffs.find(b => b.name === effectName);
-  const debuff = this.debuffs.find(d => d.name === effectName);
-
-  if (buff && buff.statAffected && !buff.overTime) {
-      this[buff.statAffected] -= buff.amount;  // Revert the buff's stat change
-      this.logMessage(`${buff.name} has expired, reducing ${buff.statAffected}.`);
-  }
-
-  if (debuff && debuff.statAffected && !debuff.overTime) {
-      this[debuff.statAffected] -= debuff.amount;  // Revert the debuff's stat change
-      this.logMessage(`${debuff.name} has expired, restoring ${debuff.statAffected}.`);
-  }
-
-  // Remove the effect from the list
-  this.buffs = this.buffs.filter(buff => buff.name !== effectName);
-  this.debuffs = this.debuffs.filter(debuff => debuff.name !== effectName);
-  this.saveToLocalStorage(this);  // Save state after removal
-}
-
-// Process buffs and debuffs to modify character stats
-processEffects(elapsedTime) {
-  const effectsToRemove = [];
-
-  // Process buffs
-  this.buffs.forEach(buff => {
-    buff.duration -= elapsedTime;
-    if (buff.duration <= 0) {
-      effectsToRemove.push(buff);
-    }
-  });
-
-  // Process debuffs
-  this.debuffs.forEach(debuff => {
-    debuff.duration -= elapsedTime;
-    if (debuff.overTime && debuff.interval) {
-      debuff.interval -= elapsedTime;
-      if (debuff.interval <= 0) {
-        this.applyOverTimeEffect(debuff);
-        debuff.interval = 5000; // Reset the interval
-      }
-    }
-    if (debuff.duration <= 0) {
-      effectsToRemove.push(debuff);
-    }
-  });
 
   // Remove expired effects
-  effectsToRemove.forEach(effect => this.removeEffect(effect.name));
-}
+  removeEffect(effectName) {
+    const buff = this.buffs.find(b => b.name === effectName);
+    const debuff = this.debuffs.find(d => d.name === effectName);
 
-// Apply an over-time effect like poison
-applyOverTimeEffect(effect) {
-  if (effect.statAffected === 'health') {
-    this.currentHealth = Math.max(0, this.currentHealth + effect.amount); // Reduces health over time
-    this.logMessage(`${effect.name} deals ${-effect.amount} damage.`);
-    this.saveToLocalStorage();
+    if (buff && buff.statAffected && !buff.overTime) {
+      this[buff.statAffected] -= buff.amount;  // Revert the buff's stat change
+      this.logMessage(`${buff.name} has expired, reducing ${buff.statAffected}.`);
+    }
+
+    if (debuff && debuff.statAffected && !debuff.overTime) {
+      this[debuff.statAffected] -= debuff.amount;  // Revert the debuff's stat change
+      this.logMessage(`${debuff.name} has expired, restoring ${debuff.statAffected}.`);
+    }
+
+    // Remove the effect from the list
+    this.buffs = this.buffs.filter(buff => buff.name !== effectName);
+    this.debuffs = this.debuffs.filter(debuff => debuff.name !== effectName);
+    this.saveToLocalStorage(this);  // Save state after removal
   }
-}
+
+  // Process buffs and debuffs to modify character stats
+  processEffects(elapsedTime) {
+    const effectsToRemove = [];
+
+    // Process buffs
+    this.buffs.forEach(buff => {
+      buff.duration -= elapsedTime;
+      if (buff.duration <= 0) {
+        effectsToRemove.push(buff);
+      }
+    });
+
+    // Process debuffs
+    this.debuffs.forEach(debuff => {
+      debuff.duration -= elapsedTime;
+      if (debuff.overTime && debuff.interval) {
+        debuff.interval -= elapsedTime;
+        if (debuff.interval <= 0) {
+          this.applyOverTimeEffect(debuff);
+          debuff.interval = 5000; // Reset the interval
+        }
+      }
+      if (debuff.duration <= 0) {
+        effectsToRemove.push(debuff);
+      }
+    });
+
+    // Remove expired effects
+    effectsToRemove.forEach(effect => this.removeEffect(effect.name));
+  }
+
+  // Apply an over-time effect like poison
+  applyOverTimeEffect(effect) {
+    if (effect.statAffected === 'health') {
+      this.currentHealth = Math.max(0, this.currentHealth + effect.amount); // Reduces health over time
+      this.logMessage(`${effect.name} deals ${-effect.amount} damage.`);
+      this.saveToLocalStorage();
+    }
+  }
 
   addDebugResources() {
     const debugResources = {
@@ -456,13 +457,13 @@ applyOverTimeEffect(effect) {
       diamonds: 5,
       coins: 1000
     };
-  
+
     // Add each resource to the character's resources object
     Object.keys(debugResources).forEach(resource => {
       this.resources[resource] = (this.resources[resource] || 0) + debugResources[resource];
       this.logMessage(`Added ${debugResources[resource]} ${resource}.`);
     });
-  
+
     this.saveToLocalStorage();
   }
 }

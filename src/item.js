@@ -8,64 +8,74 @@ export class Item {
   static getResearches(character, shopItems, setShopItems) {
     return [
       {
-          name: 'Increased Life Regen',
-          description: 'Increase life regeneration rate from 1 every 20 seconds to 1 every 10 seconds.',
-          timeRequired: 30 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 30 minutes in milliseconds
-          unlockCondition: character.intelligence >= 20, // Example condition based on intelligence
-          effect: () => {
-              character.lifeRegenRate = 10; // Apply effect to character
-          },
+        name: 'Increased Life Regen',
+        description: 'Increase life regeneration rate from 1 every 20 seconds to 1 every 10 seconds.',
+        timeRequired: 30 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 30 minutes in milliseconds
+        unlockCondition: character.intelligence >= 20, // Example condition based on intelligence
+        effect: () => {
+          character.lifeRegenRate = 10; // Apply effect to character
+        },
       },
       {
-          name: 'Improved stat booster restore',
-          description: 'Random stat increased by 20 instead of 10 but costs gold instead of iron.',
-          timeRequired: 30 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 30 minutes in milliseconds
-          unlockCondition: character.intelligence >= 20, // Example condition based on intelligence
-          effect: () => {
-              // Add the upgraded stat booster to the shop
-              const improvedBooster = Item.dynamicItemTemplates.find(item => item.name === 'Improved Stat Booster');
-              ShopService.addNewItemToShop(improvedBooster, shopItems, setShopItems);
-          },
+        name: 'Improved stat booster restore',
+        description: 'Random stat increased by 20 instead of 10 but costs gold instead of iron.',
+        timeRequired: 30 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 30 minutes in milliseconds
+        unlockCondition: character.intelligence >= 20, // Example condition based on intelligence
+        effect: () => {
+          // Add the upgraded stat booster to the shop
+          const improvedBooster = Item.dynamicItemTemplates.find(item => item.name === 'Improved Stat Booster');
+          ShopService.addNewItemToShop(improvedBooster, shopItems, setShopItems);
+        },
       },
       {
-          name: 'Improved library',
-          description: 'Research 20% faster',
-          timeRequired: 60 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 1 hour in milliseconds
-          unlockCondition: character.intelligence >= 100, // Example condition based on owning buildings
-          effect: () => {
-              character.researchBoost = 1.2; // Apply effect to character
-          },
+        name: 'A day of work',
+        description: 'Receive unallocated stat points equal to your current dexterity.',
+        timeRequired: 24 * 60 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 30 minutes in milliseconds
+        unlockCondition: character.intelligence >= 20, // Example condition based on intelligence
+        effect: () => {
+          // Add the upgraded stat booster to the shop
+          character.unallocatedPoints = character.unallocatedPoints + character.dexterity;
+        },
       },
       {
-          name: 'Increased Experience Boost',
-          description: 'Increase experience gained by 50%.',
-          timeRequired: 120 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 1 hour in milliseconds
-          unlockCondition: character.intelligence >= 25, // Example condition based on owning buildings
-          effect: () => {
-              character.expBoost = 1.5; // Apply 15% boost to experience gained
-          },
+        name: 'Improved library',
+        description: 'Research 20% faster',
+        timeRequired: 60 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 1 hour in milliseconds
+        unlockCondition: character.intelligence >= 100, // Example condition based on owning buildings
+        effect: () => {
+          character.researchBoost = 1.2; // Apply effect to character
+        },
       },
       {
-          name: 'Golden Life Regen',
-          description: 'Increase life regeneration rate from 1 every 20 seconds to 1 every 5 seconds.',
-          timeRequired: 60 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 1 hour in milliseconds
-          unlockCondition: character.intelligence >= 25 && character.isResearchCompleted('Increased Life Regen'), // Example condition based on owning buildings
-          effect: () => {
-              character.lifeRegenRate = 5; // Apply effect to character
-          },
+        name: 'Increased Experience Boost',
+        description: 'Increase experience gained by 50%.',
+        timeRequired: 120 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 1 hour in milliseconds
+        unlockCondition: character.intelligence >= 25, // Example condition based on owning buildings
+        effect: () => {
+          character.expBoost = 1.5; // Apply 15% boost to experience gained
+        },
       },
       {
-          name: 'Heavy Life Regen',
-          description: 'Increase life regeneration rate from 1 hitpoints per tick to 3.',
-          timeRequired: 60 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 1 hour in milliseconds
-          unlockCondition: character.intelligence >= 30 && character.isResearchCompleted('Increased Life Regen'), // Example condition based on owning buildings
-          effect: () => {
-              character.lifeRegen = 3; // Apply effect to character
-          },
+        name: 'Golden Life Regen',
+        description: 'Increase life regeneration rate from 1 every 20 seconds to 1 every 5 seconds.',
+        timeRequired: 60 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 1 hour in milliseconds
+        unlockCondition: character.intelligence >= 25 && character.isResearchCompleted('Increased Life Regen'), // Example condition based on owning buildings
+        effect: () => {
+          character.lifeRegenRate = 5; // Apply effect to character
+        },
       },
-  ];
+      {
+        name: 'Heavy Life Regen',
+        description: 'Increase life regeneration rate from 1 hitpoints per tick to 3.',
+        timeRequired: 60 * 60 * 1000 * (debug ? 1 / 60 : 1) * character.researchBoost, // 1 hour in milliseconds
+        unlockCondition: character.intelligence >= 30 && character.isResearchCompleted('Increased Life Regen'), // Example condition based on owning buildings
+        effect: () => {
+          character.lifeRegen = 3; // Apply effect to character
+        },
+      },
+    ];
   }
-  
+
 
   static defaultItems = [
     {
@@ -119,21 +129,21 @@ export class Item {
         // Check if there's already a "Stat Boost" buff and remove it
         character.logMessage(character.hasBuff('Stat Boost'));
         if (character.hasBuff('Stat Boost')) {
-            character.removeEffect('Stat Boost');  // Properly remove the existing buff
-            character.logMessage('Previous Stat Boost expired.');
+          character.removeEffect('Stat Boost');  // Properly remove the existing buff
+          character.logMessage('Previous Stat Boost expired.');
         }
-    
+
         // Apply the new "Stat Boost" buff
         character.applyEffect({
-            name: 'Stat Boost',
-            type: 'buff',
-            statAffected: randomStat,
-            amount: 10,
-            duration: 10 * 60 * 1000, // 5 minutes
-            overtime: false,
+          name: 'Stat Boost',
+          type: 'buff',
+          statAffected: randomStat,
+          amount: 10,
+          duration: 10 * 60 * 1000, // 5 minutes
+          overtime: false,
         });
         character.logMessage(`Your ${randomStat} increased by 10 for 10 minutes.`);
-    }
+      }
     },
   ];
 
@@ -147,12 +157,12 @@ export class Item {
       effect: (character) => {
         const stats = ['strength', 'dexterity', 'vitality', 'intelligence'];
         const randomStat = stats[Math.floor(Math.random() * stats.length)];
-  
+
         if (character.hasBuff('Imp Stat Boost')) {
           character.removeEffect('Imp Stat Boost');
           character.logMessage('Previous Stat Boost expired.');
         }
-  
+
         character.applyEffect({
           name: 'Imp Stat Boost',
           type: 'buff',
@@ -169,22 +179,22 @@ export class Item {
 
 
   static prefixes = [
-    "Dung-Induced", "Shitty", "Rusty", "Crusty", "Broken", "Dirty", "Grease-Soaked", 
-    "Moldy", "Unfortunate", "Cursed", "Grimy", "Vomit-Stained", "Half-Eaten", 
-    "Filthy", "Soggy", "Inferior", "Pathetic", "Misguided", "Muck-Infused", 
-    "Foul-Smelling", "Disastrous", "Unwashed", "Shameful", "Disgusting", "Stinky", 
+    "Dung-Induced", "Shitty", "Rusty", "Crusty", "Broken", "Dirty", "Grease-Soaked",
+    "Moldy", "Unfortunate", "Cursed", "Grimy", "Vomit-Stained", "Half-Eaten",
+    "Filthy", "Soggy", "Inferior", "Pathetic", "Misguided", "Muck-Infused",
+    "Foul-Smelling", "Disastrous", "Unwashed", "Shameful", "Disgusting", "Stinky",
     "Muddy", "Rotten", "Junky", "Crappy", "Badly-Made", "Cheap"
   ];
-  
+
   static suffixes = [
-    "of Crap", "of Garbage", "of Misfortune", "of Despair", "of Worthlessness", 
-    "of Regret", "of Uselessness", "of the Dumpster", "of Failure", "of Disgust", 
-    "of the Sewer", "of Embarrassment", "of Defeat", "of the Trash Heap", "of Waste", 
-    "of the Pit", "of Ruin", "of Humiliation", "of the Underworld", "of Neglect", 
-    "of Confusion", "of the Forgotten", "of the Abyss", "of Banishment", "of the Unlucky", 
+    "of Crap", "of Garbage", "of Misfortune", "of Despair", "of Worthlessness",
+    "of Regret", "of Uselessness", "of the Dumpster", "of Failure", "of Disgust",
+    "of the Sewer", "of Embarrassment", "of Defeat", "of the Trash Heap", "of Waste",
+    "of the Pit", "of Ruin", "of Humiliation", "of the Underworld", "of Neglect",
+    "of Confusion", "of the Forgotten", "of the Abyss", "of Banishment", "of the Unlucky",
     "of Doom", "of the Lost Cause", "of Desperation", "of Disrepair"
   ];
-  
+
   static generateRandomItemName(baseName) {
     const prefix = this.prefixes[Math.floor(Math.random() * this.prefixes.length)];
     const suffix = this.suffixes[Math.floor(Math.random() * this.suffixes.length)];
@@ -192,7 +202,7 @@ export class Item {
   }
 
   static generateArmor(depth, level, intelligence) {
-    const intelligenceFactor = 1 - ((intelligence) / (intelligence + 100));
+    const intelligenceFactor = 1 + ((intelligence) / (intelligence + 100));
     const armorBonus = Math.floor(Math.random() * 10 * intelligenceFactor * (depth + 1) / depth);
     let finalSlot = '';
 
@@ -221,9 +231,9 @@ export class Item {
   }
 
   static generateWeapon(depth, level, intelligence) {
-    
+
     const name = this.generateRandomItemName('sword');
-    const intelligenceFactor = 1 - ((intelligence) / (intelligence + 100));
+    const intelligenceFactor = 1 + ((intelligence) / (intelligence + 100));
     const dmgBonus = Math.floor(Math.random() * 10 * intelligenceFactor * (depth + 1) / depth);
     return {
       id: generateUniqueId(),  // Unique identifier for each item

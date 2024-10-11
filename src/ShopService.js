@@ -22,9 +22,7 @@ export class ShopService {
     
     // Save the updated state
     character.saveToLocalStorage();
-  }
-
-  
+  }  
 
   static conversionRates = {
     iron: 1,

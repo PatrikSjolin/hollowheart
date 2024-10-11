@@ -116,6 +116,12 @@ const App = () => {
           ShopService.addNewItemToShop(newItem, shopItems, setShopItems);  // Call the function passed from App.js
         }
       }
+
+      if (character.depth !== undefined) {
+        console.log(character.depth);
+        const colors = getStarColors(character.depth);
+        setStarColors(colors);  // Update the star colors when the depth changes
+      }
     }
   }, [character?.depth]);  // Still track changes in depth
 
@@ -128,14 +134,6 @@ const App = () => {
 
     return () => clearInterval(interval);
   }, [character, setCharacter]);
-
-  useEffect(() => {
-    if (character && character.depth !== undefined) {
-      console.log(character.depth);
-      const colors = getStarColors(character.depth);
-      setStarColors(colors);  // Update the star colors when the depth changes
-    }
-  }, [character?.depth]);  // Track changes in character
 
   // Load character state from localStorage when the app first loads
   useEffect(() => {
@@ -441,7 +439,6 @@ const App = () => {
             ></div>
           </div>
         </div>
-
       )}
 
       {/* Action Buttons */}
@@ -519,7 +516,7 @@ const App = () => {
           <div
             className="hazard-progress-bar"
             style={{
-              width: `${((game.hazardEndTime - Date.now()) / (game.hazardEndTime - (game.hazardEndTime - 60000))) * 100}%`
+              width: `${((game.remainingHazard) / game.hazardDuration) * 100}%`
             }}
           ></div>
         </div>

@@ -11,6 +11,8 @@ export class Game {
     this.hazardActive = false;  // Track whether a hazard is currently active
     this.hazardEndTime = null;
     this.hazardTimer = 0;
+    this.hazardDuration = 0;
+    this.remainingHazard = 0;
   }
 
   // Randomly generate depth configuration
@@ -24,7 +26,7 @@ export class Game {
     const monsterStrength = depth * Math.random();  // Monsters get stronger as you go deeper
 
     const canTriggerHazards = Math.random() < dangerLevel * 0.6;  // Hazards more likely deeper
-    const hazardSeverity = depth * 0.2;  // Hazard impact increases with depth
+    const hazardSeverity = 0.1 + depth * 0.2;  // Hazard impact increases with depth
 
     const isPoisonous = Math.random() < dangerLevel * 0.3;  // Poisonous depths more likely deeper
     const hazardDamage = this.character.depth * 8; // Increased danger scaling
@@ -45,7 +47,7 @@ export class Game {
   }
 
   spawnMonster(depth, depthConfig) {
-    const randomHealth = Math.floor(Math.random() * 60) + MONSTER_CONFIG.baseHealth * depthConfig.monsterStrength;  // Example: Random health between 50 and 150
+    const randomHealth = Math.floor(Math.random() * 60 + MONSTER_CONFIG.baseHealth * depthConfig.monsterStrength);  // Example: Random health between 50 and 150
     const randomDamage = Math.floor(Math.random() * 8) + MONSTER_CONFIG.baseDamage * depthConfig.monsterStrength;  // Example: Random damage between 5 and 25
     const randomAttackInterval = Math.floor(Math.random() * (MONSTER_CONFIG.monsterAttackIntervalRange[1] - MONSTER_CONFIG.monsterAttackIntervalRange[0])) + (MONSTER_CONFIG.monsterAttackIntervalRange[0] / depth);  // Attack every 2-5 seconds
 
@@ -53,7 +55,7 @@ export class Game {
 
     const monster = new Monster('Worm ' + randomNumber, randomHealth, randomDamage, randomAttackInterval);  // Example monster
 
-    this.logMessage(`A wild ${monster.name} has appeared with ${monster.health} HP!`);
+    this.logMessage(`A wild ${monster.name} has appeared with ${monster.health} health!`);
     this.character.currentMonsters.push(monster);  // Add the spawned monster to the array
   }
 
@@ -321,7 +323,7 @@ export class Game {
     const hazardChance = Math.random(); // Random chance to encounter a hazard
 
     if (hazardChance < 0.7) {
-      const damage = (Math.floor(Math.random() * depthConfig.hazardDamage) + 6) * depthConfig.hazardSeverity;
+      const damage = (Math.floor(Math.random() * depthConfig.hazardDamage) + 8) * depthConfig.hazardSeverity;
 
       const damageReduction = this.character.calculateDamageReductionFromArmor();
       const damageTaken = Math.floor(damage * (1 - damageReduction));
@@ -346,6 +348,7 @@ export class Game {
     if (this.hazardActive) {
       const now = Date.now();
       const remainingTime = this.hazardEndTime - now;
+      this.remainingHazard = remainingTime;
 
       if (remainingTime > 0) {
         // Apply random hazard effects while the hazard is active
@@ -369,6 +372,7 @@ export class Game {
   startHazard() {
     const hazardDuration = Math.floor(Math.random() * 30000) + 30000;  // Hazards last between 30-60 seconds
     this.hazardEndTime = Date.now() + hazardDuration;
+    this.hazardDuration = hazardDuration;
     this.hazardActive = true;
     this.logMessage('A disaster is happening in the village!');
   }
