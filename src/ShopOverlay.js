@@ -5,7 +5,7 @@ import { ShopService } from './ShopService';
 
 const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language, shopItems, setShopItems }) => {
   const [activeTab, setActiveTab] = useState('conversion');  // State to manage active tab
-  const [convertAmount, setConvertAmount] = useState({ iron: 0, gold: 0, emerald: 0, diamonds: 0, });
+  const [convertAmount, setConvertAmount] = useState({ iron: 0, gold: 0, emeralds: 0, diamonds: 0, });
 
   const handleSliderChange = (resource, value) => {
     setConvertAmount(prevState => ({
@@ -140,7 +140,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
         <div className="tab-content">
           {activeTab === 'conversion' && (
             <div className="conversion-section">
-                {['iron', 'gold', 'emerald', 'diamonds'].filter(resource => character.resources[resource] >= 0).map(resource => (
+                {['iron', 'gold', 'emeralds', 'diamonds'].filter(resource => character.resources[resource] >= 0).map(resource => (
     <div key={resource} className="conversion-row">
       <p>{translations[language][resource]}: {character.resources[resource]}</p>
       <p>{translations[language].convertTo} {convertAmount[resource] * ShopService.conversionRates[resource]} {translations[language].coins}</p>

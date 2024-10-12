@@ -39,6 +39,7 @@ export class Character {
     this.depthConfigs = initialState.depthConfigs || {};  // Store depth configurations for consistency
     this.currentMonsters = initialState.currentMonsters || [];  // Initialize as an empty array to hold multiple monsters
     this.inventory = initialState.inventory || [];  // Add an inventory to store items
+    this.nextBossDepth = initialState.nextBossDepth || 3 + Math.floor(Math.random() * 5);  // Initialize next boss depth
     this.equipment = initialState.equipment || {
       weapon: null,
       chest: null,
@@ -265,7 +266,6 @@ export class Character {
 
   useHealingPotion(healing) {
     this.currentHealth = Math.min(this.calculateMaxHealth(), this.currentHealth + healing);
-    this.logMessage('You used a health potion.');
     this.saveToLocalStorage(this);
   }
 

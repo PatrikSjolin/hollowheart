@@ -201,9 +201,9 @@ export class Item {
     return `${prefix} ${baseName} ${suffix}`;
   }
 
-  static generateArmor(depth, level, intelligence) {
-    const intelligenceFactor = 1 + ((intelligence) / (intelligence + 100));
-    const armorBonus = Math.floor(Math.random() * 10 * intelligenceFactor * (depth + 1) / depth);
+  static generateArmor(depth, level, quality) {
+
+    const armorBonus = Math.floor(Math.random() * 10 * quality * (depth + 1) / depth);
     let finalSlot = '';
 
     const slotRoll = Math.floor(Math.random() * 3);
@@ -230,11 +230,10 @@ export class Item {
     };
   }
 
-  static generateWeapon(depth, level, intelligence) {
+  static generateWeapon(depth, level, quality) {
 
     const name = this.generateRandomItemName('sword');
-    const intelligenceFactor = 1 + ((intelligence) / (intelligence + 100));
-    const dmgBonus = Math.floor(Math.random() * 10 * intelligenceFactor * (depth + 1) / depth);
+    const dmgBonus = Math.floor(Math.random() * 10 * quality * (depth + 1) / depth);
     return {
       id: generateUniqueId(),  // Unique identifier for each item
       name: name,
@@ -247,19 +246,19 @@ export class Item {
     };
   }
 
-  static generateEquipableItem(depth, level, intelligence) {
+  static generateEquipableItem(depth, level, quality) {
     console.log('generate equipable item');
     const typeOfSlot = Math.floor(Math.random() * 2);
     console.log('slot ' + typeOfSlot);
     if (typeOfSlot === 0) {
-      return this.generateWeapon(depth, level, intelligence);
+      return this.generateWeapon(depth, level, quality);
     }
     else if (typeOfSlot === 1) {
-      return this.generateArmor(depth, level, intelligence);
+      return this.generateArmor(depth, level, quality);
     }
   }
 
-  static generateSpecial(depth, level, intelligence) {
+  static generateSpecial(depth, level, quality) {
     return {
       id: generateUniqueId(),  // Unique identifier for each item
       name: `Rope`,
@@ -270,7 +269,7 @@ export class Item {
     };
   }
 
-  static generateConsumable(depth, level, intelligence) {
+  static generateConsumable(depth, level, quality) {
     return {
       id: generateUniqueId(),  // Unique identifier for each item
       name: 'Health restore',
@@ -284,18 +283,18 @@ export class Item {
     }
   }
 
-  static generateItem(depth, level, intelligence) {
+  static generateItem(depth, level, quality) {
 
     const typeOfItem = Math.floor(Math.random() * 3);
 
     if (typeOfItem === 0) {
-      return this.generateEquipableItem(depth, level, intelligence);
+      return this.generateEquipableItem(depth, level, quality);
     }
     else if (typeOfItem === 1) {
-      return this.generateSpecial(depth, level, intelligence);
+      return this.generateSpecial(depth, level, quality);
     }
     else if (typeOfItem === 2) {
-      return this.generateConsumable(depth, level, intelligence);
+      return this.generateConsumable(depth, level, quality);
     }
   }
 }

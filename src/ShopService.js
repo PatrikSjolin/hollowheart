@@ -27,7 +27,7 @@ export class ShopService {
   static conversionRates = {
     iron: 1,
     gold: 5,
-    emerald: 10,
+    emeralds: 10,
     diamonds: 50,
   };
   

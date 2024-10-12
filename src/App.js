@@ -14,7 +14,7 @@ import './App.css'; // Use existing styles from your CSS
 
 export const debug = process.env.REACT_APP_DEBUG === 'true';
 
-const gameVersion = '0.0.4';
+const gameVersion = '0.0.5';
 
 const App = () => {
 

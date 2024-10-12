@@ -902,6 +902,11 @@ button:disabled {
   font-weight: bold;  /* Optional: make the text bold */
 }
 
+.boss-defeated {
+  color: rgb(195, 219, 20);  /* Or any color you prefer for items found */
+  font-weight: bold;  /* Optional: make the text bold */
+}
+
 .overlay-message {
   padding: 10px;
   border-radius: 5px;
