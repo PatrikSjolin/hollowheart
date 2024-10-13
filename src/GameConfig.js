@@ -23,6 +23,6 @@ export const RESEARCH_CONFIG = {
 
 export const CHARACTER_CONFIG = {
   baseXp: 200,
-  xpNeededPerLevelIncrease: 1.4,
+  xpNeededPerLevelIncrease: 1.3,
   baseAttackSpeed: 3000 * gameSpeed,
 };

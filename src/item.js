@@ -15,6 +15,7 @@ export class Item {
         effect: () => {
           character.lifeRegenRate = 10; // Apply effect to character
         },
+        cost: { coins: 500, iron: 100, gold: 100 },
       },
       {
         name: 'Improved stat booster restore',
@@ -26,6 +27,7 @@ export class Item {
           const improvedBooster = Item.dynamicItemTemplates.find(item => item.name === 'Improved Stat Booster');
           ShopService.addNewItemToShop(improvedBooster, shopItems, setShopItems);
         },
+        cost: { coins: 5000, iron: 100, gold: 1000 },
       },
       {
         name: 'A day of work',
@@ -36,6 +38,7 @@ export class Item {
           // Add the upgraded stat booster to the shop
           character.unallocatedPoints = character.unallocatedPoints + character.dexterity;
         },
+        cost: { coins: 100000, iron: 10000, gold: 1000 },
       },
       {
         name: 'Improved library',
@@ -45,6 +48,7 @@ export class Item {
         effect: () => {
           character.researchBoost = 1.2; // Apply effect to character
         },
+        cost: { coins: 100000, iron: 10000, gold: 1000 },
       },
       {
         name: 'Increased Experience Boost',
@@ -54,6 +58,7 @@ export class Item {
         effect: () => {
           character.expBoost = 1.5; // Apply 15% boost to experience gained
         },
+        cost: { coins: 10000, emeralds: 1000 },
       },
       {
         name: 'Golden Life Regen',
@@ -63,6 +68,7 @@ export class Item {
         effect: () => {
           character.lifeRegenRate = 5; // Apply effect to character
         },
+        cost: { coins: 100000, iron: 10000, gold: 10000 },
       },
       {
         name: 'Heavy Life Regen',
@@ -72,6 +78,7 @@ export class Item {
         effect: () => {
           character.lifeRegen = 3; // Apply effect to character
         },
+        cost: { coins: 100000, iron: 10000, gold: 1000 },
       },
     ];
   }

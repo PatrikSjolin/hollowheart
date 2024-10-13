@@ -1,7 +1,7 @@
 import { TIMERS, MONSTER_CONFIG } from './GameConfig';
 import { Item } from './item'
 import { Monster } from './Monster'
-import { debug } from './App';
+import { debug, gameVersion } from './App';
 
 export class Game {
   constructor(character, logMessage, saveToLocalStorage) {
@@ -13,6 +13,7 @@ export class Game {
     this.hazardTimer = 0;
     this.hazardDuration = 0;
     this.remainingHazard = 0;
+    this.specialEventTimer = null;
   }
 
   calculateNextBossDepth() {
@@ -42,6 +43,11 @@ export class Game {
     const hazardDamage = this.character.depth * 8; // Increased danger scaling
 
     const resourceConfig = this.generateResourceConfig(depth);
+    const specialEventTrigger = Math.random() < 0.3 && (depth >= this.character.lastSpecialEvent + 3);
+
+    if(specialEventTrigger){
+      this.character.lastSpecialEvent = depth;
+    }
 
     return {
       spawnMonsters,
@@ -53,7 +59,53 @@ export class Game {
       isPoisonous,
       resourceConfig,
       hazardDamage,
+      specialEventTrigger,
     };
+  }
+
+  handleSpecialEvent(depthConfig, elapsedTime) {
+    // Initialize the event timer if it hasn't started
+    if (!this.specialEventTimer) {
+      this.specialEventTimer = 6000;  // 10 seconds countdown
+      this.logMessage(`<span class="warning-message">A mysterious force is building... You have 6 seconds to ascend! Survive it?</span>`);
+    }
+
+    // Decrease the timer
+    this.specialEventTimer -= elapsedTime;
+
+    // If the player stays for the entire time, apply the damage
+    if (this.specialEventTimer <= 0) {
+      const damage = 100 + this.character.depth * 30;  // 70% of current health or max 100
+      this.character.currentHealth = Math.max(0, this.character.currentHealth - damage);
+      this.logMessage(`You took ${damage} damage!`);
+
+      // If the player survives, reward them with something interesting
+      if (this.character.currentHealth > 0) {
+        this.logMessage('You survived the force! Something mysterious happens...');
+        this.triggerSpecialReward();  // Define what happens if the player survives
+        this.specialEventTrigger = false;
+        depthConfig.specialEventTrigger = false;
+      } else {
+        this.manageDeath();
+      }
+
+      // Reset the event
+      this.specialEventTimer = null;
+    }
+  }
+
+  triggerSpecialReward() {
+    // Example reward: gain a special item or bonus
+    const rewardItem = Item.generateEquipableItem(this.character.depth, this.character.level, this.character.calculateQualityBoostFromIntelligence() * 2);
+    this.character.addItemToInventory(rewardItem);
+    this.logMessage(`<span class="boss-defeated">You found a mysterious ${rewardItem.name} as a reward for surviving the force!</span>`);
+
+    const stats = ['strength', 'dexterity', 'vitality', 'intelligence'];
+    const randomStat = stats[Math.floor(Math.random() * stats.length)];
+    
+    // Apply a permanent boost of 5 points to the random stat
+    this.character[randomStat] += 5;
+    this.logMessage(`<span class="boss-defeated">Your ${randomStat} has been permanently increased by 5 points!</span>`);
   }
 
   spawnMonster(depth, depthConfig) {
@@ -110,6 +162,7 @@ export class Game {
       this.character.lastDepthVisited = this.character.depth;  // Store the current depth before ascending
       this.logMessage(`You ascend back to the surface.`);
       this.character.depth = 0;  // Reset depth to 0
+      this.specialEventTimer = null;
       this.saveToLocalStorage(this.character);  // Trigger React state update
     }
   }
@@ -137,7 +190,7 @@ export class Game {
   }
 
   // Method to start exploring (descend)
-  descend() {    
+  descend() {
     if (this.character.currentHealth > 0) {
       this.character.currentMonsters = this.rehydrateMonsters(this.character.currentMonsters);
       if (debug) {
@@ -153,16 +206,22 @@ export class Game {
         this.logMessage(`You descend to depth ${this.character.depth}`);
       }
       else if (this.character.timeSurvivedAtLevel > TIMERS.timeNeededToCompleteLevel && this.character.depth < this.character.nextBossDepth) {
+        this.specialEventTimer = null;
         this.character.depth += 1; // Otherwise, go down by 1 depth
         this.checkForBossSpawn();  // Check if a boss should spawn at the current depth
         this.character.timeSurvivedAtLevel = 0;
         this.logMessage(`You descend to depth ${this.character.depth}`);
       }
-      else if(this.character.depth === this.character.nextBossDepth) {
+      else if (this.character.depth === this.character.nextBossDepth) {
         this.logMessage('You must defeat the boss before descending.');
       }
       else {
         this.logMessage('Not ready to descend');
+      }
+
+      if(this.character.gameVersion !== gameVersion) {
+        this.character.gameVersion = gameVersion;
+        this.character.depthConfigs = [];
       }
 
       if (!this.character.depthConfigs[this.character.depth]) {
@@ -200,7 +259,7 @@ export class Game {
       // Set a new boss depth after the boss is defeated
       this.character.nextBossDepth = this.character.depth + 3 + Math.floor(Math.random() * 5);
     } else {
-      const expGained = Math.floor(this.character.calculateXpBoost() * this.character.depth * Math.sqrt(this.character.depth) * Math.floor(Math.random() * 4) + 10); // Random exp gained
+      const expGained = Math.floor(this.character.calculateXpBoost() * this.character.depth * Math.sqrt(this.character.depth) * Math.floor(Math.random() * 4) + 20); // Random exp gained
       this.character.experience += expGained;
       const coinsGained = 1 + Math.floor(this.character.depth / 10);
       this.character.resources['coins'] += coinsGained;
@@ -256,7 +315,6 @@ export class Game {
   generateTreasures(depthConfig) {
 
     const treasuresFound = [];
-
     depthConfig.resourceConfig.forEach(resourceConfig => {
       const roll = Math.random();
       if (roll <= resourceConfig.probability) {
@@ -299,55 +357,63 @@ export class Game {
       const depthConfig = this.character.depthConfigs[this.character.depth];
       this.character.timeSurvivedAtLevel += elapsedTime;
 
-      //Manage monsters
-      const randomMonsterSpawn = Math.random();
 
-      if (depthConfig.spawnMonsters && randomMonsterSpawn < depthConfig.spawnMonsterChance) {
-        this.spawnMonster(this.character.depth, depthConfig);
-      }
+      if (!depthConfig.specialEventTrigger) {
 
-      this.character.attackTimer += elapsedTime;
-      const rounds = Math.round(this.character.attackTimer / this.character.calculateAttackSpeed());
-      this.character.currentMonsters.forEach((monster, index) => {
-        this.fightMonster(monster, index, elapsedTime, rounds);
-      });
-      if (this.character.attackTimer > this.character.calculateAttackSpeed()) {
-        this.character.attackTimer = this.character.attackTimer - rounds * this.character.calculateAttackSpeed();
-      }
 
-      //Manage treasures
-      this.character.treasureTimer += elapsedTime;
-      if (this.character.treasureTimer > TIMERS.treasureInterval) {
-        this.generateTreasures(depthConfig);
-        this.character.treasureTimer = this.character.treasureTimer - TIMERS.treasureInterval;
-      }
+        //Manage monsters
+        const randomMonsterSpawn = Math.random();
 
-      if (depthConfig.isPoisonous) {
-        this.character.poisonDamageTimer += elapsedTime;
-        if (this.character.poisonDamageTimer > TIMERS.poisonDamageInterval) {
-          const poisonDamage = Math.floor(this.character.depth * 0.5);  // Damage increases with depth
-          this.character.currentHealth -= poisonDamage;
-          this.logMessage(`You are poisoned! Lost ${poisonDamage} HP.`);
-          this.character.poisonDamageTimer = 0;  // Reset timer
+        if (depthConfig.spawnMonsters && randomMonsterSpawn < depthConfig.spawnMonsterChance) {
+          this.spawnMonster(this.character.depth, depthConfig);
+        }
+
+        this.character.attackTimer += elapsedTime;
+        const rounds = Math.round(this.character.attackTimer / this.character.calculateAttackSpeed());
+        this.character.currentMonsters.forEach((monster, index) => {
+          this.fightMonster(monster, index, elapsedTime, rounds);
+        });
+        if (this.character.attackTimer > this.character.calculateAttackSpeed()) {
+          this.character.attackTimer = this.character.attackTimer - rounds * this.character.calculateAttackSpeed();
+        }
+
+        //Manage treasures
+        this.character.treasureTimer += elapsedTime;
+        if (this.character.treasureTimer > TIMERS.treasureInterval) {
+          this.generateTreasures(depthConfig);
+          this.character.treasureTimer = this.character.treasureTimer - TIMERS.treasureInterval;
+        }
+
+        if (depthConfig.isPoisonous) {
+          this.character.poisonDamageTimer += elapsedTime;
+          if (this.character.poisonDamageTimer > TIMERS.poisonDamageInterval) {
+            const poisonDamage = Math.floor(this.character.depth * 0.5);  // Damage increases with depth
+            this.character.currentHealth -= poisonDamage;
+            this.logMessage(`You are poisoned! Lost ${poisonDamage} HP.`);
+            this.character.poisonDamageTimer = 0;  // Reset timer
+          }
+        }
+
+        //Deal with new problems
+        this.character.hazardTimer += elapsedTime;
+        if (depthConfig.canTriggerHazards && this.character.hazardTimer > TIMERS.hazardInterval) {
+          // Check for hazards (enemies or environments)
+          const hazardChange = Math.random();
+          if (hazardChange < 0.5) {
+            this.encounterHazard(depthConfig);
+          }
+          this.character.hazardTimer = this.character.hazardTimer - TIMERS.hazardInterval;
         }
       }
-
-      //Deal with new problems
-      this.character.hazardTimer += elapsedTime;
-      if (depthConfig.canTriggerHazards && this.character.hazardTimer > TIMERS.hazardInterval) {
-        // Check for hazards (enemies or environments)
-        const hazardChange = Math.random();
-        if (hazardChange < 0.5) {
-          this.encounterHazard(depthConfig);
-        }
-        this.character.hazardTimer = this.character.hazardTimer - TIMERS.hazardInterval;
+      else {
+        this.handleSpecialEvent(depthConfig, elapsedTime);
       }
     }
 
-      // Check if it's time to level up
-      if (this.character.experience >= this.character.calculateXpNeededForLevel(this.character.level)) {
-        this.character.levelUp();
-      }
+    // Check if it's time to level up
+    if (this.character.experience >= this.character.calculateXpNeededForLevel(this.character.level)) {
+      this.character.levelUp();
+    }
   }
 
   manageDeath() {
@@ -395,10 +461,10 @@ export class Game {
       }
     } else {
       // Start a new hazard at random intervals
-      const hazardInterval = TIMERS.villageHazardMinCooldown;  // Hazards occur every 2 minutes
-      this.hazardTimer += elapsedTime;
-
-      if (this.hazardTimer >= hazardInterval) {
+      if(this.character.lastDepthVisited > 5) {
+        this.hazardTimer += elapsedTime;
+      }
+      if (this.hazardTimer >= TIMERS.villageHazardMinCooldown) {
         this.startHazard();
         this.hazardTimer = 0;
       }

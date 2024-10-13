@@ -1,4 +1,4 @@
-import { debug } from './App';
+import { debug, gameVersion } from './App';
 import { TIMERS, CHARACTER_CONFIG } from './GameConfig';
 import { Item } from './item';
 
@@ -36,10 +36,12 @@ export class Character {
     this.maxStone = initialState.maxStone || 100;  // Initial maximum amount of stone
     this.numberOfDeaths = initialState.numberOfDeaths || 0;
     this.libraryBuilt = initialState.libraryBuilt || false;
+    this.lastSpecialEvent = initialState.lastSpecialEvent || 0;
     this.depthConfigs = initialState.depthConfigs || {};  // Store depth configurations for consistency
     this.currentMonsters = initialState.currentMonsters || [];  // Initialize as an empty array to hold multiple monsters
     this.inventory = initialState.inventory || [];  // Add an inventory to store items
     this.nextBossDepth = initialState.nextBossDepth || 3 + Math.floor(Math.random() * 5);  // Initialize next boss depth
+    this.gameVersion = initialState.gameVersion || gameVersion;
     this.equipment = initialState.equipment || {
       weapon: null,
       chest: null,
@@ -122,7 +124,7 @@ export class Character {
     if (level === 1)
       return CHARACTER_CONFIG.baseXp;
 
-    return Math.floor(CHARACTER_CONFIG.baseXp + CHARACTER_CONFIG.baseXp * Math.pow(CHARACTER_CONFIG.xpNeededPerLevelIncrease, level - 1));
+    return Math.floor(CHARACTER_CONFIG.baseXp * Math.pow(CHARACTER_CONFIG.xpNeededPerLevelIncrease, level - 1) + this.calculateXpNeededForLevel(level - 1));
   }
 
   modifyResource(resourceName, quantity) {
@@ -271,6 +273,11 @@ export class Character {
 
   startResearch(research, duration) {
     const now = new Date().getTime();
+
+    Object.entries(research.cost).forEach(([resource, amount]) => {
+      this.resources[resource] -= amount;
+    });
+
     this.ongoingResearch = { ...research };
     this.researchEndTime = now + duration; // Store the end time of the research
     this.saveToLocalStorage(this);

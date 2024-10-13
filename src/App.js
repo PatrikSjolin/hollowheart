@@ -14,7 +14,7 @@ import './App.css'; // Use existing styles from your CSS
 
 export const debug = process.env.REACT_APP_DEBUG === 'true';
 
-const gameVersion = '0.0.5';
+export const gameVersion = '0.0.7';
 
 const App = () => {
 
@@ -327,6 +327,17 @@ const App = () => {
     saveToLocalStorage(character);
   };
 
+  const showXpRequirements = () => {
+    const xpList = [];
+    for (let level = 1; level <= 50; level++) {
+      const xpNeeded = character.calculateXpNeededForLevel(level);
+      xpList.push(`Level ${level}: ${xpNeeded} XP`);
+    }
+    
+    const xpMessage = xpList.join('\n');  // Join the array of XP strings with new lines
+    showGeneralMessage('XP Requirements for Levels 1-50', xpMessage);  // Use generalMessage to show the result
+  };
+
   return (
 
     <div className="container">
@@ -469,7 +480,7 @@ const App = () => {
           <button className={`character-stats-button ${character.isLevelingUp ? 'glow' : ''}`} onClick={() => setCharacterOverlayVisible(true)}>
             {translations[language].character}
           </button>
-          <button onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>Shop</button>
+          <button onClick={() => setShopOverlayVisible(!shopOverlayVisible)}>{translations[language].village}</button>
 
           {character.libraryBuilt && (
             <button onClick={() => setResearchOverlayVisible(true)}>Research</button>
@@ -503,6 +514,10 @@ const App = () => {
           )}
           {debug && (<button onClick={generateRandomItem}>Generate Item (Debug)</button>)}
           {debug && (<button onClick={generateDepthConfigs}>Generate Depth Configs (1-50)</button>)}
+          {debug && (
+  <button onClick={showXpRequirements}>Show XP Requirements (1-50)</button>
+)}
+
         </section>
       )}
 

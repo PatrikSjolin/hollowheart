@@ -39,6 +39,7 @@ const translations = {
     buy: 'Buy',
     trade: 'Trade',
     sellItems: 'Sell items',
+    village: 'Village'
   },
   sv: {
     title: 'Hollowheart',
@@ -80,6 +81,7 @@ const translations = {
     buy: 'Köp',
     trade: 'Byt',
     sellItems: 'Sälj föremål',
+    village: 'By'
   },
 };
 

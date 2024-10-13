@@ -8,7 +8,7 @@ const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible, r
 
     // Research options
     const researches = Item.getResearches(character, shopItems, setShopItems);
-    
+
     const availableResearches = researches.filter(research =>
         !character.isResearchCompleted(research.name) // Filter out completed research
     );
@@ -47,6 +47,12 @@ const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible, r
         };
     }, []);
 
+    const hasEnoughResources = (cost) => {
+        return Object.entries(cost).every(([resource, amount]) => {
+          return character.resources[resource] >= amount;
+        });
+      };
+
     return (
         <div className="overlay">
             <div className="overlay-content">
@@ -60,9 +66,10 @@ const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible, r
                         <p><strong>{research.name}</strong></p>
                         <p>{research.description}</p>
                         <p>Time required: {research.timeRequired / 60000} minutes</p>
+                        <p>Cost: {Object.entries(research.cost).map(([resource, amount]) => `${amount} ${resource}`).join(', ')}</p>
                         <button
                             onClick={() => startResearch(research)}
-                            disabled={researchTimers || !research.unlockCondition}
+                            disabled={researchTimers || !research.unlockCondition || !hasEnoughResources(research.cost)}
                         >
                             {researchTimers ? `Research in progress (${Math.floor(researchTimers / 60000)} min left)` : 'Start Research'}
                         </button>
