@@ -40,7 +40,7 @@ export class Character {
     this.depthConfigs = initialState.depthConfigs || {};  // Store depth configurations for consistency
     this.currentMonsters = initialState.currentMonsters || [];  // Initialize as an empty array to hold multiple monsters
     this.inventory = initialState.inventory || [];  // Add an inventory to store items
-    this.nextBossDepth = initialState.nextBossDepth || 3 + Math.floor(Math.random() * 5);  // Initialize next boss depth
+    this.nextBossDepth = initialState.nextBossDepth || 4 + Math.floor(Math.random() * 5);  // Initialize next boss depth
     this.gameVersion = initialState.gameVersion || gameVersion;
     this.poisonDamageTimer = initialState.poisonDamageTimer || 0;
     this.equipment = initialState.equipment || {
@@ -132,9 +132,14 @@ export class Character {
     if (!this.resources[resourceName] && quantity > 0) {
       this.resources[resourceName] = 0;  // Initialize the resource if not already present
     }
-    this.resources[resourceName] += quantity;  // Add or subtract resources
-    this.resources[resourceName] = Math.max(0, this.resources[resourceName]);  // Ensure it doesn't go below 0
-    this.saveToLocalStorage();
+    if(this.resources[resourceName]) {
+      if(this.resources[resourceName] === NaN) {
+        this.resources[resourceName] = 0;  // Initialize the resource if not already present
+      }
+      this.resources[resourceName] += quantity;  // Add or subtract resources
+      this.resources[resourceName] = Math.max(0, this.resources[resourceName]);  // Ensure it doesn't go below 0
+      this.saveToLocalStorage();
+    }
   }
 
   // Regenerate health based on lifeRegen stat

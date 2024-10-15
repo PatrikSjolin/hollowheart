@@ -19,7 +19,7 @@ export class Game {
   }
 
   calculateNextBossDepth() {
-    return this.character.depth + 3 + Math.floor(Math.random() * 5); // Random depth between 3 and 10
+    return this.character.depth + 4 + Math.floor(Math.random() * 5); // Random depth between 3 and 10
   }
 
   spawnBoss() {
@@ -33,7 +33,7 @@ export class Game {
     const dangerLevel = Math.min(0.2 + (depth / 20), 1);  // Danger increases with depth
 
     // Randomize whether this depth spawns monsters, hazards, etc.
-    const spawnMonsters = Math.random() < dangerLevel * 0.9;  // Higher chance of monsters deeper
+    const spawnMonsters = Math.random() < dangerLevel;  // Higher chance of monsters deeper
     const spawnMonsterChance = 0.02 + Math.random() * dangerLevel * 0.1;
     const numberOfMonsterTypes = spawnMonsters ? Math.floor(Math.random() * 3 + 1) : 0;
     const monsterStrength = depth * Math.random();  // Monsters get stronger as you go deeper
@@ -41,7 +41,7 @@ export class Game {
     const canTriggerHazards = Math.random() < dangerLevel * 0.6;  // Hazards more likely deeper
     const hazardSeverity = 0.1 + depth * 0.2;  // Hazard impact increases with depth
 
-    const isPoisonous = Math.random() < dangerLevel * 0.3;  // Poisonous depths more likely deeper
+    const isPoisonous = Math.random() < dangerLevel * 0.25;  // Poisonous depths more likely deeper
     const hazardDamage = this.character.depth * 8; // Increased danger scaling
 
     const resourceConfig = this.generateResourceConfig(depth);
@@ -105,14 +105,14 @@ export class Game {
     // Example reward: gain a special item or bonus
     const rewardItem = Item.generateEquipableItem(this.character.depth, this.character.level, this.character.calculateQualityBoostFromIntelligence() * 2);
     this.character.addItemToInventory(rewardItem);
-    this.logMessage(`You found a mysterious ${rewardItem.name} as a reward for surviving the force!`, 'item-found');
+    this.logMessage(`You found a mysterious ${rewardItem.name} as a reward for surviving the force!`, 'item');
 
     const stats = ['strength', 'dexterity', 'vitality', 'intelligence'];
     const randomStat = stats[Math.floor(Math.random() * stats.length)];
     
     // Apply a permanent boost of 5 points to the random stat
     this.character[randomStat] += 5;
-    this.logMessage(`Your ${randomStat} has been permanently increased by 5 points!`, 'item-found');
+    this.logMessage(`Your ${randomStat} has been permanently increased by 5 points!`, 'item');
   }
 
   spawnMonster(depth, depthConfig) {
@@ -210,12 +210,21 @@ export class Game {
       }
       else if (this.character.depth === 0) {
         this.character.depth = 1; // Otherwise, go down by 1 depth
+        if (!this.character.depthConfigs[this.character.depth]) {
+          this.character.depthConfigs[this.character.depth] = this.generateDepthConfig(this.character.depth);
+        }
         this.logMessage(`You descend to depth ${this.character.depth}`);
       }
       else if (this.character.timeSurvivedAtLevel > TIMERS.timeNeededToCompleteLevel && this.character.depth < this.character.nextBossDepth) {
         this.specialEventTimer = null;
         this.character.depth += 1; // Otherwise, go down by 1 depth
         this.character.timeSurvivedAtLevel = 0;
+        if (!this.character.depthConfigs[this.character.depth]) {
+          this.character.depthConfigs[this.character.depth] = this.generateDepthConfig(this.character.depth);
+        }
+        if(this.character.depthConfigs[this.character.depth].boss && this.character.depth === this.character.nextBossDepth) {
+          this.spawnBoss();
+        }
         this.logMessage(`You descend to depth ${this.character.depth}`);
       }
       else if (this.character.depth === this.character.nextBossDepth) {
@@ -225,18 +234,6 @@ export class Game {
         this.logMessage('Not ready to descend');
       }
 
-      if(this.character.gameVersion !== gameVersion) {
-        this.character.gameVersion = gameVersion;
-        this.character.depthConfigs = [];
-      }
-
-      if (!this.character.depthConfigs[this.character.depth]) {
-        this.character.depthConfigs[this.character.depth] = this.generateDepthConfig(this.character.depth);
-        
-        if(this.character.depthConfigs[this.character.depth].boss) {
-          this.spawnBoss();
-      }
-      }
       this.character.lastDepthVisited = this.character.depth;
       this.character.isExploring = true;
     }
@@ -252,10 +249,11 @@ export class Game {
       this.character.experience += expGained;
       this.character.currentMonsters.splice(index, 1);  // Remove the monster from the array
 
-      this.logMessage(`<span class="boss-defeated">You have defeated the boss! You can now descend further.</span>`);
+      this.logMessage(`You have defeated the boss! You can now descend further`, 'achievement');
       this.logMessage(`You gained ${expGained} experience.`);
 
       const foundItem = Item.generateEquipableItem(this.character.depth, this.character.level, this.character.calculateQualityBoostFromIntelligence() * 1.75 * this.character.depth);
+      this.logMessage(`The boss dropped you ${foundItem.name}`, 'item');
 
       this.character.addItemToInventory(foundItem);
 
@@ -332,7 +330,7 @@ export class Game {
     }
 
     //Find items
-    const itemFindChance = 0.04 + this.character.calculateQuantityBoostFromDexterity() * this.character.depth * 0.04;
+    const itemFindChance = 0.03 + this.character.calculateQuantityBoostFromDexterity() * this.character.depth * 0.04;
     const randomChance = Math.random();
 
     if (randomChance < itemFindChance) {

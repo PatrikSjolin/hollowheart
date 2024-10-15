@@ -82,7 +82,7 @@ export const buildings = [
   new Building(
     'Alchemy center',
     { wood: 300, coins: 300, iron: 50 },
-    'feature',
+    'crafting',
     { unlocks: 'alchemy' },  // Unlocks research for upgrades
     'Unlocks more consumables.',
     function (character) { return character.buildings.some(building => building.name === 'Library') && character.intelligence >= 20; }
@@ -90,7 +90,7 @@ export const buildings = [
   new Building(
     'Blacksmith',
     { wood: 500, coins: 300, iron: 50 },
-    'feature',
+    'crafting',
     { unlocks: 'alchemy' },  // Unlocks research for upgrades
     'Unlocks more consumables.',
     function (character) { return character.buildings.some(building => building.name === 'Library') && character.intelligence >= 20; }
@@ -98,7 +98,7 @@ export const buildings = [
   new Building(
     'Mineral extractor',
     { wood: 500, coins: 300, iron: 50 },
-    'feature',
+    'extraction',
     { unlocks: 'extract' },  // Unlocks research for upgrades
     'Place at a certain depth and it will harvest resources.',
     function (character) { return character.buildings.some(building => building.name === 'Library') && character.intelligence >= 20; }
@@ -106,7 +106,7 @@ export const buildings = [
   new Building(
     'Village Guard Tower',
     { wood: 50, iron: 200, coins: 100 },
-    'feature',
+    'protection',
     { reducesHazardImpact: true },  // This flag indicates hazard reduction
     'Reduces the impact of village hazards, protecting your resources and buildings.',
     function (character) { return true; }  // Always available

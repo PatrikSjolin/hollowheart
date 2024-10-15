@@ -150,6 +150,8 @@ const App = () => {
   // Load character state from localStorage when the app first loads
   useEffect(() => {
     const savedCharacter = localStorage.getItem('characterState');
+    document.title = 'Hollowheart';  // Set the title to Hollowheart
+    
     console.log("Loading character:", character);
     if (savedCharacter) {
       const parsedCharacter = JSON.parse(savedCharacter);
@@ -195,6 +197,14 @@ const App = () => {
   useEffect(() => {
     if (character && !firstTimeOverlayVisible) {  // Ensure the loop only starts after the player has clicked Start
       let lastTimestamp = Date.now(); // Keep track of the last loop tick
+      
+
+      if(character.gameVersion !== gameVersion) {
+        character.gameVersion = gameVersion;
+        character.depthConfigs = [];
+        setCharacter(character);  // Set the new character with methods intact
+      }
+
       const gameLoop = setInterval(() => {
 
         const currentTimestamp = Date.now();
@@ -203,8 +213,11 @@ const App = () => {
 
         game.update(elapsedTime);
         game.handleGlobalHazards(elapsedTime);
-
-        setCharacter(character);
+  
+        setCharacter(character);  // Set the new character with methods intact
+        //ugly fix to get the ui to update
+        setLog((prevLog) => [...prevLog ]);
+        
         saveToLocalStorage(character);
       }, 500); // Game loop runs every 500 ms
 
