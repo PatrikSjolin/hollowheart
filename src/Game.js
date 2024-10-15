@@ -45,12 +45,14 @@ export class Game {
     const hazardDamage = this.character.depth * 8; // Increased danger scaling
 
     const resourceConfig = this.generateResourceConfig(depth);
-    const specialEventTrigger = Math.random() < 0.3 && (depth >= this.character.lastSpecialEvent + 4);
+    let specialEventTrigger = Math.random() < 0.3 && (depth >= this.character.lastSpecialEvent + 4);
 
     const boss = this.character.depth === this.character.nextBossDepth;
 
     if(specialEventTrigger && !boss) {
       this.character.lastSpecialEvent = depth;      
+    } else {
+      specialEventTrigger = false;
     }
 
     return {
@@ -415,6 +417,7 @@ export class Game {
     if (this.character.experience >= this.character.calculateXpNeededForLevel(this.character.level)) {
       this.character.levelUp();
     }
+    
   }
 
   manageDeath() {

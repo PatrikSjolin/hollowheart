@@ -129,7 +129,7 @@ export class Character {
   }
 
   modifyResource(resourceName, quantity) {
-    if (!this.resources[resourceName]) {
+    if (!this.resources[resourceName] && quantity > 0) {
       this.resources[resourceName] = 0;  // Initialize the resource if not already present
     }
     this.resources[resourceName] += quantity;  // Add or subtract resources
@@ -202,7 +202,7 @@ export class Character {
     this.logMessage("You have died and lost all resources gathered during the journey. Now you need to rest.");
 
     Object.keys(this.resources).forEach(resourceKey => {
-      this.resources[resourceKey] = 0;
+      this.modifyResource(resourceKey, 0);
     });
 
     this.currentHealth = 0;

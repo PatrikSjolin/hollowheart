@@ -86,6 +86,7 @@ export class Item {
 
   static defaultItems = [
     {
+      id: generateUniqueId(),  // Unique identifier for each item
       name: 'Health restore',
       type: 'consumable',
       stacks: false,
@@ -156,6 +157,7 @@ export class Item {
 
   static dynamicItemTemplates = [
     {
+      id: generateUniqueId(),  // Unique identifier for each item
       name: 'Improved Stat Booster',
       type: 'consumable',
       stacks: false,

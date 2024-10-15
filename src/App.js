@@ -9,12 +9,13 @@ import { HighscoreService } from './HighScoreService'; // Import the service
 import { ShopService } from './ShopService';
 import { Item } from './item';
 import { Game } from './Game';  // Import the new Game class
+import { generateUniqueId } from './Utilities'
 
 import './App.css'; // Use existing styles from your CSS
 
 export const debug = process.env.REACT_APP_DEBUG === 'true';
 
-export const gameVersion = '0.0.8';
+export const gameVersion = '0.0.7';
 
 const App = () => {
 
@@ -116,6 +117,7 @@ const App = () => {
         submitHighScore(character.playerName, character.depth);
         if (character.depth === 5) {
           const newItem = {
+            id: generateUniqueId(),  // Unique identifier for each item
             name: 'Dung-induced boots',
             type: 'equipable',
             slot: 'boots',

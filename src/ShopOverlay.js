@@ -72,7 +72,7 @@ const ShopOverlay = ({ character, setCharacter, setShopOverlayVisible, language,
 
       // If the item is not consumable or special, remove it from the shop stock
       if (item.type !== 'consumable' && item.type !== 'special') {
-        const updatedShopStock = shopItems.filter((shopItem, i) => i !== (index + 1));
+        const updatedShopStock = shopItems.filter((shopItem, i) => shopItem.id !== item.id);
         setShopItems(updatedShopStock);
         localStorage.setItem('shopStock', JSON.stringify(updatedShopStock));  // Save updated stock to localStorage
       }

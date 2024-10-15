@@ -1,4 +1,4 @@
-const url = 'https://fair-cats-retire.loca.lt';
+const url = 'https://ten-streets-add.loca.lt';
 
 export const HighscoreService = {
     sendHighscore: (characterName, score) => {
