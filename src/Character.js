@@ -42,6 +42,7 @@ export class Character {
     this.inventory = initialState.inventory || [];  // Add an inventory to store items
     this.nextBossDepth = initialState.nextBossDepth || 3 + Math.floor(Math.random() * 5);  // Initialize next boss depth
     this.gameVersion = initialState.gameVersion || gameVersion;
+    this.poisonDamageTimer = initialState.poisonDamageTimer || 0;
     this.equipment = initialState.equipment || {
       weapon: null,
       chest: null,
@@ -190,7 +191,9 @@ export class Character {
     } else {
       this.inventory.push(item);  // Non-stackable items just get added
     }
-    this.logMessage(`You acquired ${item.name}.`);
+    if(debug){
+      this.logMessage(`DEBUG: You acquired ${item.name}.`);
+    }
     this.saveToLocalStorage(this);
   }
 

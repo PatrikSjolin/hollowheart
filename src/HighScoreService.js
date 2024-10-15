@@ -1,4 +1,4 @@
-const url = 'https://hungry-cows-hunt.loca.lt';
+const url = 'https://fair-cats-retire.loca.lt';
 
 export const HighscoreService = {
     sendHighscore: (characterName, score) => {

@@ -210,7 +210,7 @@ export class Item {
 
   static generateArmor(depth, level, quality) {
 
-    const armorBonus = Math.floor(Math.random() * 10 * quality * (depth + 1) / depth);
+    const armorBonus = Math.floor(this.randomSortOf() * 10 * quality * (depth + 1) / depth);
     let finalSlot = '';
 
     const slotRoll = Math.floor(Math.random() * 3);
@@ -237,10 +237,14 @@ export class Item {
     };
   }
 
+  static randomSortOf() {
+    return Math.max(0.1, Math.min(0.9, Math.random()));
+  }
+
   static generateWeapon(depth, level, quality) {
 
     const name = this.generateRandomItemName('sword');
-    const dmgBonus = Math.floor(Math.random() * 10 * quality * (depth + 1) / depth);
+    const dmgBonus = Math.floor(this.randomSortOf() * 10 * quality * (depth + 1) / depth);
     return {
       id: generateUniqueId(),  // Unique identifier for each item
       name: name,
@@ -271,7 +275,7 @@ export class Item {
       name: `Rope`,
       type: 'special',
       stacks: true,
-      description: 'Used to climb up one depth.',
+      description: 'Used to climb up one level.',
       cost: { coins: 10 },
     };
   }
@@ -292,15 +296,15 @@ export class Item {
 
   static generateItem(depth, level, quality) {
 
-    const typeOfItem = Math.floor(Math.random() * 3);
+    const typeOfItem = Math.random() * 3;
 
-    if (typeOfItem === 0) {
+    if (typeOfItem < 1.8) {
       return this.generateEquipableItem(depth, level, quality);
     }
-    else if (typeOfItem === 1) {
+    else if (typeOfItem < 2.0) {
       return this.generateSpecial(depth, level, quality);
     }
-    else if (typeOfItem === 2) {
+    else if (typeOfItem < 3) {
       return this.generateConsumable(depth, level, quality);
     }
   }

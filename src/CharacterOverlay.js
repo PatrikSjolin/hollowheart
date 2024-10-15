@@ -53,7 +53,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible,
         </div>
 
         <div className="stat-row">
-          <p><strong>Dexterity:</strong> {character.dexterity}</p>
+          <p><strong>{translations[language].dexterity}:</strong> {character.dexterity}</p>
           <p>Increases item quantity. Attack faster.</p>
           <button
             onClick={() => {
@@ -68,7 +68,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible,
         </div>
 
         <div className="stat-row">
-          <p><strong>Vitality:</strong> {character.vitality}</p>
+          <p><strong>{translations[language].vitality}:</strong> {character.vitality}</p>
           <p>Increases maximum health</p>
           <button
             onClick={() => {
@@ -83,7 +83,7 @@ const CharacterOverlay = ({ character, setCharacter, setCharacterOverlayVisible,
         </div>
 
         <div className="stat-row">
-          <p><strong>Intelligence:</strong> {character.intelligence}</p>
+          <p><strong>{translations[language].intelligence}:</strong> {character.intelligence}</p>
           <p>Increases experience and item quality</p>
           <button
             onClick={() => {

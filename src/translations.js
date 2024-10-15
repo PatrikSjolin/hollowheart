@@ -28,6 +28,9 @@ const translations = {
     language: 'Language',
     close: 'Close',
     research: 'Research',
+    dexterity: 'Dexterity',
+    vitality: 'Vitality',
+    intelligence: 'Intelligence',
     strength: 'Strength',
     rope: 'Rope',
     currentDepth: 'Current depth',
@@ -39,7 +42,8 @@ const translations = {
     buy: 'Buy',
     trade: 'Trade',
     sellItems: 'Sell items',
-    village: 'Village'
+    village: 'Village',
+    youAscend: 'You ascend back to the surface.'
   },
   sv: {
     title: 'Hollowheart',
@@ -71,6 +75,9 @@ const translations = {
     close: 'Stäng',
     research: 'Undersökningar',
     strength: 'Styrka',
+    dexterity: 'Dexterity',
+    vitality: 'Hälsa',
+    intelligence: 'Intelligens',
     rope: 'Rep',
     currentDepth: 'Nuvarande djup',
     convertResources: 'Byt resurser',
@@ -81,7 +88,8 @@ const translations = {
     buy: 'Köp',
     trade: 'Byt',
     sellItems: 'Sälj föremål',
-    village: 'By'
+    village: 'By',
+    youAscend: 'Du klättrade upp till ytan.',
   },
 };
 

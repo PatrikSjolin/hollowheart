@@ -14,7 +14,7 @@ import './App.css'; // Use existing styles from your CSS
 
 export const debug = process.env.REACT_APP_DEBUG === 'true';
 
-export const gameVersion = '0.0.7';
+export const gameVersion = '0.0.8';
 
 const App = () => {
 
@@ -69,12 +69,22 @@ const App = () => {
   }, [log]);  // This will trigger auto-scrolling whenever the log updates
 
   // Logging function
-  const logMessage = (message) => {
+  const logMessage = (message, style) => {
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, '0');
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const seconds = now.getSeconds().toString().padStart(2, '0');
     const timestamp = `[${hours}:${minutes}:${seconds}] `;
+
+    if(style) {
+      if(style === 'warning') {
+        message = `<span class="warning-message">${message}</span>`;
+      } else if(style === 'item') {
+        message = `<span class="item-found">${message}</span>`;
+      } else if(style === 'achievement') {
+        message = `<span class="boss-defeated">${message}</span>`;
+      }
+    }
 
     setLog((prevLog) => [...prevLog, `${timestamp}${message}`]);
   };
@@ -144,7 +154,7 @@ const App = () => {
       setFirstTimeOverlayVisible(false); // Hide intro if character exists
       
       const newCharacter = new Character(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores, parsedCharacter);
-      const newGame = new Game(newCharacter, logMessage, saveToLocalStorage);
+      const newGame = new Game(newCharacter, logMessage, saveToLocalStorage, language);
       newCharacter.currentMonsters = newGame.rehydrateMonsters(newCharacter.currentMonsters);
       setGame(newGame);
       setCharacter(newCharacter); // Load character from storage
@@ -156,7 +166,7 @@ const App = () => {
       logMessage('DEBUG: UseEffect savedCharacter is not set');
       }
       const newCharacter = new Character(saveToLocalStorage, logMessage, showGeneralMessage, setHighScores); // Create new character if none exists
-      setGame(new Game(newCharacter, logMessage, saveToLocalStorage));
+      setGame(new Game(newCharacter, logMessage, saveToLocalStorage, language));
       setCharacter(newCharacter);
     }
   }, []);
@@ -214,7 +224,7 @@ const App = () => {
         logMessage('DEBUG: StartGame character == null');
       }
       setCharacter(newCharacter);
-      let newGame = new Game(newCharacter, logMessage, saveToLocalStorage);
+      let newGame = new Game(newCharacter, logMessage, saveToLocalStorage, language);
       setGame(newGame);
     } else {
       // Update the name if the character already exists
@@ -423,7 +433,7 @@ const App = () => {
       {character && (
         <section className="resources-section">
           {Object.keys(character.resources).map(resourceName => (
-      <p key={resourceName}>{resourceName}: {character.resources[resourceName]}</p>
+      <p key={resourceName}>{translations[language][resourceName]}: {character.resources[resourceName]}</p>
     ))}
         </section>
       )}

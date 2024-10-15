@@ -1,7 +1,5 @@
-import { debug } from './App';
 import React, { useEffect } from 'react';
 import translations from './translations'; // Import translations
-import { ShopService } from './ShopService';
 import { Item } from './item'
 
 const ResearchOverlay = ({ character, setCharacter, setResearchOverlayVisible, researchTimers, language, shopItems, setShopItems }) => {

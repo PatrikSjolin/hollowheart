@@ -8,6 +8,7 @@ export const TIMERS = {
   stoneGenerationInterval: 15000,  // Stone generated every 15 seconds
   timeNeededToCompleteLevel: 6000 * gameSpeed,
   villageHazardMinCooldown: 120000,
+  poisonDamageInterval: 480,
 };
 
 export const MONSTER_CONFIG = {
